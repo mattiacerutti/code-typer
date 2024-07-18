@@ -2,7 +2,7 @@ import React, {useRef, useEffect} from "react";
 import TextLine from "./TextLine";
 import Caret from "./Caret";
 import useTextParser from "../hooks/useTextParser";
-import useKeyboardHandler from "../hooks/useKeyboardHandler";
+import useKeyboardHandler from "../hooks/useKeyboardHandler/useKeyboardHandler";
 
 const TextBox: React.FC = () => {
    const originalText: string =
@@ -22,12 +22,12 @@ const TextBox: React.FC = () => {
       if (caretRef.current) {
          caretRef.current.setCaretIndex(userPosition.lineIndex, userPosition.charIndex);
       }
-   }, [lines, userPosition]);
+   }, [userPosition]);
 
    if (lines.length > 0) {
       return (
          <div className="relative flex justify-center items-center">
-            <div className="text-slate-700 text-3xl flex flex-col gap-1.5">
+            <div className="text-slate-700 text-3xl flex flex-col gap-1.5 select-none">
                {lines.map((line, index) => (
                   <TextLine key={index} text={line.text} lineIndex={index} charRefs={charRefs} />
                ))}
@@ -41,3 +41,4 @@ const TextBox: React.FC = () => {
 };
 
 export default TextBox;
+
