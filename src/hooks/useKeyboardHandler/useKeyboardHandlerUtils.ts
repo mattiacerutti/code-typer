@@ -62,9 +62,10 @@ export const useKeyboardHandlerUtils = (
             newLineIndex++;
          }
 
+         const oldChar = getChar(userPosition);
          const newChar = getChar({lineIndex: newLineIndex, charIndex: newCharIndex});
 
-         if (newChar.value === WhitespaceTypes.Tab || newChar.state === CharacterState.Right) {
+         if (newChar.value === WhitespaceTypes.Tab  || (oldChar.value == WhitespaceTypes.NewLine && newChar.value == WhitespaceTypes.NewLine) || newChar.state === CharacterState.Right) {
             return incrementCursor({charIndex: newCharIndex, lineIndex: newLineIndex});
          }
 
@@ -87,7 +88,9 @@ export const useKeyboardHandlerUtils = (
             newCharIndex = lines[newLineIndex].text.length - 1;
          }
 
-         if (getChar({lineIndex: newLineIndex, charIndex: newCharIndex}).value === WhitespaceTypes.Tab) {
+         const newChar = getChar({lineIndex: newLineIndex, charIndex: newCharIndex});
+
+         if (newChar.value === WhitespaceTypes.Tab || (newChar.value == WhitespaceTypes.NewLine && newCharIndex == 0)) {
             return decrementCursor({charIndex: newCharIndex, lineIndex: newLineIndex});
          }
 
