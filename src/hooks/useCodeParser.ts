@@ -1,9 +1,9 @@
 import { useState, useEffect, useMemo } from "react";
-import { parseText } from "../utils/textParser";
-import { Line } from '../models/Line';
+import { parseText } from "@/utils/textParser";
+import { Line } from '@/models/Line';
 
 
-const useTextParser = (originalText: string) => {
+const useCodeParser = (originalText: string) => {
   const [lines, setLines] = useState<Line[]>([]);
 
   const autoClosingChars: { [key: string]: string } = useMemo(
@@ -25,4 +25,4 @@ const useTextParser = (originalText: string) => {
   return { lines, setLines, autoClosingChars };
 };
 
-export default useTextParser;
+export default useCodeParser;

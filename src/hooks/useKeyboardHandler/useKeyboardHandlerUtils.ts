@@ -1,7 +1,7 @@
 import {useCallback} from "react";
-import {Line} from "../../models/Line";
-import { Character } from "../../models/Characters";
-import {CharacterState, CharacterTypes, WhitespaceTypes} from "../../models/Characters";
+import {Line} from "@/models/Line";
+import {Character} from "@/models/Characters";
+import {CharacterState, CharacterTypes, WhitespaceTypes} from "@/models/Characters";
 
 export const useKeyboardHandlerUtils = (
    lines: Line[],
@@ -65,7 +65,11 @@ export const useKeyboardHandlerUtils = (
          const oldChar = getChar(userPosition);
          const newChar = getChar({lineIndex: newLineIndex, charIndex: newCharIndex});
 
-         if (newChar.value === WhitespaceTypes.Tab  || (oldChar.value == WhitespaceTypes.NewLine && newChar.value == WhitespaceTypes.NewLine) || newChar.state === CharacterState.Right) {
+         if (
+            newChar.value === WhitespaceTypes.Tab ||
+            (oldChar.value == WhitespaceTypes.NewLine && newChar.value == WhitespaceTypes.NewLine) ||
+            newChar.state === CharacterState.Right
+         ) {
             return incrementCursor({charIndex: newCharIndex, lineIndex: newLineIndex});
          }
 
