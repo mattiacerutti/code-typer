@@ -9,7 +9,7 @@ export const parseText = (originalText: string, autoClosingChars: { [key: string
   const linesArray: Line[] = separatedLines.map((text: string, index: number) => {
     const textArray: Character[] = text.split("").map((char: string) => {
       if (Object.keys(autoClosingChars).includes(char)) {
-        if (autoClosingChars[char] !== char) {
+        if (autoClosingChars[char] !== char && mostRecentAutoClosingChar === undefined) {
           return {
             type: CharacterTypes.AutoClosing,
             value: char,

@@ -60,6 +60,18 @@ export const useKeyboardHandlerUtils = (
       [lines, setLines]
    );
 
+   const hasOnlyWhitespacesBefore = useCallback(
+      (charIndex: number, lineIndex: number) => {
+         for (let i = charIndex - 1; i >= 0; i--) {
+            if (getChar({lineIndex, charIndex: i}).type !== CharacterTypes.Whitespace) {
+               return false;
+            }
+         }
+         return true;
+      },
+      [getChar]
+   );
+
    const incrementCursor = useCallback(
       (userPosition: {charIndex: number; lineIndex: number}): {newCharIndex: number; newLineIndex: number} => {
          let newCharIndex = userPosition.charIndex;
@@ -76,7 +88,7 @@ export const useKeyboardHandlerUtils = (
          const newChar = getChar({lineIndex: newLineIndex, charIndex: newCharIndex});
 
          if (
-            newChar.value === WhitespaceTypes.Tab ||
+            (newChar.type === CharacterTypes.Whitespace && hasOnlyWhitespacesBefore(newCharIndex, newLineIndex)) ||
             (oldChar.value == WhitespaceTypes.NewLine && newChar.value == WhitespaceTypes.NewLine) ||
             newChar.state === CharacterState.Right
          ) {
@@ -87,7 +99,7 @@ export const useKeyboardHandlerUtils = (
 
          return {newCharIndex, newLineIndex};
       },
-      [lines, getChar, updateUserPosition]
+      [lines, getChar, hasOnlyWhitespacesBefore, updateUserPosition]
    );
 
    const decrementCursor = useCallback(
@@ -105,9 +117,9 @@ export const useKeyboardHandlerUtils = (
          const newChar = getChar({lineIndex: newLineIndex, charIndex: newCharIndex});
 
          if (
-            newChar.value === WhitespaceTypes.Tab ||
+            (newChar.type === CharacterTypes.Whitespace && hasOnlyWhitespacesBefore(newCharIndex, newLineIndex)) ||
             (newChar.value == WhitespaceTypes.NewLine && newCharIndex == 0) ||
-            (SHOULD_PRESERVE_CLOSING_CHAR_WHEN_DELETING && newChar.state === CharacterState.Right && isClosingCharacter(newChar) )
+            (SHOULD_PRESERVE_CLOSING_CHAR_WHEN_DELETING && newChar.state === CharacterState.Right && isClosingCharacter(newChar))
          ) {
             return decrementCursor({charIndex: newCharIndex, lineIndex: newLineIndex});
          }
@@ -116,7 +128,7 @@ export const useKeyboardHandlerUtils = (
 
          return {newCharIndex, newLineIndex};
       },
-      [lines, getChar, updateUserPosition, isClosingCharacter, SHOULD_PRESERVE_CLOSING_CHAR_WHEN_DELETING]
+      [getChar, hasOnlyWhitespacesBefore, SHOULD_PRESERVE_CLOSING_CHAR_WHEN_DELETING, isClosingCharacter, updateUserPosition, lines]
    );
 
    const isCharacterMatch = (key: string, currentCharValue: string): boolean => {

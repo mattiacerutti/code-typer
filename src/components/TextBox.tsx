@@ -6,13 +6,13 @@ import useKeyboardHandler from "@/hooks/useKeyboardHandler/useKeyboardHandler";
 import useCodeStyler from "@/hooks/useCodeStyler";
 import "highlight.js/styles/github.css";
 
-function TextBox({codeText}: {codeText: string}) {
+function TextBox({codeText: codeSnippet, codeLanguage}: {codeText: string, codeLanguage: string}) {
 
    // Handles code parsing
-   const {lines, setLines, autoClosingChars} = useCodeParser(codeText);
+   const {lines, setLines, autoClosingChars} = useCodeParser(codeSnippet);
 
    // Handles code styling
-   const {codeStyle} = useCodeStyler(codeText, "cpp", lines);
+   const {codeStyle} = useCodeStyler(codeSnippet, codeLanguage, lines);
 
    // Handles keyboard events and cursor position
    const {userPosition} = useKeyboardHandler(lines, setLines, autoClosingChars);

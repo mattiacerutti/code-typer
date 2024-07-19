@@ -1,6 +1,6 @@
 import {useCallback} from "react";
-import { Line } from "@/models/Line";
-import { Character, CharacterState, WhitespaceTypes } from "@/models/Characters";
+import {Line} from "@/models/Line";
+import {Character, CharacterState, WhitespaceTypes} from "@/models/Characters";
 
 export const useKeyboardHandlerEvents = (
    userPosition: {charIndex: number; lineIndex: number},
@@ -98,8 +98,8 @@ export const useKeyboardHandlerEvents = (
                return;
             }
 
-            incrementCursor(userPosition);
             handleCharacterValidation(event.key, userPosition);
+            incrementCursor(userPosition);
          }
       },
       [incrementCursor, decrementCursor, handleCharacterValidation, handleDecrementValidation, handleKeyShortcut, userPosition]
