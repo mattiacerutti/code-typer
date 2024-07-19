@@ -26,8 +26,7 @@ function isValidNode(nodeType: string) {
       nodeType === "function_declaration" ||
       nodeType === "function_definition" ||
       nodeType === "class_declaration" ||
-      nodeType === "class_definition" ||
-      nodeType === "method_declaration"
+      nodeType === "class_definition"
    );
 }
 
