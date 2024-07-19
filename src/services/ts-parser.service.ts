@@ -2,14 +2,14 @@ import Parser from "web-tree-sitter";
 
 
 const languages: {[key: string]: string} = {
-   c: "public/wasm/tree-sitter-c.wasm",
-   cpp: "public/wasm/tree-sitter-cpp.wasm",
-   csharp: "public/wasm/tree-sitter-c-sharp.wasm",
-   java: "public/wasm/tree-sitter-java.wasm",
-   javascript: "public/wasm/tree-sitter-javascript.wasm",
-   python: "public/wasm/tree-sitter-python.wasm",
-   typescript: "public/wasm/tree-sitter-typescript.wasm",
-   lua: "public/wasm/tree-sitter-lua.wasm",
+   c: "wasm/tree-sitter-c.wasm",
+   cpp: "wasm/tree-sitter-cpp.wasm",
+   csharp: "wasm/tree-sitter-c-sharp.wasm",
+   java: "wasm/tree-sitter-java.wasm",
+   javascript: "wasm/tree-sitter-javascript.wasm",
+   python: "wasm/tree-sitter-python.wasm",
+   typescript: "wasm/tree-sitter-typescript.wasm",
+   lua: "wasm/tree-sitter-lua.wasm",
 }
 
 
@@ -17,7 +17,7 @@ const languages: {[key: string]: string} = {
 export const getTSParser = async (language: string) => {
    await Parser.init({
       locateFile(scriptName: string) {
-         return `public/wasm/${scriptName}`;
+         return `wasm/${scriptName}`;
       },
    });
    const parser = new Parser();
