@@ -1,12 +1,26 @@
+import {useEffect, useState} from "react";
 import TextBox from "./components/TextBox";
+import {getRandomCodeSnippet} from "@/utils/getRandomCodeSnippet";
 
 function App() {
-   const originalText: string =
-      "Label *makeLabel(Context *context)\n{\n\tLabel *ret = xmalloc(sizeof(*ret));\n\n\tret->name = xmalloc(12);\n\tsprintf(ret->name, \"'lbl%s'\", makeHexadecimalValue(8));\n\tcontext->currfunc->numlabels++;\n\n\taddLabelToList(ret, &context->currfunc->labels);\n\n\treturn ret;\n}";
+
+   const [snippet, setSnippet] = useState<string | null>(null);
+   const [loading, setLoading] = useState(false);
+
+   const LANGUAGE = "cpp";
+
+   useEffect(() => {
+      setLoading(true);
+      getRandomCodeSnippet(LANGUAGE).then((codeSnippet) => {
+         setSnippet(codeSnippet);
+         setLoading(false);
+      });
+   }, []);
 
    return (
       <div className="w-screen h-screen flex justify-center items-center">
-         <TextBox codeText={originalText}/>
+        {!loading && snippet && <TextBox codeText={snippet} codeLanguage={LANGUAGE}/>}
+        {loading && <div>Loading...</div>}
       </div>
    );
 }
