@@ -16,6 +16,16 @@ export const useKeyboardHandlerUtils = (
       [lines]
    );
 
+   // For future settings support
+   const SHOULD_PRESERVE_CLOSING_CHAR_WHEN_DELETING = true;
+
+   const isClosingCharacter = useCallback(
+      (char: Character): boolean => {
+         return Object.values(autoClosingChars).includes(char.value) && char.type === CharacterTypes.Normal;
+      },
+      [autoClosingChars]
+   );
+
    const getClosingCharacter = useCallback(
       (char: string, userPosition: {charIndex: number; lineIndex: number}) => {
          let cont = 1;
@@ -94,7 +104,11 @@ export const useKeyboardHandlerUtils = (
 
          const newChar = getChar({lineIndex: newLineIndex, charIndex: newCharIndex});
 
-         if (newChar.value === WhitespaceTypes.Tab || (newChar.value == WhitespaceTypes.NewLine && newCharIndex == 0)) {
+         if (
+            newChar.value === WhitespaceTypes.Tab ||
+            (newChar.value == WhitespaceTypes.NewLine && newCharIndex == 0) ||
+            (SHOULD_PRESERVE_CLOSING_CHAR_WHEN_DELETING && newChar.state === CharacterState.Right && isClosingCharacter(newChar) )
+         ) {
             return decrementCursor({charIndex: newCharIndex, lineIndex: newLineIndex});
          }
 
@@ -102,7 +116,7 @@ export const useKeyboardHandlerUtils = (
 
          return {newCharIndex, newLineIndex};
       },
-      [lines, getChar, updateUserPosition]
+      [lines, getChar, updateUserPosition, isClosingCharacter, SHOULD_PRESERVE_CLOSING_CHAR_WHEN_DELETING]
    );
 
    const isCharacterMatch = (key: string, currentCharValue: string): boolean => {

@@ -1,4 +1,4 @@
-import React, {useRef, useEffect} from "react";
+import {useRef, useEffect} from "react";
 import TextLine from "./text-box/TextLine";
 import Caret from "./text-box/Caret";
 import useCodeParser from "@/hooks/useCodeParser";
@@ -6,16 +6,13 @@ import useKeyboardHandler from "@/hooks/useKeyboardHandler/useKeyboardHandler";
 import useCodeStyler from "@/hooks/useCodeStyler";
 import "highlight.js/styles/github.css";
 
-
-const TextBox: React.FC = () => {
-   const originalText: string =
-      "Label *makeLabel(Context *context)\n{\n\tLabel *ret = xmalloc(sizeof(*ret));\n\n\tret->name = xmalloc(12);\n\tsprintf(ret->name, \"'lbl%s'\", makeHexadecimalValue(8));\n\tcontext->currfunc->numlabels++;\n\n\taddLabelToList(ret, &context->currfunc->labels);\n\n\treturn ret;\n}";
+function TextBox({codeText}: {codeText: string}) {
 
    // Handles code parsing
-   const {lines, setLines, autoClosingChars} = useCodeParser(originalText);
+   const {lines, setLines, autoClosingChars} = useCodeParser(codeText);
 
    // Handles code styling
-   const {codeStyle} = useCodeStyler(originalText, "cpp", lines);
+   const {codeStyle} = useCodeStyler(codeText, "cpp", lines);
 
    // Handles keyboard events and cursor position
    const {userPosition} = useKeyboardHandler(lines, setLines, autoClosingChars);
@@ -27,7 +24,6 @@ const TextBox: React.FC = () => {
    const caretRef = useRef<{
       setCaretIndex: (lineIndex: number, charIndex: number) => void;
    }>(null);
-
 
    useEffect(() => {
       // Updates the caret position everytime the user position changes
@@ -50,6 +46,6 @@ const TextBox: React.FC = () => {
    }
 
    return <></>;
-};
+}
 
 export default TextBox;
