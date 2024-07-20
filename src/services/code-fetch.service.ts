@@ -5,11 +5,24 @@ const TOKEN = import.meta.env.VITE_GITHUB_API_TOKEN;
 
 const GITHUB_API_URL = "https://api.github.com";
 
+const language_extensions: { [key: string]: string } = {
+   c: "c",
+   cpp: "cpp",
+   csharp: "cs",
+   java: "java",
+   javascript: "js",
+   python: "py",
+   typescript: "ts",
+   lua: "lua",
+}
+
 export class FetchService {
    static async fetchRandomCodeFiles(language: string): Promise<string[]> {
       const response = await axios.get(`${GITHUB_API_URL}/search/code`, {
          params: {
-            q: `language:${language} size:>10000`,
+            q: `language:${language} size:>3000 extension:${language_extensions[language]}`,
+            page: Math.floor(Math.random() * 10),
+            per_page: 100,
          },
          headers: {
             Authorization: `Bearer ${TOKEN}`,

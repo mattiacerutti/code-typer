@@ -6,8 +6,7 @@ import useKeyboardHandler from "@/hooks/useKeyboardHandler/useKeyboardHandler";
 import useCodeStyler from "@/hooks/useCodeStyler";
 import "highlight.js/styles/github.css";
 
-function TextBox({codeText: codeSnippet, codeLanguage}: {codeText: string, codeLanguage: string}) {
-
+function TextBox({codeSnippet, codeLanguage}: {codeSnippet: string; codeLanguage: string}) {
    // Handles code parsing
    const {lines, setLines, autoClosingChars} = useCodeParser(codeSnippet);
 
