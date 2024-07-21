@@ -1,10 +1,10 @@
 import {useEffect} from "react";
-import {Line} from "@/models/Line";
+import {ILine} from "@/models/Line";
 import {useKeyboardHandlerState} from "./useKeyboardHandlerState";
 import {useKeyboardHandlerUtils} from "./useKeyboardHandlerUtils";
 import {useKeyboardHandlerEvents} from "./useKeyboardHandlerEvents";
 
-const useKeyboardHandler = (lines: Line[], setLines: React.Dispatch<React.SetStateAction<Line[]>>, autoClosingChars: {[key: string]: string}) => {
+const useKeyboardHandler = (lines: ILine[], setLines: React.Dispatch<React.SetStateAction<ILine[]>>, autoClosingChars: {[key: string]: string}) => {
    const {userPosition, updateUserPosition} = useKeyboardHandlerState();
    const {incrementCursor, decrementCursor, handleCharacterValidation, handleDecrementValidation} = useKeyboardHandlerUtils(
       lines,

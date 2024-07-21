@@ -1,6 +1,6 @@
-import { Character } from './Characters';
+import { ICharacter } from './Character';
 
-export interface Line {
+export interface ILine {
    index: number;
-   text: Character[];
+   text: ICharacter[];
  }
