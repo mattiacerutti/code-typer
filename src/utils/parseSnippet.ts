@@ -1,13 +1,13 @@
-import { Character, CharacterState, CharacterTypes, WhitespaceTypes } from '../models/Characters';
-import { Line } from '../models/Line';
+import { ICharacter, CharacterState, CharacterTypes, WhitespaceTypes } from '../models/Character';
+import { ILine } from '../models/Line';
 
-export const parseText = (originalText: string, autoClosingChars: { [key: string]: string }): Line[] => {
+export const parseSnippet = (originalText: string, autoClosingChars: { [key: string]: string }): ILine[] => {
   const separatedLines: string[] = originalText.split("\n");
 
   let mostRecentAutoClosingChar: string | undefined = undefined;
 
-  const linesArray: Line[] = separatedLines.map((text: string, index: number) => {
-    const textArray: Character[] = text.split("").map((char: string) => {
+  const linesArray: ILine[] = separatedLines.map((text: string, index: number) => {
+    const textArray: ICharacter[] = text.split("").map((char: string) => {
       if (Object.keys(autoClosingChars).includes(char)) {
         if (autoClosingChars[char] !== char && mostRecentAutoClosingChar === undefined) {
           return {

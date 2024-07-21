@@ -1,12 +1,11 @@
-import { useState, useEffect, useMemo } from "react";
-import { parseText } from "@/utils/textParser";
-import { Line } from '@/models/Line';
-
+import {useState, useEffect, useMemo} from "react";
+import {parseSnippet} from "@/utils/parseSnippet";
+import {ILine} from "@/models/Line";
 
 const useCodeParser = (originalText: string) => {
-  const [lines, setLines] = useState<Line[]>([]);
+  const [lines, setLines] = useState<ILine[]>([]);
 
-  const autoClosingChars: { [key: string]: string } = useMemo(
+  const autoClosingChars: {[key: string]: string} = useMemo(
     () => ({
       "(": ")",
       "[": "]",
@@ -18,11 +17,11 @@ const useCodeParser = (originalText: string) => {
   );
 
   useEffect(() => {
-    const linesArray = parseText(originalText, autoClosingChars);
+    const linesArray = parseSnippet(originalText, autoClosingChars);
     setLines(linesArray);
   }, [originalText, autoClosingChars]);
 
-  return { lines, setLines, autoClosingChars };
+  return {lines, setLines, autoClosingChars};
 };
 
 export default useCodeParser;

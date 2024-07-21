@@ -18,31 +18,31 @@ export enum CharacterTypes {
    AutoClosing = "autoclosing"
 }
 
-export interface BaseCharacter {
+export interface IBaseCharacter {
 	type: CharacterTypes;
 	value: string | WhitespaceTypes;
    state: CharacterState;
 }
 
-export interface NormalCharacter extends BaseCharacter {
+export interface INormalCharacter extends IBaseCharacter {
 	type: CharacterTypes.Normal;
 	value: string;
 }
 
-export interface AutoClosingCharacter extends BaseCharacter {
+export interface IAutoClosingCharacter extends IBaseCharacter {
 	type: CharacterTypes.AutoClosing;
 	value: string;
 }
 
-export interface WhitespaceCharacter extends BaseCharacter {
+export interface IWhitespaceCharacter extends IBaseCharacter {
 	type: CharacterTypes.Whitespace;
 	value: WhitespaceTypes;
 }
 
-export interface EOFCharacter extends BaseCharacter {
+export interface IEOFCharacter extends IBaseCharacter {
 	type: CharacterTypes.EOF;
 	value: "EOF";
 }
 
 
-export type Character = NormalCharacter | WhitespaceCharacter | EOFCharacter | AutoClosingCharacter;
+export type ICharacter = INormalCharacter | IWhitespaceCharacter | IEOFCharacter | IAutoClosingCharacter;

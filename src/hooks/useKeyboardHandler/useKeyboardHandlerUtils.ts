@@ -1,11 +1,10 @@
 import {useCallback} from "react";
-import {Line} from "@/models/Line";
-import {Character} from "@/models/Characters";
-import {CharacterState, CharacterTypes, WhitespaceTypes} from "@/models/Characters";
+import {ILine} from "@/models/Line";
+import {ICharacter, CharacterState, CharacterTypes, WhitespaceTypes} from "@/models/Character";
 
 export const useKeyboardHandlerUtils = (
-   lines: Line[],
-   setLines: React.Dispatch<React.SetStateAction<Line[]>>,
+   lines: ILine[],
+   setLines: React.Dispatch<React.SetStateAction<ILine[]>>,
    autoClosingChars: {[key: string]: string},
    updateUserPosition: (position: {lineIndex?: number; charIndex?: number}) => void
 ) => {
@@ -20,7 +19,7 @@ export const useKeyboardHandlerUtils = (
    const SHOULD_PRESERVE_CLOSING_CHAR_WHEN_DELETING = true;
 
    const isClosingCharacter = useCallback(
-      (char: Character): boolean => {
+      (char: ICharacter): boolean => {
          return Object.values(autoClosingChars).includes(char.value) && char.type === CharacterTypes.Normal;
       },
       [autoClosingChars]
@@ -155,7 +154,7 @@ export const useKeyboardHandlerUtils = (
 
    const setCharacterState = useCallback(
       (isMatch: boolean, userPosition: {charIndex: number; lineIndex: number}): void => {
-         const selectedChar: Character = getChar(userPosition);
+         const selectedChar: ICharacter = getChar(userPosition);
          if (isMatch) {
             selectedChar.state = CharacterState.Right;
          } else {

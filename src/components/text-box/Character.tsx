@@ -1,5 +1,4 @@
-import {type Character, CharacterState, WhitespaceTypes} from "@/models/Characters";
-import "@/styles/Character.css";
+import {type ICharacter, CharacterState, WhitespaceTypes} from "@/models/Character";
 
 function Character({
    char,
@@ -7,7 +6,7 @@ function Character({
    charStyle,
    charRefs,
 }: {
-   char: Character;
+   char: ICharacter;
    charId: string;
    charStyle: string;
    charRefs: React.MutableRefObject<{[key: string]: HTMLSpanElement | null}>;
