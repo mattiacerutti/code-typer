@@ -1,3 +1,5 @@
+import { ICodeLanguage, LanguageName } from "@/types/CodeLanguage";
+import * as constants from "@/utils/constants";
 import IParser from "web-tree-sitter";
 
 type IIndentationStyle = {type: "none" | "mixed" | "tab"; value: null} | {type: "space"; value: number[]};
@@ -80,11 +82,33 @@ export function adjustFinalLineWhitespaces(lines: string[]): string[] {
     return lines;
   }
 
+  const secondLastLineWhitespaces = countInitialWhitespaces(lines[lines.length - 2]);
+
   const newLines: string[] = [lines[0]];
 
-  const hasUniqueFinalLineIndentation = finalLineWhitespaces !== countInitialWhitespaces(lines[lines.length - 2]);
+  const hasUniqueFinalLineIndentation = finalLineWhitespaces !== secondLastLineWhitespaces;
 
-  newLines.push(...removeInitialWhitespaces(lines.slice(1), hasUniqueFinalLineIndentation ? finalLineWhitespaces : finalLineWhitespaces - 1));
+  newLines.push(...removeInitialWhitespaces(lines.slice(1), hasUniqueFinalLineIndentation ? Math.min(finalLineWhitespaces, secondLastLineWhitespaces) : finalLineWhitespaces - 1));
 
   return newLines;
+}
+
+export function getUniqueRandomIndexes(length: number, quantity: number): number[] {
+  const indexes: number[] = Array.from({length: length}, (_, i) => i);
+
+  if (quantity > length) return indexes;
+
+  return Array.from({length: quantity}, () => {
+    const randomIndex = Math.floor(Math.random() * indexes.length);
+    const index = indexes[randomIndex];
+    indexes.splice(randomIndex, 1);
+    return index;
+  });
+}
+
+export function getSupportedLanguage(language: LanguageName): ICodeLanguage {
+  if(!constants.SUPPORTED_LANGUAGES[language]) {
+    throw `Language ${language} not supported.`;
+  }
+  return constants.SUPPORTED_LANGUAGES[language];
 }

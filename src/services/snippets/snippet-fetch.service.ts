@@ -1,26 +1,19 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import axios from "axios";
+import { LanguageName } from "@/types/CodeLanguage";
+import { getSupportedLanguage } from "@/utils/snippets/snippet-utils";
 
 const TOKEN = import.meta.env.VITE_GITHUB_API_TOKEN;
 
 const GITHUB_API_URL = "https://api.github.com";
 
-const language_extensions: {[key: string]: string} = {
-  c: "c",
-  cpp: "cpp",
-  csharp: "cs",
-  java: "java",
-  javascript: "js",
-  python: "py",
-  typescript: "ts",
-  lua: "lua",
-};
+export async function fetchRandomCodeFiles(language: LanguageName): Promise<string[]> {
 
+  const extensionsFilter = getSupportedLanguage(language).extensions.map((extension) => `extension:${extension}`).join(" ");
 
-export async function fetchRandomCodeFiles(language: string): Promise<string[]> {
   const response = await axios.get(`${GITHUB_API_URL}/search/code`, {
     params: {
-      q: `language:${language} size:>3000 extension:${language_extensions[language]}`,
+      q: `language:${language} size:>3000 ${extensionsFilter}`,
       page: Math.floor(Math.random() * 10),
       per_page: 100,
     },

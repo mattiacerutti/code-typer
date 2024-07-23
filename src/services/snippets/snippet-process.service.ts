@@ -9,6 +9,7 @@ import {
   removeInvalidWhitespaces,
   adjustFinalLineWhitespaces,
 } from "@/utils/snippets/snippet-utils";
+import {LanguageName} from "@/types/CodeLanguage";
 
 function findValidNodes(node: IParser.SyntaxNode): IParser.SyntaxNode[] {
   let nodes: IParser.SyntaxNode[] = [];
@@ -24,11 +25,11 @@ function findValidNodes(node: IParser.SyntaxNode): IParser.SyntaxNode[] {
   return nodes;
 }
 
-export async function extractSnippets(fileContent: string, language: string): Promise<string[]> {
+export async function extractSnippets(fileContent: string, language: LanguageName): Promise<string[]> {
   const parser = await getTSParser(language);
 
   let parsedCode: IParser.Tree;
-
+  
   try {
     parsedCode = parser.parse(fileContent);
   } catch (error) {

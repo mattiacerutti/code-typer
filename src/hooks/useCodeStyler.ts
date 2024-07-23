@@ -1,8 +1,10 @@
 import {useState, useEffect, useCallback, useRef} from "react";
 import {ILine} from "@/types/Line";
 import hljs from "highlight.js";
+import {LanguageName} from "@/types/CodeLanguage";
+import {getSupportedLanguage} from "@/utils/snippets/snippet-utils";
 
-const useCodeStyler = (code: string, language: string, lines: ILine[]) => {
+const useCodeStyler = (code: string, language: LanguageName, lines: ILine[]) => {
   const [codeStyle, setCodeStyle] = useState<string[][]>([]);
 
   const isStylingComplete = useRef(false);
@@ -15,7 +17,6 @@ const useCodeStyler = (code: string, language: string, lines: ILine[]) => {
   };
 
   const extractClassesFromElement = useCallback((node: Node, styilingArray: string[] = [], prevClass: string = "") => {
-
     // If the node it's just text, just push the parent class for every character
     if (node.nodeType === Node.TEXT_NODE) {
       node.textContent!.split("").forEach(() => {
@@ -58,8 +59,10 @@ const useCodeStyler = (code: string, language: string, lines: ILine[]) => {
   );
 
   const getCodeStyling = useCallback(
-    (code: string, language: string) => {
-      const validLanguage = hljs.getLanguage(language) ? language : "plaintext";
+    (code: string, language: LanguageName) => {
+
+      const hljsLanguage = hljs.getLanguage(getSupportedLanguage(language).highlightAlias);
+      const validLanguage = hljsLanguage && hljsLanguage.name ? hljsLanguage.name : "plaintext";
 
       // Create a temporary list of Span that contain all the code
       const wrappedCode = wrapCharactersInSpans(code);
@@ -71,7 +74,6 @@ const useCodeStyler = (code: string, language: string, lines: ILine[]) => {
       // Highligh the parent element
       hljs.configure({languages: [validLanguage], ignoreUnescapedHTML: true});
       hljs.highlightElement(tempElement);
-
 
       // Extract the code styling
       const codeStyiling = extractCodeStyling(tempElement);
