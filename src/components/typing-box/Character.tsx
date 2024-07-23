@@ -1,4 +1,4 @@
-import {type ICharacter, CharacterState, WhitespaceTypes} from "@/models/Character";
+import {type ICharacter, CharacterState, WhitespaceTypes} from "@/types/Character";
 
 function Character({
    char,

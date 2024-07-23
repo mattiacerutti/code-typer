@@ -1,5 +1,5 @@
 import {useEffect} from "react";
-import {ILine} from "@/models/Line";
+import {ILine} from "@/types/Line";
 import {useKeyboardHandlerState} from "./useKeyboardHandlerState";
 import {useKeyboardHandlerUtils} from "./useKeyboardHandlerUtils";
 import {useKeyboardHandlerEvents} from "./useKeyboardHandlerEvents";
