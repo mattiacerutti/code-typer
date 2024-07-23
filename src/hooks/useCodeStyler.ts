@@ -1,5 +1,5 @@
 import {useState, useEffect, useCallback, useRef} from "react";
-import {ILine} from "@/models/Line";
+import {ILine} from "@/types/Line";
 import hljs from "highlight.js";
 
 const useCodeStyler = (code: string, language: string, lines: ILine[]) => {

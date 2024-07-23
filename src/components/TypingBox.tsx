@@ -1,12 +1,12 @@
 import {useRef, useEffect} from "react";
-import TextLine from "./text-box/TextLine";
-import Caret from "./text-box/Caret";
+import TextLine from "./typing-box/TextLine";
+import Caret from "./typing-box/Caret";
 import useCodeParser from "@/hooks/useCodeParser";
 import useKeyboardHandler from "@/hooks/useKeyboardHandler/useKeyboardHandler";
 import useCodeStyler from "@/hooks/useCodeStyler";
 import "highlight.js/styles/github.css";
 
-function TextBox({codeSnippet, codeLanguage}: {codeSnippet: string; codeLanguage: string}) {
+function TypingBox({codeSnippet, codeLanguage}: {codeSnippet: string; codeLanguage: string}) {
    // Handles code parsing
    const {lines, setLines, autoClosingChars} = useCodeParser(codeSnippet);
 
@@ -47,4 +47,4 @@ function TextBox({codeSnippet, codeLanguage}: {codeSnippet: string; codeLanguage
    return <></>;
 }
 
-export default TextBox;
+export default TypingBox;

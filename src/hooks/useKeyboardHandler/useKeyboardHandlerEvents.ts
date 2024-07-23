@@ -1,6 +1,6 @@
 import {useCallback} from "react";
-import {ILine} from "@/models/Line";
-import {ICharacter, CharacterState, CharacterTypes, WhitespaceTypes} from "@/models/Character";
+import {ILine} from "@/types/Line";
+import {ICharacter, CharacterState, CharacterTypes, WhitespaceTypes} from "@/types/Character";
 
 export const useKeyboardHandlerEvents = (
   userPosition: {charIndex: number; lineIndex: number},

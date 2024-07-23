@@ -1,6 +1,6 @@
 import {useCallback, useEffect, useRef, useState} from "react";
-import TextBox from "./components/TextBox";
-import {getRandomCodeSnippet} from "@/utils/getRandomCodeSnippet";
+import TypingBox from "./components/TypingBox";
+import {getRandomCodeSnippet} from "@/services/snippets/snippet.service";
 
 function App() {
   const [snippet, setSnippet] = useState<string | null>(null);
@@ -27,7 +27,7 @@ function App() {
 
   return (
     <div className="w-screen h-screen flex justify-center items-center flex-col">
-      {snippet && <TextBox codeSnippet={snippet} codeLanguage={LANGUAGE} key={snippet} />}
+      {snippet && <TypingBox codeSnippet={snippet} codeLanguage={LANGUAGE} key={snippet} />}
       <button onClick={() => goToNextSnippet()}>Next Snippet</button>
       {!snippet && <div>Loading...</div>}
     </div>

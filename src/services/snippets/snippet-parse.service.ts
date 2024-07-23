@@ -1,7 +1,7 @@
-import { ICharacter, CharacterState, CharacterTypes, WhitespaceTypes } from '../models/Character';
-import { ILine } from '../models/Line';
+import {ICharacter, CharacterState, CharacterTypes, WhitespaceTypes} from "@/types/Character";
+import {ILine} from "@/types/Line";
 
-export const parseSnippet = (originalText: string, autoClosingChars: { [key: string]: string }): ILine[] => {
+export const parseSnippet = (originalText: string, autoClosingChars: {[key: string]: string}): ILine[] => {
   const separatedLines: string[] = originalText.split("\n");
 
   let mostRecentAutoClosingChar: string | undefined = undefined;

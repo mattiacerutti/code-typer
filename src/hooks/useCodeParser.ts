@@ -1,6 +1,6 @@
 import {useState, useEffect, useMemo} from "react";
-import {parseSnippet} from "@/utils/parseSnippet";
-import {ILine} from "@/models/Line";
+import {parseSnippet} from "@/services/snippets/snippet-parse.service";
+import {ILine} from "@/types/Line";
 
 const useCodeParser = (originalText: string) => {
   const [lines, setLines] = useState<ILine[]>([]);

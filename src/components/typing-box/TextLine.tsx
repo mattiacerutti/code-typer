@@ -1,5 +1,5 @@
 import Character from "./Character";
-import type { ICharacter} from "@/models/Character";
+import type { ICharacter} from "@/types/Character";
 
 function TextLine({
   lineText,
