@@ -19,8 +19,6 @@ export function filterSnippetSpecialCharacters(snippet: string): boolean {
   const regex = /^[\x00-\x7F]+$/;
   const test = regex.test(snippet);
 
-  console.log(`Regex returned ${test} with snippet: ${JSON.stringify(snippet)}`);
-
   return test;
 }
 
