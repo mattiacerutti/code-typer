@@ -12,7 +12,16 @@ import {LanguageName} from "@/types/CodeLanguage";
 import {CharacterState, CharacterTypes, WhitespaceTypes} from "@/types/Character";
 import {isGameFinished} from "@/utils/game-utils";
 
-function TypingBox({codeSnippet, codeLanguage, onGameFinished}: {codeSnippet: string; codeLanguage: LanguageName; onGameFinished: () => void}) {
+interface ITypingBoxProps {
+  codeSnippet: string;
+  codeLanguage: LanguageName;
+  onGameFinished: () => void;
+}
+
+function TypingBox(props: ITypingBoxProps) {
+
+  const {codeSnippet, codeLanguage, onGameFinished} = props;
+
   // Handles code parsing
   const {lines, setLines, autoClosingChars} = useCodeParser(codeSnippet);
 

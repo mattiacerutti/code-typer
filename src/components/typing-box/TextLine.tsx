@@ -1,17 +1,19 @@
 import Character from "./Character";
 import type { ICharacter} from "@/types/Character";
 
-function TextLine({
-  lineText,
-  lineIndex,
-  charRefs,
-  lineStyle,
-}: {
+
+interface ITextLineProps {
   lineText: ICharacter[];
   lineIndex: number;
   charRefs: React.MutableRefObject<{[key: string]: HTMLSpanElement | null}>;
   lineStyle: string[];
-}) {
+}
+
+
+function TextLine(props: ITextLineProps) {
+
+  const {lineText, lineIndex, charRefs, lineStyle} = props;
+  
   return (
     <div className="flex flex-row whitespace-pre">
       {lineText.map((char: ICharacter, index: number) => {

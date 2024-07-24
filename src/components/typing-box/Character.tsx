@@ -1,16 +1,16 @@
 import {type ICharacter, CharacterState, WhitespaceTypes} from "@/types/Character";
 
-function Character({
-   char,
-   charId,
-   charStyle,
-   charRefs,
-}: {
-   char: ICharacter;
-   charId: string;
-   charStyle: string;
-   charRefs: React.MutableRefObject<{[key: string]: HTMLSpanElement | null}>;
-}) {
+interface ICharacterProps {
+  char: ICharacter;
+  charId: string;
+  charStyle: string;
+  charRefs: React.MutableRefObject<{[key: string]: HTMLSpanElement | null}>;
+}
+
+function Character(props: ICharacterProps) {
+
+   const {char, charId, charStyle, charRefs} = props;
+
    let elementClasses = "character-default";
    let elementText = char.value;
 
