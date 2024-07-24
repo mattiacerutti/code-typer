@@ -9,7 +9,6 @@ async function getSnippetsFomLink(link: string, language: LanguageName): Promise
   const fileContent = await getFileContent(fileDetails);
 
   let codeSnippets = await extractSnippets(fileContent, language);
-
   codeSnippets = filterSnippets(codeSnippets);
 
   return codeSnippets;
@@ -38,13 +37,13 @@ async function getSnippetsBatch(fileLinks: string[], language: LanguageName): Pr
 
 export const getRandomCodeSnippet = async (language: LanguageName): Promise<string[]> => {
   const fetchedFiles = await fetchRandomCodeFiles(language).catch((error) => {
-    console.error("Error fetching random code files:", error);
+    console.error("Error fetching random files:", error);
     return [];
   });
 
   let codeSnippets: string[] = await getSnippetsBatch(fetchedFiles, language);
 
-  if (codeSnippets.length === 0) throw "Couldn't find any functions in the fetched files";
+  if (codeSnippets.length === 0) throw "Couldn't find any functions in any of the fetched files";
 
   codeSnippets = codeSnippets
     .map((snippet) => {

@@ -42,11 +42,15 @@ export function detectIndentationStyle(snippet: string): IIndentationStyle {
 }
 
 export function countInitialWhitespaces(text: string): number {
-  const match = text.match(/^\s+/);
-  if (match) {
-    return match[0].length;
+  let count = 0;
+  for (let i = 0; i < text.length; i++) {
+    if (text[i] === ' ' || text[i] === '\t') {
+      count++;
+    } else {
+      break;
+    }
   }
-  return 0;
+  return count;
 }
 
 function removeInitialWhitespaces(lines: string[], quantity: number = 1): string[] {
