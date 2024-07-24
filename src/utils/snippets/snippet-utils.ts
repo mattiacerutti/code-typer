@@ -1,4 +1,4 @@
-import { ICodeLanguage, LanguageName } from "@/types/CodeLanguage";
+import {ICodeLanguage, LanguageName} from "@/types/CodeLanguage";
 import * as constants from "@/utils/constants";
 import IParser from "web-tree-sitter";
 
@@ -44,7 +44,7 @@ export function detectIndentationStyle(snippet: string): IIndentationStyle {
 export function countInitialWhitespaces(text: string): number {
   let count = 0;
   for (let i = 0; i < text.length; i++) {
-    if (text[i] === ' ' || text[i] === '\t') {
+    if (text[i] === " " || text[i] === "\t") {
       count++;
     } else {
       break;
@@ -111,8 +111,9 @@ export function getUniqueRandomIndexes(length: number, quantity: number): number
 }
 
 export function getSupportedLanguage(language: LanguageName): ICodeLanguage {
-  if(!constants.SUPPORTED_LANGUAGES[language]) {
+  if (!constants.SUPPORTED_LANGUAGES[language]) {
     throw `Language ${language} not supported.`;
   }
   return constants.SUPPORTED_LANGUAGES[language];
 }
+

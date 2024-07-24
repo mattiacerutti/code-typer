@@ -1,12 +1,12 @@
 export enum LanguageName {
-  JavaScript = "javascript",
-  TypeScript = "typescript",
-  C = "c",
-  Cpp = "cpp",
-  CSharp = "csharp",
-  Java = "java",
-  Python = "python",
-  Lua = "lua",
+  JavaScript = "JavaScript",
+  TypeScript = "TypeScript",
+  C = "C",
+  Cpp = "C++",
+  CSharp = "C#",
+  Java = "Java",
+  Python = "Python",
+  Lua = "Lua",
 }
 
 export interface ICodeLanguage {
