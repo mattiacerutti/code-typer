@@ -29,7 +29,7 @@ export const VALID_NODES = [
 ];
 
 export const MIN_CACHED_SNIPPETS = 10;
-export const SNIPPETS_SIMULTANEOUS_REQUESTS = 5;
+export const SNIPPETS_SIMULTANEOUS_REQUESTS = 10;
 
 export const SUPPORTED_LANGUAGES: Record<LanguageName, ICodeLanguage> = {
   [LanguageName.JavaScript]: {
