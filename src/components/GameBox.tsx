@@ -10,6 +10,8 @@ function GameBox() {
   const [isGameOver, setIsGameOver] = useState<boolean>(false);
   const [isRefreshButtonDisabled, setIsRefreshButtonDisabled] = useState<boolean>(false);
 
+  const [isCapsLockOn, setIsCapsLockOn] = useState<boolean>(false);
+
   const codeSnippets = useRef<string[]>([]);
 
   const handleGameOver = useCallback(() => {
@@ -40,10 +42,9 @@ function GameBox() {
         setIsRefreshButtonDisabled(false);
       }, 1000 * 1);
     }
-    
+
     codeSnippets.current.shift();
     setActiveSnippet(codeSnippets.current[0]);
-
   }, [selectedLanguage]);
 
   if (isGameOver) return <div>Game Over</div>;
@@ -51,32 +52,35 @@ function GameBox() {
   return (
     <>
       {activeSnippet && (
-        <div className="flex flex-col gap-10 justify-center items-center">
-          <TypingBox codeSnippet={activeSnippet} codeLanguage={selectedLanguage} onGameFinished={handleGameOver} key={activeSnippet} />
-          <div className="flex flex-row gap-1.5 content-between">
-            <button
-              className="px-6 py-3 bg-slate-200 text-slate-900 font-medium rounded-md hover:bg-slate-300 disabled:opacity-20"
-              onClick={() => refreshSnippet()}
-              disabled={isRefreshButtonDisabled}
-            >
-              {!isRefreshButtonDisabled ? "Refresh Snippet" : "Wait.."}
-            </button>
-            <select
-              disabled={isRefreshButtonDisabled}
-              value={selectedLanguage}
-              onChange={(e) => {
-                setSelectedLanguage(e.target.value as LanguageName);
-              }}
-              className="px-6 py-3 bg-slate-200 text-slate-900 font-medium rounded-md hover:bg-slate-300 disabled:opacity-20"
-            >
-              {Object.values(LanguageName).map((language) => (
-                <option key={language} value={language}>
-                  {language}
-                </option>
-              ))}
-            </select>
+        <>
+          <div className={`text-red-500 relative bottom-8 ${!isCapsLockOn && "opacity-0"} font-bold text-2xl`}>Caps Lock is on</div>
+          <div className="flex flex-col gap-10 justify-center items-center">
+            <TypingBox codeSnippet={activeSnippet} codeLanguage={selectedLanguage} onGameFinished={handleGameOver} setIsCapsLockOn={setIsCapsLockOn} key={activeSnippet} />
+            <div className="flex flex-row gap-1.5 content-between">
+              <button
+                className="px-6 py-3 bg-slate-200 text-slate-900 font-medium rounded-md hover:bg-slate-300 disabled:opacity-20"
+                onClick={() => refreshSnippet()}
+                disabled={isRefreshButtonDisabled}
+              >
+                {!isRefreshButtonDisabled ? "Refresh Snippet" : "Wait.."}
+              </button>
+              <select
+                disabled={isRefreshButtonDisabled}
+                value={selectedLanguage}
+                onChange={(e) => {
+                  setSelectedLanguage(e.target.value as LanguageName);
+                }}
+                className="px-6 py-3 bg-slate-200 text-slate-900 font-medium rounded-md hover:bg-slate-300 disabled:opacity-20"
+              >
+                {Object.values(LanguageName).map((language) => (
+                  <option key={language} value={language}>
+                    {language}
+                  </option>
+                ))}
+              </select>
+            </div>
           </div>
-        </div>
+        </>
       )}
       {!activeSnippet && <div>Loading...</div>}
     </>

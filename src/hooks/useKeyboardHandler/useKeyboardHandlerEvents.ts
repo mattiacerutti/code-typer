@@ -10,7 +10,7 @@ export const useKeyboardHandlerEvents = (
   handleDecrementValidation: (position: {charIndex: number; lineIndex: number}) => void,
   lines: ILine[],
   setLines: React.Dispatch<React.SetStateAction<ILine[]>>,
-  updateUserPosition: (position: {lineIndex?: number; charIndex?: number}) => void
+  updateUserPosition: (position: {lineIndex?: number; charIndex?: number}) => void,
 ) => {
   const hasModifierKey = (event: KeyboardEvent) => {
     return event.altKey || event.ctrlKey || event.metaKey || event.key === "Fn" || event.key === "Function";
@@ -172,8 +172,7 @@ export const useKeyboardHandlerEvents = (
         incrementCursor(userPosition);
       }
     },
-    [incrementCursor, decrementCursor, handleCharacterValidation, handleDecrementValidation, handleKeyShortcut, userPosition]
-  );
+    [handleKeyShortcut, handleCharacterValidation, userPosition, incrementCursor, decrementCursor, handleDecrementValidation]);
 
   return {handleKeyPress};
 };
