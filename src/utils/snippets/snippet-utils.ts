@@ -11,17 +11,21 @@ export function detectIndentationStyle(snippet: string): IIndentationStyle {
   const spaceCounts: {[key: number]: number} = {};
 
   for (const line of lines) {
-    const match = line.match(/^( +|\t+)/);
+    const leadingWhitespaces = line.match(/^\s*/);
 
-    if (match) {
-      const indent = match[0];
-      if (indent[0] === "\t") {
-        tabCount++;
-      } else {
-        const spaceCount = indent.length;
-        spaceCounts[spaceCount] = (spaceCounts[spaceCount] || 0) + 1;
+    if(!leadingWhitespaces || leadingWhitespaces[0].length === 0) continue;
+
+    if (leadingWhitespaces[0].includes("\t")) {
+      if(leadingWhitespaces[0].includes(" ")) {
+        return {type: "mixed", value: null};
       }
+
+      tabCount++;
+      continue;
     }
+
+    const spaceCount = leadingWhitespaces[0].length;
+    spaceCounts[spaceCount] = (spaceCounts[spaceCount] || 0) + 1;
   }
 
   const spaceKeys = Object.keys(spaceCounts).map(Number);
@@ -65,8 +69,8 @@ function removeInitialWhitespaces(lines: string[], quantity: number = 1): string
   return newLines;
 }
 
-export function usesScopeTerminators(language: string): boolean {
-  return language != "python";
+export function usesScopeTerminators(language: LanguageName): boolean {
+  return language != LanguageName.Python;
 }
 
 export function getNodeText(node: IParser.SyntaxNode): string {

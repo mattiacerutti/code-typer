@@ -23,9 +23,9 @@ export const VALID_NODES = [
   "interface_item",
   "module",
   "switch_statement",
-  // "if_statement",
-  // "while_statement",
-  // "for_statement"
+  "while_statement",
+  "for_statement",
+  // "if_statement",  // TODO: Currently works on every supported language aside from Python (else indentation problem, a simple if else will reproduce)
 ];
 
 export const MIN_CACHED_SNIPPETS = 10;
