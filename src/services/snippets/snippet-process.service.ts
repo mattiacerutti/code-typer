@@ -11,15 +11,15 @@ import {
 } from "@/utils/snippets/snippet-utils";
 import {LanguageName} from "@/types/CodeLanguage";
 
-function findValidNodes(node: IParser.SyntaxNode): IParser.SyntaxNode[] {
+function findValidNodes(node: IParser.SyntaxNode, language: LanguageName): IParser.SyntaxNode[] {
   let nodes: IParser.SyntaxNode[] = [];
-  if (isValidNode(node.type)) {
+  if (isValidNode(node, language)) {
     nodes.push(node);
   }
 
   node.children.forEach((child) => {
     if (child === null) return;
-    nodes = nodes.concat(findValidNodes(child));
+    nodes = nodes.concat(findValidNodes(child, language));
   });
 
   return nodes;
@@ -37,7 +37,7 @@ export async function extractSnippets(fileContent: string, language: LanguageNam
     return [];
   }
 
-  const validNodes = findValidNodes(parsedCode.rootNode);
+  const validNodes = findValidNodes(parsedCode.rootNode, language);
   const validSnippets: string[] = validNodes.map((node) => getNodeText(node));
 
   return validSnippets;
@@ -51,7 +51,7 @@ export function filterSnippets(snippets: string[]): string[] {
     .filter((snippet) => filterSnippetSpecialCharacters(snippet));
 }
 
-export function formatCode(code: string, language: string): string | null {
+export function formatCode(code: string, language: LanguageName): string | null {
   code = removeInvalidWhitespaces(code);
 
   const indentationStyle = detectIndentationStyle(code);
