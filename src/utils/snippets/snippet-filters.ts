@@ -1,7 +1,5 @@
 import * as constants from "@/utils/constants";
 import IParser from "web-tree-sitter";
-import { usesScopeTerminators } from "./snippet-utils";
-import { LanguageName } from "@/types/CodeLanguage";
 
 export function filterLinesNumber(snippet: string): boolean {
   const numLines = snippet.split("\n").length;
@@ -25,17 +23,7 @@ export function filterSnippetSpecialCharacters(snippet: string): boolean {
   return test;
 }
 
-export function isValidNode(node: IParser.SyntaxNode, language: LanguageName) {
-
-  const nodesWithOptionalClosing = ["while_statement", "for_statement"];
-
-  // We need to check that there actually is a scope closer
-  if(nodesWithOptionalClosing.includes(node.type)) {
-    if(usesScopeTerminators(language)) {
-      return node.lastChild?.lastChild?.type === "}" || node.lastChild?.type === "end";
-    }
-    return true;
-  }
+export function isValidNode(node: IParser.SyntaxNode) {
 
   return constants.VALID_NODES.includes(node.type);
 }

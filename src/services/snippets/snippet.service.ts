@@ -8,7 +8,22 @@ async function getSnippetsFomLink(link: string, language: LanguageName): Promise
   const fileDetails = await fetchFileDetails(link);
   const fileContent = await getFileContent(fileDetails);
 
-  let codeSnippets = await extractSnippets(fileContent, language);
+  const extractedSnippets = await extractSnippets(fileContent, language);
+
+  let codeSnippets = extractedSnippets
+    .map((snippet) => {
+      const formattedSnippet = formatCode(snippet);
+
+      console.log("Raw snippet:", JSON.stringify(snippet));
+
+      if (!formattedSnippet) return null;
+
+      console.log("Formatted snippet:", JSON.stringify(formattedSnippet));
+
+      return formattedSnippet;
+    })
+    .filter((snippet) => snippet !== null);
+
   codeSnippets = filterSnippets(codeSnippets);
 
   return codeSnippets;
@@ -41,23 +56,10 @@ export const getRandomCodeSnippet = async (language: LanguageName): Promise<stri
     return [];
   });
 
-  let codeSnippets: string[] = await getSnippetsBatch(fetchedFiles, language);
+  const codeSnippets: string[] = await getSnippetsBatch(fetchedFiles, language);
 
   if (codeSnippets.length === 0) throw "Couldn't find any functions in any of the fetched files";
 
-  codeSnippets = codeSnippets
-    .map((snippet) => {
-      console.log("Raw snippet:", JSON.stringify(snippet));
-      const formattedSnippet = formatCode(snippet, language);
-
-      if (!formattedSnippet) return null;
-
-      console.log("Formatted snippet:", JSON.stringify(formattedSnippet));
-
-      return formattedSnippet;
-    })
-    .filter((snippet) => snippet !== null);
-
-  // Shuffle snippets before returning  
+  // Shuffle snippets before returning
   return codeSnippets.sort(() => 0.5 - Math.random());
 };

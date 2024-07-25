@@ -25,7 +25,7 @@ export const VALID_NODES = [
   "switch_statement",
   "while_statement",
   "for_statement",
-  // "if_statement",  // TODO: Currently works on every supported language aside from Python (else indentation problem, a simple if else will reproduce)
+  "if_statement"
 ];
 
 export const MIN_CACHED_SNIPPETS = 10;
@@ -35,56 +35,48 @@ export const SUPPORTED_LANGUAGES: Record<LanguageName, ICodeLanguage> = {
   [LanguageName.JavaScript]: {
     name: LanguageName.JavaScript,
     extensions: ["js", "jsx"],
-    hasScopeTerminators: true,
     treeSitterFile: "tree-sitter-javascript.wasm",
     highlightAlias: "javascript"
   },
   [LanguageName.TypeScript]: {
     name: LanguageName.TypeScript,
     extensions: ["ts", "tsx"],
-    hasScopeTerminators: true,
     treeSitterFile: "tree-sitter-typescript.wasm",
     highlightAlias: "typescript"
   },
   [LanguageName.C]: {
     name: LanguageName.C,
     extensions: ["c"],
-    hasScopeTerminators: true,
     treeSitterFile: "tree-sitter-c.wasm",
     highlightAlias: "cpp"
   },
   [LanguageName.Cpp]: {
     name: LanguageName.Cpp,
     extensions: ["cpp"],
-    hasScopeTerminators: true,
     treeSitterFile: "tree-sitter-cpp.wasm",
     highlightAlias: "cpp"
   },
   [LanguageName.CSharp]: {
     name: LanguageName.CSharp,
     extensions: ["cs"],
-    hasScopeTerminators: true,
     treeSitterFile: "tree-sitter-c_sharp.wasm",
     highlightAlias: "csharp"
   },
   [LanguageName.Java]: {
     name: LanguageName.Java,
     extensions: ["java"],
-    hasScopeTerminators: true,
     treeSitterFile: "tree-sitter-java.wasm",
     highlightAlias: "java"
   },
   [LanguageName.Python]: {
     name: LanguageName.Python,
     extensions: ["py"],
-    hasScopeTerminators: true,
     treeSitterFile: "tree-sitter-python.wasm",
     highlightAlias: "python"
   },
   [LanguageName.Lua]: {
     name: LanguageName.Lua,
     extensions: ["lua"],
-    hasScopeTerminators: true,
     treeSitterFile: "tree-sitter-lua.wasm",
     highlightAlias: "lua"
   }
