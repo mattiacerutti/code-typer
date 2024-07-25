@@ -16,11 +16,12 @@ interface ITypingBoxProps {
   codeSnippet: string;
   codeLanguage: LanguageName;
   onGameFinished: () => void;
+  setIsCapsLockOn: React.Dispatch<React.SetStateAction<boolean>>,
 }
 
 function TypingBox(props: ITypingBoxProps) {
 
-  const {codeSnippet, codeLanguage, onGameFinished} = props;
+  const {codeSnippet, codeLanguage, onGameFinished, setIsCapsLockOn} = props;
 
   // Handles code parsing
   const {lines, setLines, autoClosingChars} = useCodeParser(codeSnippet);
@@ -29,7 +30,7 @@ function TypingBox(props: ITypingBoxProps) {
   const {codeStyle} = useCodeStyler(codeSnippet, codeLanguage, lines);
 
   // Handles keyboard events and cursor position
-  const {userPosition} = useKeyboardHandler(lines, setLines, autoClosingChars);
+  const {userPosition} = useKeyboardHandler(lines, setLines, autoClosingChars, setIsCapsLockOn);
 
   // Collection of all character refs, used to know where every character is at and to update caret position
   const charRefs = useRef<{[key: string]: HTMLSpanElement | null}>({});
