@@ -1,35 +1,55 @@
 import {getTSParser} from "../ts-parser.service";
 import IParser from "web-tree-sitter";
 import {filterLineLength, filterLinesNumber, filterSnippetLength, filterSnippetSpecialCharacters, isValidNode} from "@/utils/snippets/snippet-filters";
-import {
-  detectIndentationStyle,
-  countInitialWhitespaces,
-  usesScopeTerminators,
-  getNodeText,
-  removeInvalidWhitespaces,
-  adjustFinalLineWhitespaces,
-} from "@/utils/snippets/snippet-utils";
+import {detectIndentationStyle, countInitialWhitespaces, getNodeText, removeInvalidWhitespaces, adjustIndentationOffset} from "@/utils/snippets/snippet-utils";
 import {LanguageName} from "@/types/CodeLanguage";
 
-function findValidNodes(node: IParser.SyntaxNode, language: LanguageName): IParser.SyntaxNode[] {
+function findValidNodes(node: IParser.SyntaxNode): IParser.SyntaxNode[] {
   let nodes: IParser.SyntaxNode[] = [];
-  if (isValidNode(node, language)) {
+  if (isValidNode(node)) {
     nodes.push(node);
   }
 
   node.children.forEach((child) => {
     if (child === null) return;
-    nodes = nodes.concat(findValidNodes(child, language));
+    nodes = nodes.concat(findValidNodes(child));
   });
 
   return nodes;
 }
 
+function getInitialIndentation(nodeStartIndex: number, sourceCode: string): string {
+  let startingPoint = nodeStartIndex - 1;
+
+  let buf: string = "";
+
+  while (sourceCode[startingPoint] !== "\n" && startingPoint >= 0) {
+    if (sourceCode[startingPoint] !== " " && sourceCode[startingPoint] !== "\t") {
+      buf = "";
+      startingPoint--;
+      continue;
+    }
+
+    buf += sourceCode[startingPoint];
+    startingPoint--;
+  }
+
+  return buf;
+}
+
+
+function convertSnippetToText(node: IParser.SyntaxNode, sourceCode: string): string {
+  const initialIndentation = getInitialIndentation(node.startIndex, sourceCode);
+
+  return initialIndentation + getNodeText(node);
+}
+
+
 export async function extractSnippets(fileContent: string, language: LanguageName): Promise<string[]> {
   const parser = await getTSParser(language);
 
   let parsedCode: IParser.Tree;
-  
+
   try {
     parsedCode = parser.parse(fileContent);
   } catch (error) {
@@ -37,8 +57,8 @@ export async function extractSnippets(fileContent: string, language: LanguageNam
     return [];
   }
 
-  const validNodes = findValidNodes(parsedCode.rootNode, language);
-  const validSnippets: string[] = validNodes.map((node) => getNodeText(node));
+  const validNodes = findValidNodes(parsedCode.rootNode);
+  const validSnippets = validNodes.map((node) => convertSnippetToText(node, fileContent));
 
   return validSnippets;
 }
@@ -51,7 +71,7 @@ export function filterSnippets(snippets: string[]): string[] {
     .filter((snippet) => filterSnippetSpecialCharacters(snippet));
 }
 
-export function formatCode(code: string, language: LanguageName): string | null {
+export function formatCode(code: string): string | null {
   code = removeInvalidWhitespaces(code);
 
   const indentationStyle = detectIndentationStyle(code);
@@ -81,12 +101,7 @@ export function formatCode(code: string, language: LanguageName): string | null 
     return "\t".repeat(indentationStyle.value.indexOf(initialWhitespaces)) + line;
   });
 
-  /* We need to do this because in languages where a scope end with something like "}", 
-  the final line is commonly bad indented (like when you copy a piece of code) */
-
-  if (usesScopeTerminators(language)) {
-    codeLines = adjustFinalLineWhitespaces(codeLines);
-  }
+  codeLines = adjustIndentationOffset(codeLines);
 
   return codeLines.join("\n");
 }

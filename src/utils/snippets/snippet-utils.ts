@@ -69,10 +69,6 @@ function removeInitialWhitespaces(lines: string[], quantity: number = 1): string
   return newLines;
 }
 
-export function usesScopeTerminators(language: LanguageName): boolean {
-  return language != LanguageName.Python;
-}
-
 export function getNodeText(node: IParser.SyntaxNode): string {
   return node.text;
 }
@@ -81,24 +77,11 @@ export function removeInvalidWhitespaces(text: string): string {
   return text.replace(/[^\S\t\n ]/g, "");
 }
 
-export function adjustFinalLineWhitespaces(lines: string[]): string[] {
-  // Since the last line should indentation depth equal to 0, we calculate the offset and subtract it through all the other lines
-  const finalLineWhitespaces = countInitialWhitespaces(lines[lines.length - 1]);
+export function adjustIndentationOffset(lines: string[]): string[] {
+  // Sometimes the code has an indentation offset on every line. We can remove that offset by removing the number of initial whitespaces in the first line from every line (this is because the first line should never be indented).
+  const indentationOffset = countInitialWhitespaces(lines[0]);
 
-  if (lines.length == 1) {
-    removeInitialWhitespaces(lines, finalLineWhitespaces);
-    return lines;
-  }
-
-  const secondLastLineWhitespaces = countInitialWhitespaces(lines[lines.length - 2]);
-
-  const newLines: string[] = [lines[0]];
-
-  const hasUniqueFinalLineIndentation = finalLineWhitespaces !== secondLastLineWhitespaces;
-
-  newLines.push(...removeInitialWhitespaces(lines.slice(1), hasUniqueFinalLineIndentation ? Math.min(finalLineWhitespaces, secondLastLineWhitespaces) : finalLineWhitespaces - 1));
-
-  return newLines;
+  return removeInitialWhitespaces(lines, indentationOffset);
 }
 
 export function getUniqueRandomIndexes(length: number, quantity: number): number[] {

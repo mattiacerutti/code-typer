@@ -12,7 +12,6 @@ export enum LanguageName {
 export interface ICodeLanguage {
   name: LanguageName;
   extensions: string[];
-  hasScopeTerminators: boolean;
   treeSitterFile: string;
   highlightAlias: string;
 }
