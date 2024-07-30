@@ -1,10 +1,12 @@
-import GameBox from "./components/GameBox";
+import GameView from "@/components/GameView";
+import { GameStateProvider } from "./contexts/game-state/GameStateProvider";
 
 function App() {
-
   return (
     <div className="w-screen h-screen flex justify-center items-center flex-col">
-      <GameBox />
+      <GameStateProvider>
+        <GameView />
+      </GameStateProvider>
     </div>
   );
 }

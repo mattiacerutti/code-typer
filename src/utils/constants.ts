@@ -81,3 +81,6 @@ export const SUPPORTED_LANGUAGES: Record<LanguageName, ICodeLanguage> = {
     highlightAlias: "lua"
   }
 };
+
+export const DEFAULT_LANGUAGE = LanguageName.TypeScript;
+export const REFRESH_BUTTON_MIN_DELAY = 1000;

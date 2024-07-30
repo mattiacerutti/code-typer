@@ -50,7 +50,7 @@ async function getSnippetsBatch(fileLinks: string[], language: LanguageName): Pr
   return codeSnippets;
 }
 
-export const getRandomCodeSnippet = async (language: LanguageName): Promise<string[]> => {
+export const getRandomCodeSnippets = async (language: LanguageName): Promise<string[]> => {
   const fetchedFiles = await fetchRandomCodeFiles(language).catch((error) => {
     console.error("Error fetching random files:", error);
     return [];
