@@ -1,6 +1,6 @@
-import {useRef, useEffect, useMemo} from "react";
-import TextLine from "./typing-box/TextLine";
-import Caret from "./typing-box/Caret";
+import {useRef, useEffect } from "react";
+import TextLine from "./typing-area/TextLine";
+import Caret from "./typing-area/Caret";
 import useCodeParser from "@/hooks/useCodeParser";
 import useKeyboardHandler from "@/hooks/useKeyboardHandler/useKeyboardHandler";
 import useCodeStyler from "@/hooks/useCodeStyler";
@@ -8,26 +8,31 @@ import useCodeStyler from "@/hooks/useCodeStyler";
 //Custom theme for code highlighting
 import "highlight.js/styles/github.css";
 
-import {LanguageName} from "@/types/CodeLanguage";
-import {CharacterState, CharacterTypes, WhitespaceTypes} from "@/types/Character";
+import {CharacterState} from "@/types/Character";
 import {isGameFinished} from "@/utils/game-utils";
+import {useGameState} from "@/contexts/game-state/GameStateContext";
+import { GameStatus } from "@/types/GameState";
 
-interface ITypingBoxProps {
-  codeSnippet: string;
-  codeLanguage: LanguageName;
+interface ITypingAreaProps {
   onGameFinished: () => void;
-  setIsCapsLockOn: React.Dispatch<React.SetStateAction<boolean>>,
+  onGameStarted: () => void;
+  setIsCapsLockOn: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-function TypingBox(props: ITypingBoxProps) {
+function TypingArea(props: ITypingAreaProps) {
+  const { onGameFinished, onGameStarted, setIsCapsLockOn} = props;
 
-  const {codeSnippet, codeLanguage, onGameFinished, setIsCapsLockOn} = props;
+  const {gameState} = useGameState();
+
+  if(!gameState.snippet || !gameState.language) {
+    throw("Snippet or language not found");
+  }
 
   // Handles code parsing
-  const {lines, setLines, autoClosingChars} = useCodeParser(codeSnippet);
+  const {lines, setLines, autoClosingChars} = useCodeParser(gameState.snippet);
 
   // Handles code styling
-  const {codeStyle} = useCodeStyler(codeSnippet, codeLanguage, lines);
+  const {codeStyle} = useCodeStyler(gameState.snippet, gameState.language, lines);
 
   // Handles keyboard events and cursor position
   const {userPosition} = useKeyboardHandler(lines, setLines, autoClosingChars, setIsCapsLockOn);
@@ -35,36 +40,26 @@ function TypingBox(props: ITypingBoxProps) {
   // Collection of all character refs, used to know where every character is at and to update caret position
   const charRefs = useRef<{[key: string]: HTMLSpanElement | null}>({});
 
+
   // Handles caret position
   const caretRef = useRef<{
     setCaretIndex: (lineIndex: number, charIndex: number) => void;
   }>(null);
 
-  const hasFinished = useMemo(() => {
-    if (lines.length > 0) {
-      //Check for win
-
-      const allCorrect = lines.every((line) => {
-        const check = line.text.every(
-          (char) =>
-            char.state === CharacterState.Right ||
-            (char.state === CharacterState.Default && char.value === WhitespaceTypes.NewLine) ||
-            char.value === WhitespaceTypes.Tab ||
-            char.type === CharacterTypes.EOF
-        );
-        return check;
-      });
-
-      return allCorrect;
-    }
-    return false;
-  }, [lines]);
 
   useEffect(() => {
-    if (lines.length > 0 && isGameFinished(lines)) {
+    if (lines.length > 0 && gameState.status !== GameStatus.Finished && isGameFinished(lines)) {
+      gameState.status = GameStatus.Finished;
       onGameFinished();
     }
-  }, [onGameFinished, lines]);
+  }, [onGameFinished, lines, gameState]);
+
+  useEffect(() => {
+    if (lines.length > 0 && gameState.status === GameStatus.NotStarted && lines[0].text[0].state !== CharacterState.Default) {
+      gameState.status = GameStatus.Started;
+      onGameStarted();
+    }
+  }, [onGameStarted, lines, gameState]);
 
   useEffect(() => {
     // Updates the caret position everytime the user position changes
@@ -73,9 +68,6 @@ function TypingBox(props: ITypingBoxProps) {
     }
   }, [userPosition]);
 
-  if (hasFinished) {
-    return <div className="text-slate-700 text-3xl flex flex-col gap-1.5 select-none">YOU WIN</div>;
-  }
 
   if (lines.length > 0 && codeStyle.length > 0) {
     return (
@@ -95,4 +87,4 @@ function TypingBox(props: ITypingBoxProps) {
   return <></>;
 }
 
-export default TypingBox;
+export default TypingArea;
