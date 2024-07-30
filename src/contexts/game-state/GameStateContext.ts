@@ -8,14 +8,18 @@ export const GameStateContext = createContext<{
   gameState: IGameState;
   setSnippet: (snippet: string | null) => void;
   setLanguage: (language: LanguageName) => void;
+  resetGameState: () => void;
 }>({
   gameState: {
     status: GameStatus.NotStarted,
     snippet: null,
     language: DEFAULT_LANGUAGE,
+    wrongKeystrokes: 0,
+    validKeystrokes: 0
   },
   setSnippet: () => {},
   setLanguage: () => {},
+  resetGameState: () => {},
 });
 
 export const useGameState = () => useContext(GameStateContext);

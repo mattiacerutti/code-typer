@@ -10,6 +10,7 @@ const useCodeParser = (originalText: string) => {
       "(": ")",
       "[": "]",
       "{": "}",
+      "`": "`",
       '"': '"',
       "'": "'",
     }),
@@ -25,3 +26,4 @@ const useCodeParser = (originalText: string) => {
 };
 
 export default useCodeParser;
+
