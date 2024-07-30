@@ -11,6 +11,8 @@ export function GameStateProvider({children}: {children: ReactNode}) {
     status: GameStatus.NotStarted,
     snippet: null,
     language: DEFAULT_LANGUAGE,
+    wrongKeystrokes: 0,
+    validKeystrokes: 0
   });
 
   const setSnippet = useCallback((snippet: string | null) => {
@@ -27,5 +29,16 @@ export function GameStateProvider({children}: {children: ReactNode}) {
     }));
   }, []);
 
-  return <GameStateContext.Provider value={{gameState: state, setSnippet, setLanguage}}>{children}</GameStateContext.Provider>;
+  const resetGameState = useCallback(() => {
+    setState((prevState) => ({
+      ...prevState,
+      status: GameStatus.NotStarted,
+      snippet: null,
+      language: DEFAULT_LANGUAGE,
+      wrongKeystrokes: 0,
+      validKeystrokes: 0
+    }));
+  }, []);
+
+  return <GameStateContext.Provider value={{gameState: state, setSnippet, setLanguage, resetGameState}}>{children}</GameStateContext.Provider>;
 }

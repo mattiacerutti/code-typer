@@ -28,6 +28,14 @@ function TypingArea(props: ITypingAreaProps) {
     throw("Snippet or language not found");
   }
 
+  const onWrongKeystroke = () => {
+    gameState.wrongKeystrokes += 1;
+  }
+
+  const onValidKeystroke = () => {
+    gameState.validKeystrokes += 1;
+  }
+
   // Handles code parsing
   const {lines, setLines, autoClosingChars} = useCodeParser(gameState.snippet);
 
@@ -35,7 +43,7 @@ function TypingArea(props: ITypingAreaProps) {
   const {codeStyle} = useCodeStyler(gameState.snippet, gameState.language, lines);
 
   // Handles keyboard events and cursor position
-  const {userPosition} = useKeyboardHandler(lines, setLines, autoClosingChars, setIsCapsLockOn);
+  const {userPosition} = useKeyboardHandler(lines, setLines, autoClosingChars, setIsCapsLockOn, onWrongKeystroke, onValidKeystroke);
 
   // Collection of all character refs, used to know where every character is at and to update caret position
   const charRefs = useRef<{[key: string]: HTMLSpanElement | null}>({});
@@ -45,7 +53,6 @@ function TypingArea(props: ITypingAreaProps) {
   const caretRef = useRef<{
     setCaretIndex: (lineIndex: number, charIndex: number) => void;
   }>(null);
-
 
   useEffect(() => {
     if (lines.length > 0 && gameState.status !== GameStatus.Finished && isGameFinished(lines)) {

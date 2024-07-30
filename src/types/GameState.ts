@@ -11,4 +11,6 @@ export interface IGameState {
   status: GameStatus,
   snippet: string | null,
   language: LanguageName,
+  wrongKeystrokes: number,
+  validKeystrokes: number,
 }

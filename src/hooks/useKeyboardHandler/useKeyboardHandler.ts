@@ -8,10 +8,18 @@ const useKeyboardHandler = (
   lines: ILine[],
   setLines: React.Dispatch<React.SetStateAction<ILine[]>>,
   autoClosingChars: {[key: string]: string},
-  setIsCapsLockOn: React.Dispatch<React.SetStateAction<boolean>>
+  setIsCapsLockOn: React.Dispatch<React.SetStateAction<boolean>>,
+  onWrongKeystroke: () => void,
+  onValidKeystroke: () => void
 ) => {
   const {userPosition, updateUserPosition} = useKeyboardHandlerState();
-  const {incrementCursor, decrementCursor, handleCharacterValidation, handleDecrementValidation} = useKeyboardHandlerUtils(lines, setLines, autoClosingChars, updateUserPosition);
+  const {incrementCursor, decrementCursor, handleCharacterValidation, handleDecrementValidation} = useKeyboardHandlerUtils(
+    lines,
+    setLines,
+    autoClosingChars,
+    updateUserPosition,
+    onWrongKeystroke,
+  );
 
   const {handleKeyPress} = useKeyboardHandlerEvents(
     userPosition,
@@ -21,12 +29,13 @@ const useKeyboardHandler = (
     handleDecrementValidation,
     lines,
     setLines,
-    updateUserPosition
+    updateUserPosition,
+    onValidKeystroke
   );
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.getModifierState('CapsLock')) {
+      if (event.getModifierState("CapsLock")) {
         setIsCapsLockOn(true);
       }
       handleKeyPress(event);
