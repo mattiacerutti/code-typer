@@ -14,11 +14,11 @@ async function getSnippetsFomLink(link: string, language: LanguageName): Promise
     .map((snippet) => {
       const formattedSnippet = formatCode(snippet);
 
-      console.log("Raw snippet:", JSON.stringify(snippet));
+      // console.log("Raw snippet:", JSON.stringify(snippet));
 
       if (!formattedSnippet) return null;
 
-      console.log("Formatted snippet:", JSON.stringify(formattedSnippet));
+      // console.log("Formatted snippet:", JSON.stringify(formattedSnippet));
 
       return formattedSnippet;
     })
