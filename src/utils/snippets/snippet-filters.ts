@@ -23,6 +23,11 @@ export function filterSnippetSpecialCharacters(snippet: string): boolean {
   return test;
 }
 
+export function filterTabsInBetween(snippet: string): boolean {
+  const regex = /(^|[^\\])(\\t)|(\t)/;
+  return regex.test(snippet.trim());
+}
+
 export function isValidNode(node: IParser.SyntaxNode) {
 
   return constants.VALID_NODES.includes(node.type);

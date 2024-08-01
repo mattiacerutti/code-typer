@@ -24,7 +24,7 @@ export function calculateWPM(milliseconds: number, totalCharacters: number) {
 
 export function calculateAccuracy(validKeystrokes: number, wrongKeystrokes: number) {
 
-  console.log("validKeystrokes", validKeystrokes, "wrongKeystrokes", wrongKeystrokes);
+  // console.log("validKeystrokes", validKeystrokes, "wrongKeystrokes", wrongKeystrokes);
 
   const accuracy = ((validKeystrokes - wrongKeystrokes) / validKeystrokes) * 100;
   return Math.round(accuracy);

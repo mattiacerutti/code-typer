@@ -34,7 +34,6 @@ export function GameStateProvider({children}: {children: ReactNode}) {
       ...prevState,
       status: GameStatus.NotStarted,
       snippet: null,
-      language: DEFAULT_LANGUAGE,
       wrongKeystrokes: 0,
       validKeystrokes: 0
     }));

@@ -5,7 +5,7 @@ import {GameStatus} from "@/types/GameState";
 import GamePanel from "./GamePanel";
 import {REFRESH_BUTTON_MIN_DELAY} from "@/utils/constants";
 import {useGameState} from "@/contexts/game-state/GameStateContext";
-import { calculateAccuracy, calculateWPM, humanizeTime } from "@/utils/game-utils";
+import EndPanel from "./EndPanel";
 
 function GameView() {
   const {setSnippet, setLanguage, resetGameState, gameState} = useGameState();
@@ -42,6 +42,9 @@ function GameView() {
   const refreshSnippet = useCallback(() => {
     setIsRefreshing(true);
 
+    resetGameState();
+    resetTimer();
+
     const startTime = Date.now();
     goToNextSnippet().then(() => {
       const elapsedTime = Date.now() - startTime;
@@ -57,7 +60,7 @@ function GameView() {
         setIsRefreshing(false);
       }
     });
-  }, [goToNextSnippet]);
+  }, [goToNextSnippet, resetTimer, resetGameState]);
 
   const handleStartGame = useCallback(() => {
     startTimer();
@@ -76,17 +79,11 @@ function GameView() {
     });
   }, [resetTimer, goToNextSnippet, resetGameState]);
 
-  if (isGameOver && gameState.status === GameStatus.Finished && gameState.snippet)
+  if (isGameOver && gameState.status === GameStatus.Finished)
     return (
-      <div>
-        <h1 className="text-3xl font-bold">Game Over</h1>
-        <h2 className="text-xl font-bold">Your time: {humanizeTime(getTime())}</h2>
-        <h2 className="text-xl font-bold">WPM: {calculateWPM(getTime(), gameState.snippet.length)}</h2>
-        <h2 className="text-xl font-bold">Accuracy: {calculateAccuracy(gameState.validKeystrokes, gameState.wrongKeystrokes)}%</h2>
-        <button className="px-6 py-3 bg-slate-200 text-slate-900 font-medium rounded-md hover:bg-slate-300 disabled:opacity-20" onClick={handleRestartGame}>
-          Restart
-        </button>
-      </div>
+      <>
+        <EndPanel totalTime={getTime()} handleRestartGame={handleRestartGame} />
+      </>
     );
 
   return (

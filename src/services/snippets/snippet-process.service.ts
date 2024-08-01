@@ -1,6 +1,6 @@
 import {getTSParser} from "../ts-parser.service";
 import IParser from "web-tree-sitter";
-import {filterLineLength, filterLinesNumber, filterSnippetLength, filterSnippetSpecialCharacters, isValidNode} from "@/utils/snippets/snippet-filters";
+import {filterLineLength, filterLinesNumber, filterSnippetLength, filterSnippetSpecialCharacters, filterTabsInBetween, isValidNode} from "@/utils/snippets/snippet-filters";
 import {detectIndentationStyle, countInitialWhitespaces, getNodeText, removeInvalidWhitespaces, adjustIndentationOffset} from "@/utils/snippets/snippet-utils";
 import {LanguageName} from "@/types/CodeLanguage";
 
@@ -68,18 +68,19 @@ export function filterSnippets(snippets: string[]): string[] {
     .filter((snippet) => filterSnippetLength(snippet))
     .filter((snippet) => filterLinesNumber(snippet))
     .filter((snippet) => filterLineLength(snippet))
-    .filter((snippet) => filterSnippetSpecialCharacters(snippet));
+    .filter((snippet) => filterSnippetSpecialCharacters(snippet))
+    .filter((snippet) => filterTabsInBetween(snippet));
 }
 
 export function formatCode(code: string): string | null {
   code = removeInvalidWhitespaces(code);
 
   const indentationStyle = detectIndentationStyle(code);
-  console.log("Detected indentation style:", indentationStyle);
+  // console.log("Detected indentation style:", indentationStyle);
 
   switch (indentationStyle.type) {
     case "mixed":
-      console.error("Mixed indentation is not supported");
+      // console.warn("Mixed indentation is not supported");
       return null;
     case "none":
       return code;

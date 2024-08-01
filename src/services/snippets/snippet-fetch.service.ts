@@ -50,7 +50,7 @@ export async function fetchFileDetails(fileUrl: string): Promise<any> {
 export async function getFileContent(fileDetails: any): Promise<string> {
   const rawUrl = fileDetails.download_url;
 
-  console.log("Raw Url:", rawUrl);
+  // console.log("Raw Url:", rawUrl);
 
   const response = await axios.get(rawUrl);
   return response.data;
