@@ -21,12 +21,14 @@ function GameView() {
     // Handles language change. We re-fetch the snippets and select a random one.
     if (gameState.language) {
       setSnippet(null);
+      resetGameState();
+      resetTimer();
       getRandomCodeSnippets(gameState.language).then((ret) => {
         codeSnippets.current = ret;
         setSnippet(ret[0]);
       });
     }
-  }, [gameState.language, setSnippet]);
+  }, [gameState.language, setSnippet, resetGameState, resetTimer]);
 
   const goToNextSnippet = useCallback(async () => {
     // If we have only 3 snippet left, we re-fetch and append them to the end of the array
@@ -39,11 +41,15 @@ function GameView() {
     setSnippet(codeSnippets.current[0]);
   }, [codeSnippets, gameState.language, setSnippet]);
 
-  const refreshSnippet = useCallback(() => {
+  const resetSnippet = useCallback(() => {
+    resetGameState(false);
+    resetTimer();
+  }, [resetTimer, resetGameState]);
+
+  const changeSnippet = useCallback(() => {
     setIsRefreshing(true);
 
-    resetGameState();
-    resetTimer();
+    resetSnippet();
 
     const startTime = Date.now();
     goToNextSnippet().then(() => {
@@ -60,7 +66,7 @@ function GameView() {
         setIsRefreshing(false);
       }
     });
-  }, [goToNextSnippet, resetTimer, resetGameState]);
+  }, [goToNextSnippet, resetSnippet]);
 
   const handleStartGame = useCallback(() => {
     startTimer();
@@ -79,6 +85,8 @@ function GameView() {
     });
   }, [resetTimer, goToNextSnippet, resetGameState]);
 
+
+
   if (isGameOver && gameState.status === GameStatus.Finished)
     return (
       <>
@@ -92,10 +100,11 @@ function GameView() {
         <GamePanel
           onGameFinished={handleGameOver}
           onGameStarted={handleStartGame}
-          refreshSnippet={refreshSnippet}
+          changeSnippet={changeSnippet}
+          resetSnippet={resetSnippet}
           setSelectedLanguage={setLanguage}
           isRefreshing={isRefreshing}
-          key={gameState.snippet}
+          key={gameState.snippet.text}
         />
       )}
       {!gameState.snippet && <div>Loading...</div>}

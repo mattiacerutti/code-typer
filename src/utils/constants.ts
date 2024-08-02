@@ -28,6 +28,15 @@ export const VALID_NODES = [
   "if_statement"
 ];
 
+export const AUTO_CLOSING_CHARS: {[key: string]: string} = {
+  "(": ")",
+  "[": "]",
+  "{": "}",
+  "`": "`",
+  '"': '"',
+  "'": "'",
+}
+
 export const MIN_CACHED_SNIPPETS = 10;
 export const SNIPPETS_SIMULTANEOUS_REQUESTS = 10;
 
@@ -86,3 +95,5 @@ export const DEFAULT_LANGUAGE = LanguageName.TypeScript;
 export const REFRESH_BUTTON_MIN_DELAY = 1000;
 
 export const SHOULD_PRESERVE_CLOSING_CHAR_WHEN_DELETING = true;
+
+

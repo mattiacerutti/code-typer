@@ -25,7 +25,7 @@ function EndPanel(props: IEndPanelProps) {
   return (
     <div className="flex flex-col gap-8">
       <div className="flex flex-row gap-4">
-        <div className="bg-slate-500 rounded-lg px-8 py-4 text-white shadow-lg">WPM: {calculateWPM(totalTime, gameState.snippet.length)}</div>
+        <div className="bg-slate-500 rounded-lg px-8 py-4 text-white shadow-lg">WPM {calculateWPM(totalTime, gameState.snippet.text.length)}</div>
         <div className="bg-slate-500 rounded-lg px-8 py-4 text-white shadow-lg">Accuracy: {calculateAccuracy(validKeystrokes, wrongKeystrokes)}%</div>
         <div className="bg-slate-500 rounded-lg px-8 py-4 text-white shadow-lg">{humanizeTime(totalTime)}</div>
       </div>

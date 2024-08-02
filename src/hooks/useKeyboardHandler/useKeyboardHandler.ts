@@ -1,22 +1,21 @@
 import {useEffect} from "react";
 import {ILine} from "@/types/Line";
-import {useKeyboardHandlerState} from "./useKeyboardHandlerState";
 import {useKeyboardHandlerUtils} from "./useKeyboardHandlerUtils";
 import {useKeyboardHandlerEvents} from "./useKeyboardHandlerEvents";
 
 const useKeyboardHandler = (
   lines: ILine[],
-  setLines: React.Dispatch<React.SetStateAction<ILine[]>>,
-  autoClosingChars: {[key: string]: string},
+  updateSnippetLines: (lines: ILine[]) => void,
+  userPosition: {lineIndex: number; charIndex: number},
+  updateUserPosition: (position: {lineIndex?: number; charIndex?: number}) => void,
   setIsCapsLockOn: React.Dispatch<React.SetStateAction<boolean>>,
   onWrongKeystroke: () => void,
   onValidKeystroke: () => void
 ) => {
-  const {userPosition, updateUserPosition} = useKeyboardHandlerState();
+
   const {incrementCursor, decrementCursor, handleCharacterValidation, handleDecrementValidation} = useKeyboardHandlerUtils(
     lines,
-    setLines,
-    autoClosingChars,
+    updateSnippetLines,
     updateUserPosition,
     onWrongKeystroke,
   );
@@ -28,7 +27,7 @@ const useKeyboardHandler = (
     handleCharacterValidation,
     handleDecrementValidation,
     lines,
-    setLines,
+    updateSnippetLines,
     updateUserPosition,
     onValidKeystroke
   );

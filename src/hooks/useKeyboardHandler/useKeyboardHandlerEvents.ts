@@ -9,7 +9,7 @@ export const useKeyboardHandlerEvents = (
   handleCharacterValidation: (key: string, position: {charIndex: number; lineIndex: number}) => void,
   handleDecrementValidation: (position: {charIndex: number; lineIndex: number}) => void,
   lines: ILine[],
-  setLines: React.Dispatch<React.SetStateAction<ILine[]>>,
+  updateSnippetLines: (lines: ILine[]) => void,
   updateUserPosition: (position: {lineIndex?: number; charIndex?: number}) => void,
   onValidKeystroke: () => void
 ) => {
@@ -84,17 +84,17 @@ export const useKeyboardHandlerEvents = (
         const newLineIndex = userPosition.lineIndex - 1;
 
         lines[newLineIndex].text[lines[newLineIndex].text.length - 1].state = CharacterState.Default;
-        setLines([...lines]);
+        updateSnippetLines([...lines]);
         updateUserPosition({lineIndex: newLineIndex, charIndex: newCharIndex});
         return;
       }
       lines[userPosition.lineIndex].text.map((char: ICharacter) => {
         char.state = CharacterState.Default;
       });
-      setLines([...lines]);
+      updateSnippetLines([...lines]);
       updateUserPosition({charIndex: getFirstNonWhitespaceCharacter(userPosition.lineIndex)});
     },
-    [lines, setLines, updateUserPosition, getFirstNonWhitespaceCharacter, isFirstCharacter]
+    [lines, updateSnippetLines, updateUserPosition, getFirstNonWhitespaceCharacter, isFirstCharacter]
   );
 
   const deleteWord = useCallback(
@@ -106,7 +106,7 @@ export const useKeyboardHandlerEvents = (
         const newLineIndex = userPosition.lineIndex - 1;
 
         lines[newLineIndex].text[lines[newLineIndex].text.length - 1].state = CharacterState.Default;
-        setLines([...lines]);
+        updateSnippetLines([...lines]);
         updateUserPosition({lineIndex: newLineIndex, charIndex: newCharIndex});
         return;
       }
@@ -125,10 +125,10 @@ export const useKeyboardHandlerEvents = (
         lines[userPosition.lineIndex].text[i].state = CharacterState.Default;
       }
 
-      setLines([...lines]);
+      updateSnippetLines([...lines]);
       updateUserPosition({charIndex: newCharIndex});
     },
-    [isFirstCharacter, setLines, lines, updateUserPosition, getPreviousWordPosition]
+    [isFirstCharacter, updateSnippetLines, lines, updateUserPosition, getPreviousWordPosition]
   );
 
   const handleKeyShortcut = useCallback(
