@@ -1,12 +1,11 @@
 import {useCallback} from "react";
 import {ILine} from "@/types/Line";
 import {ICharacter, CharacterState, CharacterTypes, WhitespaceTypes} from "@/types/Character";
-import { SHOULD_PRESERVE_CLOSING_CHAR_WHEN_DELETING } from "@/utils/constants";
+import { AUTO_CLOSING_CHARS, SHOULD_PRESERVE_CLOSING_CHAR_WHEN_DELETING } from "@/utils/constants";
 
 export const useKeyboardHandlerUtils = (
   lines: ILine[],
-  setLines: React.Dispatch<React.SetStateAction<ILine[]>>,
-  autoClosingChars: {[key: string]: string},
+  updateSnippetLines: (lines: ILine[]) => void,
   updateUserPosition: (position: {lineIndex?: number; charIndex?: number}) => void,
   onWrongKeystroke: () => void
 ) => {
@@ -43,9 +42,9 @@ export const useKeyboardHandlerUtils = (
 
   const isClosingCharacter = useCallback(
     (char: ICharacter): boolean => {
-      return Object.values(autoClosingChars).includes(char.value) && char.type === CharacterTypes.Normal;
+      return Object.values(AUTO_CLOSING_CHARS).includes(char.value) && char.type === CharacterTypes.Normal;
     },
-    [autoClosingChars]
+    []
   );
 
   const getClosingCharacter = useCallback(
@@ -56,7 +55,7 @@ export const useKeyboardHandlerUtils = (
       for (let i = userPosition.lineIndex; i < lines.length; i++) {
         for (let j = startingChar; j < lines[i].text.length; j++) {
           const currentChar = lines[i].text[j];
-          if (currentChar.value === autoClosingChars[char]) {
+          if (currentChar.value === AUTO_CLOSING_CHARS[char]) {
             cont--;
             if (cont === 0) {
               return currentChar;
@@ -71,15 +70,15 @@ export const useKeyboardHandlerUtils = (
       }
       return undefined;
     },
-    [lines, autoClosingChars]
+    [lines]
   );
 
   const resetKeyState = useCallback(
     (userPosition: {lineIndex: number; charIndex: number}) => {
       lines[userPosition.lineIndex].text[userPosition.charIndex].state = CharacterState.Default;
-      setLines([...lines]);
+      updateSnippetLines([...lines]);
     },
-    [lines, setLines]
+    [lines, updateSnippetLines]
   );
 
   const hasOnlyWhitespacesBefore = useCallback(
@@ -183,9 +182,9 @@ export const useKeyboardHandlerUtils = (
       } else {
         selectedChar.state = CharacterState.Wrong;
       }
-      setLines([...lines]);
+      updateSnippetLines([...lines]);
     },
-    [lines, setLines, getChar]
+    [lines, updateSnippetLines, getChar]
   );
 
   const handleCharacterValidation = useCallback(
