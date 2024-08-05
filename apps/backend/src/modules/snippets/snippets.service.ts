@@ -40,7 +40,7 @@ export class SnippetsService {
   ): Promise<string[]> {
     const fileContent = await this.snippetFetchService.getFileContent(link);
 
-    const extractedSnippets = await this.snippetProcessService.extractSnippets(
+    const extractedSnippets = this.snippetProcessService.extractSnippets(
       fileContent,
       language,
     );

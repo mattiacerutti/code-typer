@@ -104,7 +104,7 @@ export function getUniqueRandomIndexes(
 }
 
 export function getSnippetRawLink(data: any): string {
-  const baseUrl = 'https://raw.githubusercontent.com/';
+  const baseUrl = 'https://raw.githubusercontent.com';
 
   const repository = data.repository.full_name;
 
@@ -112,5 +112,5 @@ export function getSnippetRawLink(data: any): string {
 
   const path = data.path;
 
-  return `${baseUrl}${repository}/${sha}/${path}`;
+  return `${baseUrl}/${repository}/${sha}/${path}`;
 }

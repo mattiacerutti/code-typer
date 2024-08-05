@@ -1,5 +1,5 @@
-import { CharacterState, CharacterTypes, WhitespaceTypes } from "@/types/Character";
-import { ILine } from "@/types/Line";
+import {CharacterState, CharacterTypes, WhitespaceTypes} from "@/types/Character";
+import {ILine} from "@/types/Line";
 
 export function isGameFinished(lines: ILine[]) {
   const allCorrect = lines.every((line) => {
@@ -15,17 +15,13 @@ export function isGameFinished(lines: ILine[]) {
   return allCorrect;
 }
 
-
 export function calculateWPM(milliseconds: number, totalCharacters: number) {
-  const minutes = (milliseconds / 1000) / 60;
-  const wpm = (totalCharacters / 5) / minutes;
+  const minutes = milliseconds / 1000 / 60;
+  const wpm = totalCharacters / 5 / minutes;
   return Math.round(wpm);
 }
 
 export function calculateAccuracy(validKeystrokes: number, wrongKeystrokes: number) {
-
-  // console.log("validKeystrokes", validKeystrokes, "wrongKeystrokes", wrongKeystrokes);
-
   const accuracy = ((validKeystrokes - wrongKeystrokes) / validKeystrokes) * 100;
   return Math.round(accuracy);
 }
