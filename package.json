@@ -4,13 +4,18 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "concurrently \"npm run start:backend\" \"npm run start:frontend\"",
-    "start:frontend": "npm --prefix ./apps/frontend run dev",
-    "start:backend": "npm --prefix ./apps/backend run start:dev"
+    "dev": "turbo dev",
+    "build": "turbo build && npm run postbuild",
+    "postbuild": "cp -R apps/frontend/dist/. apps/backend/dist/apps/frontend",
+    "start": "node apps/backend/dist/apps/backend/src/main"
   },
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "concurrently": "^8.2.2"
-  }
+    "turbo": "^2.0.11"
+  },
+  "workspaces": [
+    "apps/*"
+  ],
+  "packageManager": "npm@7.0.0"
 }
