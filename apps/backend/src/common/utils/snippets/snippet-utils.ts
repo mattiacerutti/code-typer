@@ -102,3 +102,15 @@ export function getUniqueRandomIndexes(
     return index;
   });
 }
+
+export function getSnippetRawLink(data: any): string {
+  const baseUrl = 'https://raw.githubusercontent.com/';
+
+  const repository = data.repository.full_name;
+
+  const sha = data.url.split('?ref=')[1];
+
+  const path = data.path;
+
+  return `${baseUrl}${repository}/${sha}/${path}`;
+}

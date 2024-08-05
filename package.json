@@ -6,7 +6,7 @@
   "scripts": {
     "start": "concurrently \"npm run start:backend\" \"npm run start:frontend\"",
     "start:frontend": "npm --prefix ./apps/frontend run dev",
-    "start:backend": "npm --prefix ./apps/backend run start"
+    "start:backend": "npm --prefix ./apps/backend run start:dev"
   },
   "author": "",
   "license": "ISC",

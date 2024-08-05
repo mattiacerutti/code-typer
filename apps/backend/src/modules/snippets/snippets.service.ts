@@ -15,7 +15,7 @@ export class SnippetsService {
     private readonly snippetProcessService: SnippetProcessService,
   ) {}
   getRandomCodeSnippets = async (language: LanguageName): Promise<string[]> => {
-    const fetchedFiles = await this.snippetFetchService
+    const snippetUrls = await this.snippetFetchService
       .fetchRandomCodeFiles(language)
       .catch((error) => {
         console.error('Error fetching random files:', error);
@@ -23,24 +23,22 @@ export class SnippetsService {
       });
 
     const codeSnippets: string[] = await this.getSnippetsBatch(
-      fetchedFiles,
+      snippetUrls,
       language,
     );
 
     if (codeSnippets.length === 0)
-      throw "Couldn't find any functions in any of the fetched files";
+      throw "Couldn't find any valid nodes in any of the fetched files";
 
     // Shuffle snippets before returning
     return codeSnippets.sort(() => 0.5 - Math.random());
   };
 
-  async getSnippetsFomLink(
+  async getSnippetsFromLink(
     link: string,
     language: LanguageName,
   ): Promise<string[]> {
-    const fileDetails = await this.snippetFetchService.fetchFileDetails(link);
-    const fileContent =
-      await this.snippetFetchService.getFileContent(fileDetails);
+    const fileContent = await this.snippetFetchService.getFileContent(link);
 
     const extractedSnippets = await this.snippetProcessService.extractSnippets(
       fileContent,
@@ -67,29 +65,29 @@ export class SnippetsService {
   }
 
   async getSnippetsBatch(
-    fileLinks: string[],
+    snippetUrls: string[],
     language: LanguageName,
   ): Promise<string[]> {
     const codeSnippets: string[] = [];
     while (codeSnippets.length < MIN_CACHED_SNIPPETS) {
-      if (fileLinks.length === 0) break;
+      if (snippetUrls.length === 0) break;
 
       // Gets N unquie random indexes. Number could be changed to increase concurrency
       const randomIndexes = getUniqueRandomIndexes(
-        fileLinks.length,
+        snippetUrls.length,
         SNIPPETS_SIMULTANEOUS_REQUESTS,
       );
 
       // Simultaneously get snippets different files
       const snippetPromises = randomIndexes.map((randomIndex) =>
-        this.getSnippetsFomLink(fileLinks[randomIndex], language),
+        this.getSnippetsFromLink(snippetUrls[randomIndex], language),
       );
       const snippets = (await Promise.all(snippetPromises)).flat();
 
       codeSnippets.push(...snippets);
 
       // Removes already fetched files
-      fileLinks = fileLinks.filter((_, i) => !randomIndexes.includes(i));
+      snippetUrls = snippetUrls.filter((_, i) => !randomIndexes.includes(i));
     }
 
     return codeSnippets;

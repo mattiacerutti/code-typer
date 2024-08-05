@@ -10,6 +10,7 @@ import * as CSharp from 'tree-sitter-c-sharp';
 import * as Java from 'tree-sitter-java';
 import * as Python from 'tree-sitter-python';
 import * as Lua from 'tree-sitter-lua';
+import { convertLanguage } from 'tree-sitter-compat';
 
 @Injectable()
 export class SnippetParseService {
@@ -18,7 +19,7 @@ export class SnippetParseService {
 
     const languageName = this.getLanguage(language);
 
-    parser.setLanguage(languageName);
+    parser.setLanguage(convertLanguage(languageName));
 
     return parser;
   };

@@ -84,7 +84,7 @@ export class SnippetProcessService {
     try {
       parsedCode = parser.parse(fileContent);
     } catch (error) {
-      console.error('Error parsing code:', error);
+      // console.error('Error parsing code:', error);
       return [];
     }
 
