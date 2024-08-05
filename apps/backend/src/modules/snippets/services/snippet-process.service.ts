@@ -15,7 +15,7 @@ import {
 } from '@/common/utils/snippets/snippet-utils';
 import { LanguageName } from '@lib/types/CodeLanguage';
 import { Injectable } from '@nestjs/common';
-import { SnippetParseService } from './snippet-parse.service';
+import { SnippetParseService } from './snippet-parser.service';
 import IParser from 'tree-sitter';
 
 @Injectable()
@@ -73,10 +73,7 @@ export class SnippetProcessService {
     return initialIndentation + getNodeText(node);
   }
 
-  async extractSnippets(
-    fileContent: string,
-    language: LanguageName,
-  ): Promise<string[]> {
+  extractSnippets(fileContent: string, language: LanguageName): string[] {
     const parser = this.snippetParseService.getTSParser(language);
 
     let parsedCode: IParser.Tree;
