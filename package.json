@@ -1,21 +1,44 @@
 {
   "name": "code-typer",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "version": "0.1.0",
+  "private": true,
   "scripts": {
-    "dev": "turbo dev",
-    "build": "turbo build && npm run postbuild",
-    "postbuild": "cp -R apps/frontend/dist/. apps/backend/dist/apps/frontend",
-    "start": "node apps/backend/dist/apps/backend/src/main"
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
   },
-  "author": "",
-  "license": "ISC",
+  "dependencies": {
+    "axios": "^1.8.4",
+    "axios-cache-interceptor": "^1.7.0",
+    "dotenv": "^16.4.7",
+    "highlight.js": "^11.11.1",
+    "next": "15.2.4",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "rxjs": "^7.8.2",
+    "tree-sitter": "^0.21.1",
+    "tree-sitter-c": "^0.20.0",
+    "tree-sitter-c-sharp": "^0.23.1",
+    "tree-sitter-compat": "^0.1.2",
+    "tree-sitter-cpp": "^0.20.0",
+    "tree-sitter-java": "^0.23.5",
+    "tree-sitter-javascript": "^0.23.1",
+    "tree-sitter-lua": "^2.1.3",
+    "tree-sitter-python": "^0.20.0",
+    "tree-sitter-typescript": "^0.23.2"
+  },
   "devDependencies": {
-    "turbo": "^2.0.11"
-  },
-  "workspaces": [
-    "apps/*"
-  ],
-  "packageManager": "npm@7.0.0"
+    "@eslint/eslintrc": "^3",
+    "@tailwindcss/postcss": "^4",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "eslint": "^9",
+    "eslint-config-next": "15.2.4",
+    "eslint-plugin-react-hooks": "^5.2.0",
+    "node-loader": "^2.1.0",
+    "tailwindcss": "^4",
+    "typescript": "^5"
+  }
 }
