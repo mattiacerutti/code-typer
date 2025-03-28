@@ -5,6 +5,7 @@ import {Language} from "@/constants/supported-languages";
 import {useGameState} from "@/contexts/game-state/GameStateContext";
 import { GameStatus } from "@/types/game-state";
 import TypingArea from "@/components/typing-area";
+import useTyping from "@/hooks/useTyping";
 
 interface IGamePageProps {
   onGameFinished: () => void;
@@ -18,15 +19,25 @@ interface IGamePageProps {
 function GamePage(props: IGamePageProps) {
   const {onGameFinished, onGameStarted, changeSnippet: refreshSnippet, resetSnippet: restartGame, setSelectedLanguage, isRefreshing} = props;
 
-  const [isCapsLockOn, setIsCapsLockOn] = useState<boolean>(false);
-
   const {gameState} = useGameState();
+
+  const onWrongKeystroke = () => {
+    gameState.wrongKeystrokes += 1;
+  };
+
+  const onValidKeystroke = () => {
+    gameState.validKeystrokes += 1;
+  };
+
+
+  const {isCapsLockOn} =  useTyping(onWrongKeystroke, onValidKeystroke);
+
 
   return (
     <>
       <div className={`text-red-500 relative bottom-8 ${!isCapsLockOn && "opacity-0"} font-bold text-2xl`}>Caps Lock is on</div>
       <div className="flex flex-col gap-10 justify-center items-center">
-        <TypingArea onGameFinished={onGameFinished} onGameStarted={onGameStarted} setIsCapsLockOn={setIsCapsLockOn} />
+        <TypingArea onGameFinished={onGameFinished} onGameStarted={onGameStarted} />
         <div className="flex flex-row gap-1.5 content-between">
           <button
             className="px-6 py-3 bg-slate-200 text-slate-900 font-medium rounded-md hover:bg-slate-300 disabled:opacity-20"

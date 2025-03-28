@@ -1,7 +1,7 @@
 "use client";
 
 import {useGameState} from "@/contexts/game-state/GameStateContext";
-import {calculateAccuracy, calculateWPM, humanizeTime} from "@/utils/game-utils";
+import {calculateAccuracy, calculateWPM, humanizeTime} from "@/utils/game";
 
 interface IEndPageProps {
   totalTime: number;
