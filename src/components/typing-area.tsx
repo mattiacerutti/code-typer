@@ -12,6 +12,7 @@ import Caret from "./typing-area/caret";
 
 //Custom theme for code highlighting
 import "highlight.js/styles/github.css";
+import useTyping from "@/hooks/useTyping";
 
 
 
@@ -41,8 +42,11 @@ function TypingArea(props: ITypingAreaProps) {
   // Handles code styling
   const {codeHighlight} = useCodeHighlighter(gameState.snippet.text, gameState.language, gameState.snippet.lines);
 
+
   // Handles keyboard events and cursor position
-  useKeyboardHandler(gameState.snippet.lines, updateSnippetLines, gameState.userPosition, updateUserPosition, setIsCapsLockOn, onWrongKeystroke, onValidKeystroke);
+  // useKeyboardHandler(gameState.snippet.lines, updateSnippetLines, gameState.userPosition, updateUserPosition, setIsCapsLockOn, onWrongKeystroke, onValidKeystroke);
+
+  useTyping(onWrongKeystroke, onValidKeystroke);
 
   // Collection of all character refs, used to know where every character is at and to update caret position
   const charRefs = useRef<{[key: string]: React.RefObject<HTMLSpanElement>}>({});
