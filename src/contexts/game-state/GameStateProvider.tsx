@@ -1,6 +1,6 @@
 
 "use client";
-import {Languages} from "@/constants/supported-languages";
+import {Language} from "@/constants/supported-languages";
 import {GameStatus, IGameState} from "@/types/game-state";
 import {AUTO_CLOSING_CHARS, DEFAULT_LANGUAGE} from "@/constants/constants";
 import {useCallback, useEffect, useRef, useState} from "react";
@@ -44,7 +44,7 @@ export function GameStateProvider({children}: {children: ReactNode}) {
     }));
   }, []);
 
-  const setLanguage = useCallback((language: Languages) => {
+  const setLanguage = useCallback((language: Language) => {
     setState((prevState) => ({
       ...prevState,
       language,

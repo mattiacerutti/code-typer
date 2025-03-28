@@ -1,5 +1,5 @@
 import Parser from "tree-sitter";
-import {Languages} from "@/constants/supported-languages";
+import {Language} from "@/constants/supported-languages";
 import * as JavaScript from 'tree-sitter-javascript';
 import * as TypeScript from 'tree-sitter-typescript/typescript';
 import * as C from 'tree-sitter-c';
@@ -12,7 +12,7 @@ import { convertLanguage } from 'tree-sitter-compat';
 
 // import {convertLanguage} from "tree-sitter-compat";
 
-export function getTSParser(language: Languages): Parser {
+export function getTSParser(language: Language): Parser {
   const parser = new Parser();
 
   const languageName = getLanguage(language);
@@ -22,23 +22,23 @@ export function getTSParser(language: Languages): Parser {
   return parser;
 }
 
-function getLanguage(language: Languages) {
+function getLanguage(language: Language) {
   switch (language) {
-    case Languages.JAVASCRIPT:
+    case Language.JAVASCRIPT:
       return JavaScript;
-    case Languages.TYPESCRIPT:
+    case Language.TYPESCRIPT:
       return TypeScript;
-    case Languages.C:
+    case Language.C:
       return C;
-    case Languages.CPP:
+    case Language.CPP:
       return Cpp;
-    case Languages.CSHARP:
+    case Language.CSHARP:
       return CSharp;
-    case Languages.JAVA:
+    case Language.JAVA:
       return Java;
-    case Languages.PYTHON:
+    case Language.PYTHON:
       return Python;
-    case Languages.LUA:
+    case Language.LUA:
       return Lua;
     default:
       throw new Error(`Language ${language} not supported.`);

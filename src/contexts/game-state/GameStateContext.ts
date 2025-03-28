@@ -1,4 +1,4 @@
-import {Languages} from "@/constants/supported-languages";
+import {Language} from "@/constants/supported-languages";
 import {GameStatus, IGameState} from "@/types/game-state";
 import {ITextLine} from "@/types/text-line";
 import {DEFAULT_LANGUAGE} from "@/constants/constants";
@@ -11,7 +11,7 @@ export const GameStateContext = createContext<{
     setCaretIndex: (lineIndex: number, charIndex: number) => void;
   } | null>;
   setSnippet: (snippet: string | null) => void;
-  setLanguage: (language: Languages) => void;
+  setLanguage: (language: Language) => void;
   resetGameState: (invalidateSnippet?: boolean) => void;
   updateSnippetLines: (lines: ITextLine[]) => void;
   updateUserPosition: (position: {charIndex?: number; lineIndex?: number}) => void;

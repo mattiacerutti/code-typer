@@ -1,4 +1,4 @@
-import {Languages} from "@/constants/supported-languages"; // Import the LanguageName type from the appropriate module
+import {Language} from "@/constants/supported-languages"; // Import the LanguageName type from the appropriate module
 import {ITextLine} from "./text-line"; // Import the Line type from the appropriate module
 
 export enum GameStatus {
@@ -13,11 +13,11 @@ export interface IGameState {
     text: string;
     lines: ITextLine[]; // Use the imported Line type here
   } | null;
-  language: Languages;
+  language: Language;
   wrongKeystrokes: number;
   validKeystrokes: number;
   userPosition: {
     charIndex: number;
     lineIndex: number;
-  } ;
+  };
 }

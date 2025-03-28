@@ -1,30 +1,26 @@
 "use client";
 
-
-
-import type { ICharacter} from "@/types/characther";
+import type {ICharacter} from "@/types/character";
 import React from "react";
-import Character from "./Character";
+import Character from "./character";
 
 interface ITextLineProps {
-  lineText: ICharacter[];
+  text: ICharacter[];
   lineIndex: number;
   charRefs: React.RefObject<{[key: string]: React.RefObject<HTMLSpanElement>}>;
-  lineStyle: string[];
+  textHighlighting: string[];
 }
 
-
 function TextLine(props: ITextLineProps) {
+  const {text, lineIndex, charRefs, textHighlighting} = props;
 
-  const {lineText, lineIndex, charRefs, lineStyle} = props;
-  
   return (
     <div className="flex flex-row whitespace-pre">
-      {lineText.map((char: ICharacter, index: number) => {
+      {text.map((char: ICharacter, index: number) => {
         const charId = `char-${lineIndex}-${index}`;
         const charRef = React.createRef<HTMLSpanElement>() as React.RefObject<HTMLSpanElement>;
         charRefs.current[charId] = charRef;
-        return <Character char={char} charId={charId}  charStyle={lineStyle[index]}  ref={charRef} key={charId} />;
+        return <Character char={char} charHighlighting={textHighlighting[index]} ref={charRef} key={charId} />;
       })}
     </div>
   );

@@ -1,23 +1,21 @@
 import IParser from "tree-sitter";
 
-type IIndentationStyle =
-  | { type: 'none' | 'mixed' | 'tab'; value: null }
-  | { type: 'space'; value: number[] };
+type IIndentationStyle = {type: "none" | "mixed" | "tab"; value: null} | {type: "space"; value: number[]};
 
 export function detectIndentationStyle(snippet: string): IIndentationStyle {
-  const lines = snippet.split('\n');
+  const lines = snippet.split("\n");
 
   let tabCount = 0;
-  const spaceCounts: { [key: number]: number } = {};
+  const spaceCounts: {[key: number]: number} = {};
 
   for (const line of lines) {
     const leadingWhitespaces = line.match(/^\s*/);
 
     if (!leadingWhitespaces || leadingWhitespaces[0].length === 0) continue;
 
-    if (leadingWhitespaces[0].includes('\t')) {
-      if (leadingWhitespaces[0].includes(' ')) {
-        return { type: 'mixed', value: null };
+    if (leadingWhitespaces[0].includes("\t")) {
+      if (leadingWhitespaces[0].includes(" ")) {
+        return {type: "mixed", value: null};
       }
 
       tabCount++;
@@ -31,24 +29,24 @@ export function detectIndentationStyle(snippet: string): IIndentationStyle {
   const spaceKeys = Object.keys(spaceCounts).map(Number);
 
   if (spaceKeys.length === 0 && tabCount === 0) {
-    return { type: 'none', value: null };
+    return {type: "none", value: null};
   }
 
   if (spaceKeys.length > 0 && tabCount > 0) {
-    return { type: 'mixed', value: null };
+    return {type: "mixed", value: null};
   }
 
   if (tabCount > 0) {
-    return { type: 'tab', value: null };
+    return {type: "tab", value: null};
   }
 
-  return { type: 'space', value: spaceKeys };
+  return {type: "space", value: spaceKeys};
 }
 
 export function countInitialWhitespaces(text: string): number {
   let count = 0;
   for (let i = 0; i < text.length; i++) {
-    if (text[i] === ' ' || text[i] === '\t') {
+    if (text[i] === " " || text[i] === "\t") {
       count++;
     } else {
       break;
@@ -57,10 +55,7 @@ export function countInitialWhitespaces(text: string): number {
   return count;
 }
 
-function removeInitialWhitespaces(
-  lines: string[],
-  quantity: number = 1,
-): string[] {
+function removeInitialWhitespaces(lines: string[], quantity: number = 1): string[] {
   if (quantity < 1) return lines;
 
   const newLines: string[] = [];
@@ -77,7 +72,7 @@ export function getNodeText(node: IParser.SyntaxNode): string {
 }
 
 export function removeInvalidWhitespaces(text: string): string {
-  return text.replace(/[^\S\t\n ]/g, '');
+  return text.replace(/[^\S\t\n ]/g, "");
 }
 
 export function adjustIndentationOffset(lines: string[]): string[] {
@@ -87,15 +82,12 @@ export function adjustIndentationOffset(lines: string[]): string[] {
   return removeInitialWhitespaces(lines, indentationOffset);
 }
 
-export function getUniqueRandomIndexes(
-  length: number,
-  quantity: number,
-): number[] {
-  const indexes: number[] = Array.from({ length: length }, (_, i) => i);
+export function getUniqueRandomIndexes(length: number, quantity: number): number[] {
+  const indexes: number[] = Array.from({length: length}, (_, i) => i);
 
   if (quantity > length) return indexes;
 
-  return Array.from({ length: quantity }, () => {
+  return Array.from({length: quantity}, () => {
     const randomIndex = Math.floor(Math.random() * indexes.length);
     const index = indexes[randomIndex];
     indexes.splice(randomIndex, 1);
@@ -104,11 +96,11 @@ export function getUniqueRandomIndexes(
 }
 
 export function getSnippetRawLink(data: any): string {
-  const baseUrl = 'https://raw.githubusercontent.com';
+  const baseUrl = "https://raw.githubusercontent.com";
 
   const repository = data.repository.full_name;
 
-  const sha = data.url.split('?ref=')[1];
+  const sha = data.url.split("?ref=")[1];
 
   const path = data.path;
 

@@ -1,13 +1,13 @@
 import {useState, useEffect, useCallback, useRef} from "react";
 import {ITextLine} from "@/types/text-line";
 import hljs from "highlight.js";
-import {Languages} from "@/types/language";
+import {Language} from "@/constants/supported-languages";
 import {getSupportedLanguage} from "@/utils/game-utils";
 
-const useCodeStyler = (code: string, language: Languages, lines: ITextLine[]) => {
-  const [codeStyle, setCodeStyle] = useState<string[][]>([]);
+const useCodeHighlighter = (snippet: string, language: Language, lines: ITextLine[]) => {
+  const [codeHighlight, setCodeHighlight] = useState<string[][]>([]);
 
-  const isStylingComplete = useRef(false);
+  const hasFinished = useRef(false);
 
   const wrapCharactersInSpans = (code: string) => {
     return code
@@ -58,8 +58,8 @@ const useCodeStyler = (code: string, language: Languages, lines: ITextLine[]) =>
     [extractClassesFromElement]
   );
 
-  const getCodeStyling = useCallback(
-    (code: string, language: Languages) => {
+  const getCodeHighlighting = useCallback(
+    (code: string, language: Language) => {
 
       const hljsLanguage = hljs.getLanguage(getSupportedLanguage(language).highlightAlias);
       const validLanguage = hljsLanguage && hljsLanguage.name ? hljsLanguage.name : "plaintext";
@@ -84,23 +84,25 @@ const useCodeStyler = (code: string, language: Languages, lines: ITextLine[]) =>
   );
 
   useEffect(() => {
-    if (lines.length > 0 && !isStylingComplete.current) {
-      const codeStyle = getCodeStyling(code, language);
+    if (lines.length > 0 && !hasFinished.current) {
+      const codeHighlighting = getCodeHighlighting(snippet, language);
 
-      const styleArray: string[][] = [];
+      console.log("highlighting", codeHighlighting);
+
+      const arr: string[][] = [];
 
       let cont = 0;
       lines.map((line) => {
-        styleArray.push(codeStyle.slice(cont, cont + line.text.length));
+        arr.push(codeHighlighting.slice(cont, cont + line.text.length));
         cont += line.text.length;
       });
 
-      isStylingComplete.current = true;
-      setCodeStyle(styleArray);
+      hasFinished.current = true;
+      setCodeHighlight(arr);
     }
-  }, [getCodeStyling, lines, code, language]);
+  }, [getCodeHighlighting, lines, snippet, language]);
 
-  return {codeStyle};
+  return {codeHighlight};
 };
 
-export default useCodeStyler;
+export default useCodeHighlighter;

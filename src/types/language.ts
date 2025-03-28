@@ -1,7 +1,7 @@
-import { Languages } from "@/constants/supported-languages";
+import { Language } from "@/constants/supported-languages";
 
 export interface ILanguage {
-  name: Languages;
+  name: Language;
   extensions: string[];
   highlightAlias: string;
 }
