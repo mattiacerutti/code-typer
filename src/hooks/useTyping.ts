@@ -3,14 +3,14 @@ import {hasModifierKey, isAValidKey, isAValidShortcutKey} from "@/utils/typing/k
 import {deleteCharacter} from "@/utils/typing/delete-character";
 import {useCallback, useEffect, useState} from "react";
 import {addCharacter} from "@/utils/typing/add-character";
-
+import {deleteWord} from "@/utils/typing/delete-word";
+import {deleteLine} from "@/utils/typing/delete-line";
 /*
 //TODO:
 
-Implement shortcuts
 Do more tests
 Convert position from line-char to single index
-
+Implement capslock
 */
 
 const useTyping = (onWrongKeystroke: () => void, onValidKeystroke: () => void) => {
@@ -28,24 +28,47 @@ const useTyping = (onWrongKeystroke: () => void, onValidKeystroke: () => void) =
     [onWrongKeystroke, onValidKeystroke]
   );
 
+  const handleKeyShortcut = useCallback(
+    (event: KeyboardEvent) => {
+      if (event.ctrlKey || event.metaKey) {
+        switch (event.key) {
+          case "Backspace":
+            deleteLine(gameState, updateSnippetLines, updateUserPosition);
+            break;
+        }
+      } else if (event.altKey) {
+        switch (event.key) {
+          case "Backspace":
+            deleteWord(gameState, updateSnippetLines, updateUserPosition);
+            break;
+        }
+      }
+    },
+    [gameState, updateSnippetLines, updateUserPosition]
+  );
   const handleKeyPress = useCallback(
     (event: KeyboardEvent) => {
-      const isShortcut = hasModifierKey(event) && !event.altKey && isAValidShortcutKey(event);
+
+      const isShortcut = hasModifierKey(event) && isAValidShortcutKey(event);
       if (isShortcut) {
-        //handleKeyShortcut(event);
+        handleKeyShortcut(event);
+        return;
+      }
+
+      if (hasModifierKey(event) && !event.altKey) {
         return;
       }
 
       if (isAValidKey(event)) {
         if (event.key === "Backspace") {
-          deleteCharacter(gameState, gameState.userPosition, updateSnippetLines, updateUserPosition);
+          deleteCharacter(gameState, updateSnippetLines, updateUserPosition);
           return;
         }
 
         addCharacter(event.key, gameState, updateSnippetLines, updateUserPosition, registerKeyStroke);
       }
     },
-    [gameState, updateSnippetLines, updateUserPosition, registerKeyStroke]
+    [gameState, updateSnippetLines, updateUserPosition, registerKeyStroke, handleKeyShortcut]
   );
 
   useEffect(() => {

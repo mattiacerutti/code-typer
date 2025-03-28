@@ -2,9 +2,9 @@ import {useState, useEffect, useCallback, useRef} from "react";
 import {ITextLine} from "@/types/text-line";
 import hljs from "highlight.js";
 import {Language} from "@/constants/supported-languages";
-import {getSupportedLanguage} from "@/utils/game-utils";
+import {getSupportedLanguage} from "@/utils/game";
 
-const useCodeHighlighter = (snippet: string, language: Language, lines: ITextLine[]) => {
+const useCodeHighlight = (snippet: string, language: Language, lines: ITextLine[]) => {
   const [codeHighlight, setCodeHighlight] = useState<string[][]>([]);
 
   const hasFinished = useRef(false);
@@ -87,8 +87,6 @@ const useCodeHighlighter = (snippet: string, language: Language, lines: ITextLin
     if (lines.length > 0 && !hasFinished.current) {
       const codeHighlighting = getCodeHighlighting(snippet, language);
 
-      console.log("highlighting", codeHighlighting);
-
       const arr: string[][] = [];
 
       let cont = 0;
@@ -105,4 +103,4 @@ const useCodeHighlighter = (snippet: string, language: Language, lines: ITextLin
   return {codeHighlight};
 };
 
-export default useCodeHighlighter;
+export default useCodeHighlight;

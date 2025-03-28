@@ -2,51 +2,32 @@
 
 import {useRef, useEffect} from "react";
 import TextLine from "./typing-area/text-line";
-import useKeyboardHandler from "@/hooks/useKeyboardHandler/useKeyboardHandler";
-import useCodeHighlighter from "@/hooks/useCodeStyler";
+import useCodeHighlight from "@/hooks/useCodeHighlight";
 import {CharacterState} from "@/types/character";
-import {isGameFinished} from "@/utils/game-utils";
+import {isGameFinished} from "@/utils/game";
 import {useGameState} from "@/contexts/game-state/GameStateContext";
 import {GameStatus} from "@/types/game-state";
 import Caret from "./typing-area/caret";
 
 //Custom theme for code highlighting
 import "highlight.js/styles/github.css";
-import useTyping from "@/hooks/useTyping";
-
-
 
 interface ITypingAreaProps {
   onGameFinished: () => void;
   onGameStarted: () => void;
-  setIsCapsLockOn: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 function TypingArea(props: ITypingAreaProps) {
-  const {onGameFinished, onGameStarted, setIsCapsLockOn} = props;
+  const {onGameFinished, onGameStarted} = props;
 
-  const {gameState, updateSnippetLines, caretRef, updateUserPosition} = useGameState();
+  const {gameState, caretRef} = useGameState();
 
   if (!gameState.snippet || !gameState.language) {
     throw "Snippet or language not found";
   }
 
-  const onWrongKeystroke = () => {
-    gameState.wrongKeystrokes += 1;
-  };
-
-  const onValidKeystroke = () => {
-    gameState.validKeystrokes += 1;
-  };
-
   // Handles code styling
-  const {codeHighlight} = useCodeHighlighter(gameState.snippet.text, gameState.language, gameState.snippet.lines);
-
-
-  // Handles keyboard events and cursor position
-  // useKeyboardHandler(gameState.snippet.lines, updateSnippetLines, gameState.userPosition, updateUserPosition, setIsCapsLockOn, onWrongKeystroke, onValidKeystroke);
-
-  useTyping(onWrongKeystroke, onValidKeystroke);
+  const {codeHighlight} = useCodeHighlight(gameState.snippet.text, gameState.language, gameState.snippet.lines);
 
   // Collection of all character refs, used to know where every character is at and to update caret position
   const charRefs = useRef<{[key: string]: React.RefObject<HTMLSpanElement>}>({});
@@ -78,7 +59,7 @@ function TypingArea(props: ITypingAreaProps) {
               return <TextLine key={index} text={line.text} lineIndex={index} charRefs={charRefs} textHighlighting={codeHighlight[index]} />;
             })}
           </div>
-          <Caret charRefs={charRefs} ref={caretRef} />
+          <Caret charRefs={charRefs} ref={caretRef as React.RefObject<{ setCaretIndex: (line: number, char: number) => void }>} />
         </div>
       </div>
     );

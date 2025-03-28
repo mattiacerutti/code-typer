@@ -1,5 +1,5 @@
 import {Language} from "@/constants/supported-languages";
-import {getSupportedLanguage} from "@/utils/game-utils";
+import {getSupportedLanguage} from "@/utils/game";
 import "dotenv/config";
 import {getSnippetRawLink} from "@/utils/api/snippet-utils";
 

@@ -1,7 +1,7 @@
 import {IGameState} from "@/types/game-state";
 import {CharacterState, CharacterTypes, ICharacter, WhitespaceTypes} from "@/types/character";
 import {ITextLine} from "@/types/text-line";
-import { AUTO_CLOSING_CHARS } from "@/constants/constants";
+import {AUTO_CLOSING_CHARS} from "@/constants/constants";
 
 export function getChar(gameState: IGameState, position: {lineIndex: number; charIndex: number}): ICharacter {
   return gameState.snippet!.lines[position.lineIndex].text[position.charIndex];
@@ -24,6 +24,15 @@ export function getPreviousChar(gameState: IGameState, userPosition: {lineIndex:
     return getPreviousChar(gameState, {lineIndex: userPosition.lineIndex, charIndex: userPosition.charIndex - 1});
   }
   return prevChar;
+}
+
+export function getFirstNonWhitespaceCharacter(gameState: IGameState, lineIndex: number) {
+  for (let i = 0; i < gameState.snippet!.lines[lineIndex].text.length; i++) {
+    if (gameState.snippet!.lines[lineIndex].text[i].value !== WhitespaceTypes.Tab) {
+      return i;
+    }
+  }
+  return 0;
 }
 
 export function setCharacterState(
@@ -70,4 +79,8 @@ export function hasOnlyWhitespacesBefore(gameState: IGameState, charIndex: numbe
 
 export function isClosingCharacter(char: ICharacter): boolean {
   return Object.values(AUTO_CLOSING_CHARS).includes(char.value) && char.type === CharacterTypes.Normal;
+}
+
+export function isFirstCharacter(gameState: IGameState, userPosition: {charIndex: number; lineIndex: number}) {
+  return userPosition.charIndex === 0 || getFirstNonWhitespaceCharacter(gameState, userPosition.lineIndex) === userPosition.charIndex;
 }
