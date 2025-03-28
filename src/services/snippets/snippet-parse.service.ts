@@ -1,4 +1,4 @@
-import {ICharacter, CharacterState, CharacterTypes, WhitespaceTypes} from "@/types/characther";
+import {ICharacter, CharacterState, CharacterTypes, WhitespaceTypes} from "@/types/character";
 import {ITextLine} from "@/types/text-line";
 
 export const parseSnippet = (originalText: string, autoClosingChars: {[key: string]: string}): ITextLine[] => {

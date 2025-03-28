@@ -1,56 +1,55 @@
-import { ILanguage } from "@/types/language";
+import {ILanguage} from "@/types/language";
 
-export enum Languages {
-  JAVASCRIPT = 'JavaScript',
-  TYPESCRIPT = 'TypeScript',
-  C = 'C',
-  CPP = 'C++',
-  CSHARP = 'C#',
-  JAVA = 'Java',
-  PYTHON = 'Python',
-  LUA = 'Lua',
+export enum Language {
+  JAVASCRIPT = "JavaScript",
+  TYPESCRIPT = "TypeScript",
+  C = "C",
+  CPP = "C++",
+  CSHARP = "C#",
+  JAVA = "Java",
+  PYTHON = "Python",
+  LUA = "Lua",
 }
 
-
-export const SUPPORTED_LANGUAGES: Record<Languages, ILanguage> = {
-  [Languages.JAVASCRIPT]: {
-    name: Languages.JAVASCRIPT,
-    extensions: ['js', 'jsx'],
-    highlightAlias: 'javascript',
+export const SUPPORTED_LANGUAGES: Record<Language, ILanguage> = {
+  [Language.JAVASCRIPT]: {
+    name: Language.JAVASCRIPT,
+    extensions: ["js", "jsx"],
+    highlightAlias: "javascript",
   },
-  [Languages.TYPESCRIPT]: {
-    name: Languages.TYPESCRIPT,
-    extensions: ['ts', 'tsx'],
-    highlightAlias: 'typescript',
+  [Language.TYPESCRIPT]: {
+    name: Language.TYPESCRIPT,
+    extensions: ["ts", "tsx"],
+    highlightAlias: "typescript",
   },
-  [Languages.C]: {
-    name: Languages.C,
-    extensions: ['c'],
-    highlightAlias: 'cpp',
+  [Language.C]: {
+    name: Language.C,
+    extensions: ["c"],
+    highlightAlias: "cpp",
   },
-  [Languages.CPP]: {
-    name: Languages.CPP,
-    extensions: ['cpp'],
-    highlightAlias: 'cpp',
+  [Language.CPP]: {
+    name: Language.CPP,
+    extensions: ["cpp"],
+    highlightAlias: "cpp",
   },
-  [Languages.CSHARP]: {
-    name: Languages.CSHARP,
-    extensions: ['cs'],
-    highlightAlias: 'csharp',
+  [Language.CSHARP]: {
+    name: Language.CSHARP,
+    extensions: ["cs"],
+    highlightAlias: "csharp",
   },
-  [Languages.JAVA]: {
-    name: Languages.JAVA,
-    extensions: ['java'],
-    highlightAlias: 'java',
+  [Language.JAVA]: {
+    name: Language.JAVA,
+    extensions: ["java"],
+    highlightAlias: "java",
   },
-  [Languages.PYTHON]: {
-    name: Languages.PYTHON,
-    extensions: ['py'],
-    highlightAlias: 'python',
+  [Language.PYTHON]: {
+    name: Language.PYTHON,
+    extensions: ["py"],
+    highlightAlias: "python",
   },
-  [Languages.LUA]: {
-    name: Languages.LUA,
-    extensions: ['lua'],
-    highlightAlias: 'lua',
+  [Language.LUA]: {
+    name: Language.LUA,
+    extensions: ["lua"],
+    highlightAlias: "lua",
   },
 };

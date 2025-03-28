@@ -1,6 +1,6 @@
 import { SUPPORTED_LANGUAGES } from "@/constants/supported-languages";
-import {CharacterState, CharacterTypes, WhitespaceTypes} from "@/types/characther";
-import { Languages } from "@/constants/supported-languages";
+import {CharacterState, CharacterTypes, WhitespaceTypes} from "@/types/character";
+import { Language } from "@/constants/supported-languages";
 import { ILanguage } from "@/types/language";
 import {ITextLine} from "@/types/text-line";
 
@@ -34,7 +34,7 @@ export function humanizeTime(milliseconds: number) {
   return `${seconds}s`;
 }
 
-export function getSupportedLanguage(language: Languages): ILanguage {
+export function getSupportedLanguage(language: Language): ILanguage {
   if (!SUPPORTED_LANGUAGES[language]) {
     throw `Language ${language} not supported.`;
   }

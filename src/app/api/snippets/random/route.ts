@@ -1,5 +1,5 @@
 import { MIN_CACHED_SNIPPETS, SNIPPETS_SIMULTANEOUS_REQUESTS } from "@/constants/api/snippets";
-import { Languages } from "@/constants/supported-languages";
+import { Language } from "@/constants/supported-languages";
 import { fetchRandomCodeFiles, getFileContent } from "@/services/api/snippet-fetch.service";
 import { extractSnippets, filterSnippets, formatCode } from "@/services/api/snippet-process.service";
 import { getUniqueRandomIndexes } from "@/utils/api/snippet-utils";
@@ -11,12 +11,12 @@ export async function GET(request: Request) {
   const language = searchParams.get('language');
   console.log("languagasdsadasde", language);
 
-  const snippets = await getRandomCodeSnippets(language as Languages);
+  const snippets = await getRandomCodeSnippets(language as Language);
 
   return NextResponse.json(snippets);
 }
 
-async function getRandomCodeSnippets(language: Languages): Promise<string[]> {
+async function getRandomCodeSnippets(language: Language): Promise<string[]> {
   const snippetUrls = await fetchRandomCodeFiles(language)
     .catch((error) => {
       console.error('Error fetching random files:', error);
@@ -37,7 +37,7 @@ async function getRandomCodeSnippets(language: Languages): Promise<string[]> {
 
 async function getSnippetsFromLink(
   link: string,
-  language: Languages,
+  language: Language,
 ): Promise<string[]> {
   const fileContent = await getFileContent(link);
 
@@ -67,7 +67,7 @@ async function getSnippetsFromLink(
 
 async function getSnippetsBatch(
   snippetUrls: string[],
-  language: Languages,
+  language: Language,
 ): Promise<string[]> {
   const codeSnippets: string[] = [];
   while (codeSnippets.length < MIN_CACHED_SNIPPETS) {

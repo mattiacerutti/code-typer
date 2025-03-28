@@ -1,6 +1,6 @@
 import {useCallback} from "react";
 import {ITextLine} from "@/types/text-line";
-import {ICharacter, CharacterState, CharacterTypes, WhitespaceTypes} from "@/types/characther";
+import {ICharacter, CharacterState, CharacterTypes, WhitespaceTypes} from "@/types/character";
 import { AUTO_CLOSING_CHARS, SHOULD_PRESERVE_CLOSING_CHAR_WHEN_DELETING } from "@/constants/constants";
 
 export const useKeyboardHandlerUtils = (

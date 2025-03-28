@@ -1,4 +1,4 @@
-import { ICharacter } from './characther';
+import { ICharacter } from './character';
 
 export interface ITextLine {
    index: number;

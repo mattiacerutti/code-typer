@@ -1,6 +1,6 @@
-import {Languages} from "@/constants/supported-languages";
+import {Language} from "@/constants/supported-languages";
 
-export async function fetchRandomSnippets(language: Languages): Promise<string[]> {
+export async function fetchRandomSnippets(language: Language): Promise<string[]> {
   const url = `api/snippets/random?language=${encodeURIComponent(language)}`;
 
   const response = await fetch(url);

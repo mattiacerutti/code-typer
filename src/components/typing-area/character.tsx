@@ -1,19 +1,18 @@
-import {ICharacter, CharacterState, WhitespaceTypes} from "@/types/characther";
+import {ICharacter, CharacterState, WhitespaceTypes} from "@/types/character";
 
 interface ICharacterProps {
   char: ICharacter;
-  charId: string;
-  charStyle: string;
+  charHighlighting: string;
 }
 
 function Character(props: ICharacterProps & {ref: React.RefObject<HTMLSpanElement>}) {
-  const {char, charId, charStyle, ref} = props;
+  const {char, charHighlighting, ref} = props;
 
   let elementClasses = "character-default";
   let elementText = char.value;
 
   if (char.state == CharacterState.Right) {
-    elementClasses = charStyle;
+    elementClasses = charHighlighting;
   }
 
   if (char.state == CharacterState.Wrong) {
@@ -35,7 +34,6 @@ function Character(props: ICharacterProps & {ref: React.RefObject<HTMLSpanElemen
   return (
     <span
       className={elementClasses}
-      id={charId}
       ref={ref}
     >
       {elementText}
