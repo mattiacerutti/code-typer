@@ -51,7 +51,7 @@ function TypingArea(props: ITypingAreaProps) {
     }
   }, [onGameStarted, gameState]);
 
-  if (gameState.snippet.parsedSnippet.length > 0 && codeHighlight.length > 0 && caretRef.current) {
+  if (gameState.snippet.parsedSnippet.length > 0 && codeHighlight.length > 0) {
     return (
       <div className="flex flex-col justify-center items-center bg-slate-100 rounded-2xl shadow-lg p-10">
         <div className="relative flex justify-center items-center">
