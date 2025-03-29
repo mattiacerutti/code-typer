@@ -1,11 +1,10 @@
 import {useState, useEffect, useCallback, useRef} from "react";
-import {ITextLine} from "@/types/text-line";
 import hljs from "highlight.js";
 import {Language} from "@/constants/supported-languages";
 import {getSupportedLanguage} from "@/utils/game";
 
-const useCodeHighlight = (snippet: string, language: Language, lines: ITextLine[]) => {
-  const [codeHighlight, setCodeHighlight] = useState<string[][]>([]);
+const useCodeHighlight = (snippet: string, language: Language) => {
+  const [codeHighlight, setCodeHighlight] = useState<string[]>([]);
 
   const hasFinished = useRef(false);
 
@@ -60,7 +59,6 @@ const useCodeHighlight = (snippet: string, language: Language, lines: ITextLine[
 
   const getCodeHighlighting = useCallback(
     (code: string, language: Language) => {
-
       const hljsLanguage = hljs.getLanguage(getSupportedLanguage(language).highlightAlias);
       const validLanguage = hljsLanguage && hljsLanguage.name ? hljsLanguage.name : "plaintext";
 
@@ -84,21 +82,12 @@ const useCodeHighlight = (snippet: string, language: Language, lines: ITextLine[
   );
 
   useEffect(() => {
-    if (lines.length > 0 && !hasFinished.current) {
+    if (!hasFinished.current) {
       const codeHighlighting = getCodeHighlighting(snippet, language);
-
-      const arr: string[][] = [];
-
-      let cont = 0;
-      lines.map((line) => {
-        arr.push(codeHighlighting.slice(cont, cont + line.text.length));
-        cont += line.text.length;
-      });
-
       hasFinished.current = true;
-      setCodeHighlight(arr);
+      setCodeHighlight(codeHighlighting);
     }
-  }, [getCodeHighlighting, lines, snippet, language]);
+  }, [getCodeHighlighting, snippet, language]);
 
   return {codeHighlight};
 };

@@ -5,16 +5,9 @@ import {useCallback, useEffect, useState} from "react";
 import {addCharacter} from "@/utils/typing/add-character";
 import {deleteWord} from "@/utils/typing/delete-word";
 import {deleteLine} from "@/utils/typing/delete-line";
-/*
-//TODO:
-
-Do more tests
-Convert position from line-char to single index
-Implement capslock
-*/
 
 const useTyping = (onWrongKeystroke: () => void, onValidKeystroke: () => void) => {
-  const {gameState, updateSnippetLines, updateUserPosition} = useGameState();
+  const {gameState, updateParsedSnippet, updateUserPosition} = useGameState();
   const [isCapsLockOn, setIsCapsLockOn] = useState(false);
 
   const registerKeyStroke = useCallback(
@@ -33,18 +26,18 @@ const useTyping = (onWrongKeystroke: () => void, onValidKeystroke: () => void) =
       if (event.ctrlKey || event.metaKey) {
         switch (event.key) {
           case "Backspace":
-            deleteLine(gameState, updateSnippetLines, updateUserPosition);
+            deleteLine(gameState, updateParsedSnippet, updateUserPosition);
             break;
         }
       } else if (event.altKey) {
         switch (event.key) {
           case "Backspace":
-            deleteWord(gameState, updateSnippetLines, updateUserPosition);
+            // TODO: deleteWord(gameState, updateParsedSnippet, updateUserPosition);
             break;
         }
       }
     },
-    [gameState, updateSnippetLines, updateUserPosition]
+    [gameState, updateParsedSnippet, updateUserPosition]
   );
   const handleKeyPress = useCallback(
     (event: KeyboardEvent) => {
@@ -61,14 +54,14 @@ const useTyping = (onWrongKeystroke: () => void, onValidKeystroke: () => void) =
 
       if (isAValidKey(event)) {
         if (event.key === "Backspace") {
-          deleteCharacter(gameState, updateSnippetLines, updateUserPosition);
+          deleteCharacter(gameState, updateParsedSnippet, updateUserPosition, gameState.userPosition);
           return;
         }
 
-        addCharacter(event.key, gameState, updateSnippetLines, updateUserPosition, registerKeyStroke);
+        addCharacter(event.key, gameState, updateParsedSnippet, updateUserPosition, registerKeyStroke);
       }
     },
-    [gameState, updateSnippetLines, updateUserPosition, registerKeyStroke, handleKeyShortcut]
+    [gameState, updateParsedSnippet, updateUserPosition, registerKeyStroke, handleKeyShortcut]
   );
 
   useEffect(() => {
