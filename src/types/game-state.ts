@@ -1,5 +1,5 @@
 import {Language} from "@/constants/supported-languages"; // Import the LanguageName type from the appropriate module
-import {ITextLine} from "./text-line"; // Import the Line type from the appropriate module
+import {ICharacter} from "./character"; 
 
 export enum GameStatus {
   NotStarted = "NotStarted",
@@ -11,13 +11,10 @@ export interface IGameState {
   status: GameStatus;
   snippet: {
     text: string;
-    lines: ITextLine[]; // Use the imported Line type here
+    parsedSnippet: ICharacter[];
   } | null;
   language: Language;
   wrongKeystrokes: number;
   validKeystrokes: number;
-  userPosition: {
-    charIndex: number;
-    lineIndex: number;
-  };
+  userPosition: number;
 }

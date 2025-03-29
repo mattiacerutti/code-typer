@@ -1,4 +1,3 @@
-
 "use client";
 import {Language} from "@/constants/supported-languages";
 import {GameStatus, IGameState} from "@/types/game-state";
@@ -8,7 +7,7 @@ import {GameStateContext} from "./GameStateContext";
 
 import {ReactNode} from "react";
 import {parseSnippet} from "@/services/snippets/snippet-parse.service";
-import {ITextLine} from "@/types/text-line";
+import {ICharacter} from "@/types/character";
 
 export function GameStateProvider({children}: {children: ReactNode}) {
   const [state, setState] = useState<IGameState>({
@@ -17,11 +16,11 @@ export function GameStateProvider({children}: {children: ReactNode}) {
     language: DEFAULT_LANGUAGE,
     wrongKeystrokes: 0,
     validKeystrokes: 0,
-    userPosition: {charIndex: 0, lineIndex: 0},
+    userPosition: 0,
   });
 
   const caretRef = useRef<{
-    setCaretIndex: (lineIndex: number, charIndex: number) => void;
+    setCaretIndex: (index: number) => void;
   }>(null);
 
   const setSnippet = useCallback((snippet: string | null) => {
@@ -33,13 +32,13 @@ export function GameStateProvider({children}: {children: ReactNode}) {
       return;
     }
 
-    const linesArray = parseSnippet(snippet, AUTO_CLOSING_CHARS);
+    const parsedText = parseSnippet(snippet, AUTO_CLOSING_CHARS);
 
     setState((prevState) => ({
       ...prevState,
       snippet: {
         text: snippet,
-        lines: linesArray,
+        parsedSnippet: parsedText,
       },
     }));
   }, []);
@@ -59,7 +58,7 @@ export function GameStateProvider({children}: {children: ReactNode}) {
         snippet: null,
         wrongKeystrokes: 0,
         validKeystrokes: 0,
-        userPosition: {charIndex: 0, lineIndex: 0},
+        userPosition: 0,
       }));
       return;
     }
@@ -76,45 +75,39 @@ export function GameStateProvider({children}: {children: ReactNode}) {
           ...prevState.snippet,
           lines: parseSnippet(prevState.snippet.text, AUTO_CLOSING_CHARS),
         },
-        userPosition: {charIndex: 0, lineIndex: 0},
+        userPosition: 0,
       };
     });
 
     if (caretRef.current) {
-      caretRef.current.setCaretIndex(0, 0);
+      caretRef.current.setCaretIndex(0);
     }
   }, []);
 
-  const updateSnippetLines = useCallback((lines: ITextLine[]) => {
+  const updateParsedSnippet = useCallback((parsedSnippet: ICharacter[]) => {
     setState((prevState) => {
-      if (!prevState.snippet) throw "Can't update lines if snippet is null";
+      if (!prevState.snippet) throw "Can't update parsedSnippet if snippet is null";
 
       return {
         ...prevState,
         snippet: {
           ...prevState.snippet,
-          lines,
+          parsedSnippet,
         },
       };
     });
   }, []);
 
-  const updateUserPosition = useCallback((position: {charIndex?: number; lineIndex?: number}) => {
-    setState((prevState) => {
-      const newCharIndex = position.charIndex ?? prevState.userPosition.charIndex;
-      const newLineIndex = position.lineIndex ?? prevState.userPosition.lineIndex;
-      const userPosition = {charIndex: newCharIndex, lineIndex: newLineIndex};
-
-      return {...prevState, userPosition};
-    });
+  const updateUserPosition = useCallback((position: number) => {
+    setState((prevState) => ({...prevState, userPosition: position}));
   }, []);
 
   useEffect(() => {
-    caretRef.current?.setCaretIndex(state.userPosition.lineIndex, state.userPosition.charIndex);
+    caretRef.current?.setCaretIndex(state.userPosition);
   }, [state.userPosition]);
 
   return (
-    <GameStateContext.Provider value={{gameState: state, caretRef, setSnippet, setLanguage, resetGameState, updateSnippetLines, updateUserPosition}}>
+    <GameStateContext.Provider value={{gameState: state, caretRef, setSnippet, setLanguage, resetGameState, updateParsedSnippet, updateUserPosition}}>
       {children}
     </GameStateContext.Provider>
   );

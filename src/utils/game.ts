@@ -1,19 +1,16 @@
-import { SUPPORTED_LANGUAGES } from "@/constants/supported-languages";
-import {CharacterState, CharacterTypes, WhitespaceTypes} from "@/types/character";
-import { Language } from "@/constants/supported-languages";
-import { ILanguage } from "@/types/language";
-import {ITextLine} from "@/types/text-line";
+import {SUPPORTED_LANGUAGES} from "@/constants/supported-languages";
+import {CharacterState, CharacterTypes, ICharacter, WhitespaceTypes} from "@/types/character";
+import {Language} from "@/constants/supported-languages";
+import {ILanguage} from "@/types/language";
 
-export function isGameFinished(lines: ITextLine[]) {
-  const allCorrect = lines.every((line) => {
-    return line.text.every(
-      (char) =>
-        char.state === CharacterState.Right ||
-        (char.state === CharacterState.Default && char.value === WhitespaceTypes.NewLine) ||
-        char.value === WhitespaceTypes.Tab ||
-        char.type === CharacterTypes.EOF
-    );
-  });
+export function isGameFinished(parsedSnippets: ICharacter[]) {
+  const allCorrect = parsedSnippets.every(
+    (char) =>
+      char.state === CharacterState.Right ||
+      (char.state === CharacterState.Default && char.value === WhitespaceTypes.NewLine) ||
+      char.value === WhitespaceTypes.Tab ||
+      char.type === CharacterTypes.EOF
+  );
 
   return allCorrect;
 }
@@ -40,4 +37,3 @@ export function getSupportedLanguage(language: Language): ILanguage {
   }
   return SUPPORTED_LANGUAGES[language];
 }
-

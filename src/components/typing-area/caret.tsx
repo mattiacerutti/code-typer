@@ -3,18 +3,16 @@
 import {useImperativeHandle, useState, useEffect, useCallback} from "react";
 
 interface ICaretProps {
-  charRefs: React.RefObject<{[key: string]: React.RefObject<HTMLSpanElement>}>;
+  charRefs: React.RefObject<HTMLSpanElement>[];
 }
 
-function Caret(props: ICaretProps & {ref: React.RefObject<{setCaretIndex: (line: number, char: number) => void}>}) {
+function Caret(props: ICaretProps & {ref: React.RefObject<{setCaretIndex: (position: number) => void}>}) {
   const {charRefs, ref} = props;
 
 
   const [caretPosition, setCaretPosition] = useState({top: 0, left: 0});
-  const [caretIndex, setCaretIndex] = useState({
-    lineIndex: 0,
-    charIndex: 0,
-  });
+
+  const [caretIndex, setCaretIndex] = useState(0);
 
   const [blinking, setBlinking] = useState(true);
 
@@ -36,9 +34,8 @@ function Caret(props: ICaretProps & {ref: React.RefObject<{setCaretIndex: (line:
     return () => clearTimeout(blinkingTimeout);
   }, [caretPosition, caretIndex]);
 
-  const updateCaretPosition = useCallback((line: number, char: number) => {
-    const charKey = `char-${line}-${char}`;
-    const charElement = charRefs.current[charKey].current;
+  const updateCaretPosition = useCallback((index: number) => {
+    const charElement = charRefs[index].current;
     if (charElement) {
         const {offsetTop, offsetLeft} = charElement;
       setCaretPosition({top: offsetTop, left: offsetLeft});
@@ -47,14 +44,14 @@ function Caret(props: ICaretProps & {ref: React.RefObject<{setCaretIndex: (line:
 
   // Exposes our local function to the parent via the ref
   useImperativeHandle(ref, () => ({
-    setCaretIndex: (line: number, char: number) => {
-      setCaretIndex({lineIndex: line, charIndex: char});
+    setCaretIndex: (position: number) => {
+      setCaretIndex(position);
     },
   }));
 
   useEffect(() => {
     // Update cursor position every render
-    updateCaretPosition(caretIndex.lineIndex, caretIndex.charIndex);
+    updateCaretPosition(caretIndex);
   }, [caretIndex, updateCaretPosition]);
 
   return (

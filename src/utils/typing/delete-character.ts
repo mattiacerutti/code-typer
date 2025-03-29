@@ -1,44 +1,38 @@
 import {SHOULD_PRESERVE_CLOSING_CHAR_WHEN_DELETING} from "@/constants/constants";
-import {ITextLine} from "@/types/text-line";
-import {CharacterState, CharacterTypes, WhitespaceTypes} from "@/types/character";
+import {CharacterState, CharacterTypes, ICharacter} from "@/types/character";
 import {IGameState} from "@/types/game-state";
-import {getBindedClosingChar, getChar, hasOnlyWhitespacesBefore, isClosingCharacter, setCharacterState} from "./shared";
+import {getBindedClosingChar, getPreviousChar, hasOnlyWhitespacesBefore, isClosingCharacter, setCharacterState} from "./shared";
 
 export function deleteCharacter(
   gameState: IGameState,
-  updateSnippetLines: (lines: ITextLine[]) => void,
-  updateUserPosition: (position: {lineIndex?: number; charIndex?: number}) => void,
-  position: {lineIndex: number; charIndex: number} = gameState.userPosition,
+  updateParsedSnippet: (parsedSnippet: ICharacter[]) => void,
+  updateUserPosition: (position: number) => void,
+  position: number
 ) {
-  if (position.charIndex > 0) {
-    position.charIndex--;
-  } else if (position.lineIndex !== 0) {
-    position.lineIndex--;
-    position.charIndex = gameState.snippet!.lines[position.lineIndex].text.length - 1;
-  }
-
-  const newChar = getChar(gameState, position);
-
-  if (
-    (newChar.type === CharacterTypes.Whitespace && hasOnlyWhitespacesBefore(gameState, position.charIndex, position.lineIndex)) ||
-    (newChar.value == WhitespaceTypes.NewLine && position.charIndex == 0) ||
-    (SHOULD_PRESERVE_CLOSING_CHAR_WHEN_DELETING && newChar.state === CharacterState.Right && isClosingCharacter(newChar))
-  ) {
-    deleteCharacter(gameState, updateSnippetLines, updateUserPosition, position);
+  if(position === 0) {
     return;
   }
 
-  const char = getChar(gameState, position);
+  const newChar = getPreviousChar(gameState, position) as ICharacter;
 
-  if (char.type === CharacterTypes.AutoClosing) {
-    const closingParenthesis = getBindedClosingChar(gameState, char);
-    if (closingParenthesis) {
-      closingParenthesis.state = CharacterState.Default;
+  if (
+    (newChar.type === CharacterTypes.Whitespace && hasOnlyWhitespacesBefore(gameState, position - 1)) ||
+    //(newChar.value == WhitespaceTypes.NewLine && position.charIndex == 0) ||
+    (SHOULD_PRESERVE_CLOSING_CHAR_WHEN_DELETING && newChar.state === CharacterState.Right && isClosingCharacter(newChar))
+  ) {
+    deleteCharacter(gameState, updateParsedSnippet, updateUserPosition, position - 1);
+    return;
+  }
+
+  if (newChar.type === CharacterTypes.AutoClosing) {
+    const bindedClosingChar = getBindedClosingChar(gameState, newChar);
+    if (bindedClosingChar) {
+      bindedClosingChar.state = CharacterState.Default;
     } else {
       throw new Error("Couldn't find a closing parenthesis");
     }
   }
 
-  setCharacterState(gameState, position, updateSnippetLines, CharacterState.Default);
-  updateUserPosition(position);
+  setCharacterState(gameState, position - 1, updateParsedSnippet, CharacterState.Default);
+  updateUserPosition(position - 1);
 }
