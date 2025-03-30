@@ -1,6 +1,6 @@
+import "dotenv/config";
 import {Language} from "@/constants/supported-languages";
 import {getSupportedLanguage} from "@/utils/game";
-import "dotenv/config";
 import {getSnippetRawLink} from "@/utils/api/snippet-utils";
 
 const GITHUB_API_URL = "https://api.github.com";
@@ -27,22 +27,20 @@ export async function fetchRandomCodeFiles(language: Language): Promise<string[]
       }
     });
 
-  let response = await (await request()).json();
-
-  console.log("response1", response);
+  let response = await request();
+  let responseJson = await response.json();
 
   // Sometimes the request is succesfull but the items array is empty. In this case, we just need to re-try the request
-  if (response.items.length === 0) {
+  if (responseJson.items.length === 0) {
     response = await request();
+    responseJson = await response.json();
   }
 
-  console.log("response2", response);
-
-  if (response.items.length === 0) {
+  if (responseJson.items.length === 0) {
     throw "Request was successfull but the items array was empty for two times in a row";
   }
 
-  return response.items.map((item: unknown) => getSnippetRawLink(item));
+  return responseJson.items.map((item: unknown) => getSnippetRawLink(item));
 }
 
 export async function getFileContent(rawUrl: string): Promise<string> {
