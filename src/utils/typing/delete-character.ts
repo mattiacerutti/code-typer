@@ -1,7 +1,7 @@
 import {SHOULD_PRESERVE_CLOSING_CHAR_WHEN_DELETING} from "@/constants/constants";
 import {CharacterState, CharacterTypes, ICharacter} from "@/types/character";
 import {IGameState} from "@/types/game-state";
-import {getBindedClosingChar, getPreviousChar, hasOnlyWhitespacesBefore, isClosingCharacter, setCharacterState} from "./shared";
+import {getBindedClosingChar, getPreviousChar, hasOnlyWhitespacesBefore, isClosingCharacter, setCharacterState} from "@/utils/typing/shared";
 
 export function deleteCharacter(
   gameState: IGameState,

@@ -1,16 +1,20 @@
 import Parser from "tree-sitter";
 import {Language} from "@/constants/supported-languages";
-import * as JavaScript from 'tree-sitter-javascript';
-import * as TypeScript from 'tree-sitter-typescript/typescript';
-import * as C from 'tree-sitter-c';
-import * as Cpp from 'tree-sitter-cpp';
-import * as CSharp from 'tree-sitter-c-sharp';
-import * as Java from 'tree-sitter-java';
-import * as Python from 'tree-sitter-python';
-import * as Lua from 'tree-sitter-lua';
-import { convertLanguage } from 'tree-sitter-compat';
+import JavaScript from "tree-sitter-javascript";
 
-// import {convertLanguage} from "tree-sitter-compat";
+// @ts-expect-error tree-sitter packages have no types
+import TypeScript from "tree-sitter-typescript/typescript";
+// @ts-expect-error tree-sitter packages have no types
+import C from "tree-sitter-c";
+// @ts-expect-error tree-sitter packages have no types
+import Cpp from "tree-sitter-cpp";
+import CSharp from "tree-sitter-c-sharp";
+import Java from "tree-sitter-java";
+// @ts-expect-error tree-sitter packages have no types
+import Python from "tree-sitter-python";
+// @ts-expect-error tree-sitter packages have no types
+import Lua from "tree-sitter-lua";
+import {convertLanguage} from "tree-sitter-compat";
 
 export function getTSParser(language: Language): Parser {
   const parser = new Parser();

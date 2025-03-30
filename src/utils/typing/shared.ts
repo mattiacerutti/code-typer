@@ -1,7 +1,7 @@
 import {IGameState} from "@/types/game-state";
-import {CharacterState, CharacterTypes, ICharacter, ISnippet, WhitespaceTypes} from "@/types/character";
+import {CharacterState, CharacterTypes, ICharacter, WhitespaceTypes} from "@/types/character";
 import {AUTO_CLOSING_CHARS, SHOULD_PRESERVE_CLOSING_CHAR_WHEN_DELETING} from "@/constants/constants";
-
+import {ISnippet} from "@/types/snippet";
 export function getChar(gameState: IGameState, position: number): ICharacter {
   return gameState.snippet!.parsedSnippet[position];
 }
