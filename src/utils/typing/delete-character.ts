@@ -17,7 +17,6 @@ export function deleteCharacter(
 
   if (
     (newChar.type === CharacterTypes.Whitespace && hasOnlyWhitespacesBefore(gameState, position - 1)) ||
-    //(newChar.value == WhitespaceTypes.NewLine && position.charIndex == 0) ||
     (SHOULD_PRESERVE_CLOSING_CHAR_WHEN_DELETING && newChar.state === CharacterState.Right && isClosingCharacter(newChar))
   ) {
     deleteCharacter(gameState, updateParsedSnippet, updateUserPosition, position - 1);
@@ -25,7 +24,7 @@ export function deleteCharacter(
   }
 
   if (newChar.type === CharacterTypes.AutoClosing) {
-    const bindedClosingChar = getBindedClosingChar(gameState, newChar);
+    const bindedClosingChar = getBindedClosingChar(gameState.snippet!.parsedSnippet, newChar, position - 1);
     if (bindedClosingChar) {
       bindedClosingChar.state = CharacterState.Default;
     } else {

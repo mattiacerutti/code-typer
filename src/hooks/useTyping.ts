@@ -32,7 +32,7 @@ const useTyping = (onWrongKeystroke: () => void, onValidKeystroke: () => void) =
       } else if (event.altKey) {
         switch (event.key) {
           case "Backspace":
-            // TODO: deleteWord(gameState, updateParsedSnippet, updateUserPosition);
+            deleteWord(gameState, updateParsedSnippet, updateUserPosition);
             break;
         }
       }
