@@ -1,5 +1,5 @@
 import {Language} from "@/constants/supported-languages"; // Import the LanguageName type from the appropriate module
-import {ICharacter} from "./character"; 
+import {ICharacter} from "@/types/character";
 
 export enum GameStatus {
   NotStarted = "NotStarted",

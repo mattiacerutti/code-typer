@@ -1,4 +1,4 @@
-import { Language } from "@/constants/supported-languages";
+import {Language} from "@/constants/supported-languages";
 
 export interface ILanguage {
   name: Language;

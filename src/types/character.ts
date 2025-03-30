@@ -44,4 +44,3 @@ export interface IEOFCharacter extends IBaseCharacter {
 }
 
 export type ICharacter = INormalCharacter | IWhitespaceCharacter | IEOFCharacter | IAutoClosingCharacter;
-export type ISnippet = ICharacter[];

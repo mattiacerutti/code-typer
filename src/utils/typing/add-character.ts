@@ -1,5 +1,5 @@
 import {IGameState} from "@/types/game-state";
-import {getBindedClosingChar, getChar, getPreviousChar, hasOnlyWhitespacesBefore, setCharacterState} from "./shared";
+import {getBindedClosingChar, getChar, getPreviousChar, hasOnlyWhitespacesBefore, setCharacterState} from "@/utils/typing/shared";
 import {CharacterState, CharacterTypes, ICharacter} from "@/types/character";
 
 function handleAutoClosingCharacter(gameState: IGameState, char: ICharacter) {

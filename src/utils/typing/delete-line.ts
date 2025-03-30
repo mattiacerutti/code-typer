@@ -1,5 +1,5 @@
 import {CharacterState, ICharacter} from "@/types/character";
-import {getLineStart, getPreviousLineEnd, isFirstCharacter, resetCharactersInRange} from "./shared";
+import {getLineStart, getPreviousLineEnd, isFirstCharacter, resetCharactersInRange} from "@/utils/typing/shared";
 import {IGameState} from "@/types/game-state";
 
 export function deleteLine(gameState: IGameState, updateParsedSnippet: (parsedSnippet: ICharacter[]) => void, updateUserPosition: (position: number) => void) {

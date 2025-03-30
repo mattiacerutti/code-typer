@@ -1,5 +1,5 @@
 import {CharacterState, ICharacter, WhitespaceTypes} from "@/types/character";
-import {getLineStart, getPreviousChar, getPreviousLineEnd, isFirstCharacter, resetCharactersInRange} from "./shared";
+import {getLineStart, getPreviousChar, getPreviousLineEnd, isFirstCharacter, resetCharactersInRange} from "@/utils/typing/shared";
 import {IGameState} from "@/types/game-state";
 import {AUTO_CLOSING_CHARS} from "@/constants/constants";
 
