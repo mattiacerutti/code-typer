@@ -73,7 +73,7 @@ export function GameStateProvider({children}: {children: ReactNode}) {
         validKeystrokes: 0,
         snippet: {
           ...prevState.snippet,
-          lines: parseSnippet(prevState.snippet.text, AUTO_CLOSING_CHARS),
+          parsedSnippet: parseSnippet(prevState.snippet.text, AUTO_CLOSING_CHARS),
         },
         userPosition: 0,
       };
