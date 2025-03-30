@@ -3,7 +3,7 @@ import {getBindedClosingChar, getChar, getPreviousChar, hasOnlyWhitespacesBefore
 import {CharacterState, CharacterTypes, ICharacter} from "@/types/character";
 
 function handleAutoClosingCharacter(gameState: IGameState, char: ICharacter) {
-  const closingCharacter = getBindedClosingChar(gameState, char);
+  const closingCharacter = getBindedClosingChar(gameState.snippet!.parsedSnippet, char, gameState.userPosition);
   if (closingCharacter) {
     closingCharacter.state = CharacterState.Right;
     return;

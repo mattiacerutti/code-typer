@@ -1,13 +1,13 @@
 import {IGameState} from "@/types/game-state";
-import {CharacterState, CharacterTypes, ICharacter, WhitespaceTypes} from "@/types/character";
-import {AUTO_CLOSING_CHARS} from "@/constants/constants";
+import {CharacterState, CharacterTypes, ICharacter, ISnippet, WhitespaceTypes} from "@/types/character";
+import {AUTO_CLOSING_CHARS, SHOULD_PRESERVE_CLOSING_CHAR_WHEN_DELETING} from "@/constants/constants";
 
 export function getChar(gameState: IGameState, position: number): ICharacter {
   return gameState.snippet!.parsedSnippet[position];
 }
 
 export function getPreviousChar(gameState: IGameState, position: number) {
-  if (position === 0) {
+  if (position <= 0) {
     return undefined;
   }
   const prevChar = getChar(gameState, position - 1);
@@ -36,11 +36,11 @@ export function setCharacterState(gameState: IGameState, position: number, updat
   updateParsedSnippet([...gameState.snippet!.parsedSnippet]);
 }
 
-export function getBindedClosingChar(gameState: IGameState, char: ICharacter) {
+export function getBindedClosingChar(snippet: ISnippet, char: ICharacter, position: number) {
   let cont = 1;
 
-  for (let i = gameState.userPosition + 1; i < gameState.snippet!.parsedSnippet.length; i++) {
-    const currentChar = gameState.snippet!.parsedSnippet[i];
+  for (let i = position + 1; i < snippet.length; i++) {
+    const currentChar = snippet[i];
     if (currentChar.value === AUTO_CLOSING_CHARS[char.value]) {
       cont--;
       if (cont === 0) {
@@ -73,4 +73,34 @@ export function isClosingCharacter(char: ICharacter): boolean {
 export function isFirstCharacter(gameState: IGameState, position: number): boolean {
   const prevChar = getPreviousChar(gameState, position);
   return prevChar === undefined || (prevChar.type === CharacterTypes.Whitespace && prevChar.value === WhitespaceTypes.NewLine) || hasOnlyWhitespacesBefore(gameState, position);
+}
+
+export function getPreviousLineEnd(gameState: IGameState, position: number): number | undefined {
+  for (let i = position - 1; i >= 0; i--) {
+    if (gameState.snippet!.parsedSnippet[i].value === WhitespaceTypes.NewLine) {
+      return i;
+    }
+  }
+  return undefined;
+}
+
+
+export function resetCharactersInRange(snippet: ISnippet, start: number, end: number) {
+  for (let i = start; i <= end; i++) {
+
+    if(SHOULD_PRESERVE_CLOSING_CHAR_WHEN_DELETING && snippet[i].state === CharacterState.Right && isClosingCharacter(snippet[i])) {
+      continue;
+    }
+
+    snippet[i].state = CharacterState.Default;
+    if (snippet[i].type === CharacterTypes.AutoClosing) {
+      const bindedClosingChar = getBindedClosingChar(snippet, snippet[i], i);
+      if (bindedClosingChar) {
+        bindedClosingChar.state = CharacterState.Default;
+      }
+    }
+  }
+
+
+  
 }
