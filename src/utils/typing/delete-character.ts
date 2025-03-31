@@ -1,30 +1,30 @@
 import {SHOULD_PRESERVE_CLOSING_CHAR_WHEN_DELETING} from "@/constants/constants";
 import {CharacterState, CharacterTypes, ICharacter} from "@/types/character";
-import {IGameState} from "@/types/game-state";
+import { ISnippet } from "@/types/snippet";
 import {getBindedClosingChar, getPreviousChar, hasOnlyWhitespacesBefore, isClosingCharacter, setCharacterState} from "@/utils/typing/shared";
 
 export function deleteCharacter(
-  gameState: IGameState,
-  updateParsedSnippet: (parsedSnippet: ICharacter[]) => void,
+  snippet: ISnippet,
+  position: number,
+  updateParsedSnippet: (parsedSnippet: ISnippet) => void,
   updateUserPosition: (position: number) => void,
-  position: number
 ) {
   if(position === 0) {
     return;
   }
 
-  const newChar = getPreviousChar(gameState, position) as ICharacter;
+  const newChar = getPreviousChar(snippet, position) as ICharacter;
 
   if (
-    (newChar.type === CharacterTypes.Whitespace && hasOnlyWhitespacesBefore(gameState, position - 1)) ||
+    (newChar.type === CharacterTypes.Whitespace && hasOnlyWhitespacesBefore(snippet, position - 1)) ||
     (SHOULD_PRESERVE_CLOSING_CHAR_WHEN_DELETING && newChar.state === CharacterState.Right && isClosingCharacter(newChar))
   ) {
-    deleteCharacter(gameState, updateParsedSnippet, updateUserPosition, position - 1);
+    deleteCharacter(snippet, position - 1, updateParsedSnippet, updateUserPosition);
     return;
   }
 
   if (newChar.type === CharacterTypes.AutoClosing) {
-    const bindedClosingChar = getBindedClosingChar(gameState.snippet!.parsedSnippet, newChar, position - 1);
+    const bindedClosingChar = getBindedClosingChar(snippet, newChar, position - 1);
     if (bindedClosingChar) {
       bindedClosingChar.state = CharacterState.Default;
     } else {
@@ -32,6 +32,7 @@ export function deleteCharacter(
     }
   }
 
-  setCharacterState(gameState, position - 1, updateParsedSnippet, CharacterState.Default);
+  setCharacterState(snippet, position - 1, updateParsedSnippet, CharacterState.Default);
   updateUserPosition(position - 1);
 }
+

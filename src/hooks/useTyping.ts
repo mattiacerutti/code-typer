@@ -1,14 +1,23 @@
-import {useGameState} from "@/contexts/game-state/GameStateContext";
+import {useGameState} from "@/contexts/GameStateContext";
 import {hasModifierKey, isAValidKey, isAValidShortcutKey} from "@/utils/typing/keys";
 import {deleteCharacter} from "@/utils/typing/delete-character";
 import {useCallback, useEffect, useState} from "react";
 import {addCharacter} from "@/utils/typing/add-character";
 import {deleteWord} from "@/utils/typing/delete-word";
 import {deleteLine} from "@/utils/typing/delete-line";
+import { ISnippet } from "@/types/snippet";
 
 const useTyping = (onWrongKeystroke: () => void, onValidKeystroke: () => void) => {
-  const {gameState, updateParsedSnippet, updateUserPosition} = useGameState();
+  const {state, dispatch} = useGameState();
   const [isCapsLockOn, setIsCapsLockOn] = useState(false);
+
+  const updateParsedSnippet = useCallback((parsedSnippet: ISnippet) => {
+    dispatch({type: "UPDATE_PARSED_SNIPPET", payload: parsedSnippet});
+  }, [dispatch])
+
+  const updateUserPosition = useCallback((position: number) => {
+    dispatch({type: "UPDATE_USER_POSITION", payload: position});
+  }, [dispatch])
 
   const registerKeyStroke = useCallback(
     (isCorrect: boolean) => {
@@ -26,18 +35,18 @@ const useTyping = (onWrongKeystroke: () => void, onValidKeystroke: () => void) =
       if (event.ctrlKey || event.metaKey) {
         switch (event.key) {
           case "Backspace":
-            deleteLine(gameState, updateParsedSnippet, updateUserPosition);
+            deleteLine(state, (updateParsedSnippet), updateUserPosition);
             break;
         }
       } else if (event.altKey) {
         switch (event.key) {
           case "Backspace":
-            deleteWord(gameState, updateParsedSnippet, updateUserPosition);
+            deleteWord(state, updateParsedSnippet, updateUserPosition);
             break;
         }
       }
     },
-    [gameState, updateParsedSnippet, updateUserPosition]
+    [state, updateParsedSnippet, updateUserPosition]
   );
   const handleKeyPress = useCallback(
     (event: KeyboardEvent) => {
@@ -54,14 +63,14 @@ const useTyping = (onWrongKeystroke: () => void, onValidKeystroke: () => void) =
 
       if (isAValidKey(event)) {
         if (event.key === "Backspace") {
-          deleteCharacter(gameState, updateParsedSnippet, updateUserPosition, gameState.userPosition);
+          deleteCharacter(state.snippet!.parsedSnippet, state.userPosition, updateParsedSnippet, updateUserPosition);
           return;
         }
 
-        addCharacter(event.key, gameState, updateParsedSnippet, updateUserPosition, registerKeyStroke);
+        addCharacter(state, event.key, updateParsedSnippet, updateUserPosition, registerKeyStroke);
       }
     },
-    [gameState, updateParsedSnippet, updateUserPosition, registerKeyStroke, handleKeyShortcut]
+    [state, updateParsedSnippet, updateUserPosition, registerKeyStroke, handleKeyShortcut]
   );
 
   useEffect(() => {

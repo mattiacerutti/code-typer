@@ -1,17 +1,13 @@
 "use client";
 
-import {useRef, useEffect} from "react";
+import React, {useRef, useEffect} from "react";
 import useCodeHighlight from "@/hooks/useCodeHighlight";
 import {CharacterState, CharacterTypes, ICharacter, WhitespaceTypes} from "@/types/character";
 import {isGameFinished} from "@/utils/game";
-import {useGameState} from "@/contexts/game-state/GameStateContext";
 import {GameStatus} from "@/types/game-state";
+import {useGameState} from "@/contexts/GameStateContext";
 import Caret from "./typing-area/caret";
-
-//Custom theme for code highlighting
-import "highlight.js/styles/github.css";
 import Character from "./typing-area/character";
-import React from "react";
 
 interface ITypingAreaProps {
   onGameFinished: () => void;
@@ -21,54 +17,56 @@ interface ITypingAreaProps {
 function TypingArea(props: ITypingAreaProps) {
   const {onGameFinished, onGameStarted} = props;
 
-  const {gameState, caretRef} = useGameState();
+  const {state, dispatch} = useGameState();
 
-  if (!gameState.snippet || !gameState.language) {
-    throw "Snippet or language not found";
+  if (!state.snippet || !state.language) {
+    throw new Error("TypingArea: Received invalid snippet or language");
   }
 
   // Handles code styling
-  const {codeHighlight} = useCodeHighlight(gameState.snippet.text, gameState.language);
+  const {codeHighlight} = useCodeHighlight(state.snippet.text, state.language);
 
   // Collection of all character refs, used to know where every character is at and to update caret position
   const charRefs = useRef<React.RefObject<HTMLSpanElement>[]>([]);
 
+  // Everytime the state updates, we check if the user is at the end. If so we check every character.
   useEffect(() => {
-    if (gameState.snippet) {
-      if (gameState.snippet.parsedSnippet.length > 0 && gameState.status !== GameStatus.Finished && isGameFinished(gameState.snippet.parsedSnippet)) {
-        gameState.status = GameStatus.Finished;
-        onGameFinished();
+    if (state.status === GameStatus.Started && state.userPosition === state.snippet!.parsedSnippet.length - 1) {
+
+      if(!isGameFinished(state.snippet!.parsedSnippet)) {
+        return;
       }
+
+      dispatch({type: "UPDATE_STATUS", payload: GameStatus.Finished});
+      onGameFinished();
     }
-  }, [onGameFinished, gameState]);
+   }, [onGameFinished, state, dispatch]);
 
   useEffect(() => {
-    if (gameState.snippet) {
-      if (gameState.snippet.parsedSnippet.length > 0 && gameState.status === GameStatus.NotStarted && gameState.snippet.parsedSnippet[0].state !== CharacterState.Default) {
-        gameState.status = GameStatus.Started;
-        onGameStarted();
-      }
+    if (state.status === GameStatus.NotStarted && state.snippet!.parsedSnippet[0].state !== CharacterState.Default) {
+      dispatch({type: "UPDATE_STATUS", payload: GameStatus.Started});
+      onGameStarted();
     }
-  }, [onGameStarted, gameState]);
+  }, [onGameStarted, state, dispatch]);
 
-  if (gameState.snippet.parsedSnippet.length > 0 && codeHighlight.length > 0) {
+  if (state.snippet.parsedSnippet.length > 0 && codeHighlight.length > 0) {
     return (
       <div className="flex flex-col justify-center items-center bg-slate-100 rounded-2xl shadow-lg p-10">
         <div className="relative flex justify-center items-center">
           <div className="text-slate-700 text-3xl flex flex-col gap-1.5 select-none">
             {(() => {
-              const groups: {char: ICharacter, index: number}[][] = [];
-              let current: {char: ICharacter, index: number}[] = [];
+              const groups: {char: ICharacter; index: number}[][] = [];
+              let current: {char: ICharacter; index: number}[] = [];
 
-              gameState.snippet.parsedSnippet.forEach((char, index) => {
-                current.push({ char, index });
-        
+              state.snippet.parsedSnippet.forEach((char: ICharacter, index: number) => {
+                current.push({char, index});
+
                 if (char.type === CharacterTypes.Whitespace && char.value === WhitespaceTypes.NewLine) {
                   groups.push([...current]);
                   current = [];
                 }
               });
-        
+
               if (current.length > 0) groups.push([...current]);
 
               return groups.map((group, idx) => (
@@ -83,7 +81,7 @@ function TypingArea(props: ITypingAreaProps) {
               ));
             })()}
           </div>
-          <Caret charRefs={charRefs.current} ref={caretRef as React.RefObject<{setCaretIndex: (position: number) => void}>} />
+          <Caret charRefs={charRefs.current} />
         </div>
       </div>
     );

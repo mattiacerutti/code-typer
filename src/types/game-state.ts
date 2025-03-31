@@ -11,7 +11,7 @@ export interface IGameState {
   status: GameStatus;
   snippet: {
     text: string;
-    parsedSnippet: ICharacter[];
+    parsedSnippet: ISnippet;
   } | null;
   language: Language;
   wrongKeystrokes: number;

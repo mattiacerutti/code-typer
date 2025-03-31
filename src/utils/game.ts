@@ -1,13 +1,13 @@
 import {SUPPORTED_LANGUAGES} from "@/constants/supported-languages";
-import {CharacterState, CharacterTypes, ICharacter, WhitespaceTypes} from "@/types/character";
+import {CharacterState, CharacterTypes, WhitespaceTypes} from "@/types/character";
 import {Language} from "@/constants/supported-languages";
 import {ILanguage} from "@/types/language";
+import { ISnippet } from "@/types/snippet";
 
-export function isGameFinished(parsedSnippets: ICharacter[]) {
+export function isGameFinished(parsedSnippets: ISnippet) {
   const allCorrect = parsedSnippets.every(
     (char) =>
       char.state === CharacterState.Right ||
-      (char.state === CharacterState.Default && char.value === WhitespaceTypes.NewLine) ||
       char.value === WhitespaceTypes.Tab ||
       char.type === CharacterTypes.EOF
   );
