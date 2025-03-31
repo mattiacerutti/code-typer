@@ -25,11 +25,7 @@ function Character(props: ICharacterProps & {ref: React.RefObject<HTMLSpanElemen
   }
 
   if (char.value == WhitespaceTypes.NewLine) {
-    if(isSelected) {
-      elementText = "\u00A0\u00A0⮐";
-    } else if(char.state == CharacterState.Wrong) {
-      elementText = "\u00A0\u00A0⮐";
-    }
+    elementText = "\u00A0\u00A0⮐";
   }
 
   if (char.value == WhitespaceTypes.Tab) {
@@ -41,7 +37,15 @@ function Character(props: ICharacterProps & {ref: React.RefObject<HTMLSpanElemen
   }
 
   return (
-    <span className={`${elementClasses} flex items-center justify-center`} ref={ref} style={{fontSize: char.value == WhitespaceTypes.NewLine ? "1rem" : "", fontWeight: char.value == WhitespaceTypes.NewLine ? "bold" : ""}}>
+    <span
+      className={`${elementClasses} flex items-center justify-center`}
+      ref={ref}
+      style={{
+        fontSize: char.value == WhitespaceTypes.NewLine ? "1rem" : "",
+        fontWeight: char.value == WhitespaceTypes.NewLine ? "bold" : "",
+        opacity: char.value == WhitespaceTypes.NewLine && !isSelected && char.state !== CharacterState.Wrong ? 0 : 1,
+      }}
+    >
       {elementText}
     </span>
   );
