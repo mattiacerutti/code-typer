@@ -1,9 +1,10 @@
-import {ICharacter, CharacterState, CharacterTypes, WhitespaceTypes} from "@/types/character";
+import {CharacterState, CharacterTypes, WhitespaceTypes} from "@/types/character";
+import { ISnippet } from "@/types/snippet";
 
-export const parseSnippet = (originalText: string, autoClosingChars: {[key: string]: string}): ICharacter[] => {
+export const parseSnippet = (originalText: string, autoClosingChars: {[key: string]: string}): ISnippet => {
   let mostRecentAutoClosingChar: string | undefined = undefined;
 
-  const parsedText: ICharacter[] = originalText.split("").map((char: string) => {
+  const parsedText: ISnippet = originalText.split("").map((char: string) => {
     if (Object.keys(autoClosingChars).includes(char)) {
       if (autoClosingChars[char] !== char && mostRecentAutoClosingChar === undefined) {
         return {

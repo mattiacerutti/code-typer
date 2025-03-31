@@ -89,6 +89,12 @@ const useCodeHighlight = (snippet: string, language: Language) => {
     }
   }, [getCodeHighlighting, snippet, language]);
 
+  useEffect(() => {
+    //@ts-expect-error custom theme for code highlighting
+    import("highlight.js/styles/github.css");
+  }, []);
+
+
   return {codeHighlight};
 };
 

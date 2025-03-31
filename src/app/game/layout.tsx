@@ -1,4 +1,4 @@
-import { GameStateProvider } from "@/contexts/game-state/GameStateProvider";
+import { GameStateProvider } from "@/contexts/GameStateProvider";
 import React from "react";
 
 function GameLayout({children}: {children: React.ReactNode}) {

@@ -1,18 +1,17 @@
 "use client";
 
-import {useImperativeHandle, useState, useEffect, useCallback} from "react";
+import { useGameState } from "@/contexts/GameStateContext";
+import {useState, useEffect, useCallback} from "react";
 
 interface ICaretProps {
   charRefs: React.RefObject<HTMLSpanElement>[];
 }
 
-function Caret(props: ICaretProps & {ref: React.RefObject<{setCaretIndex: (position: number) => void}>}) {
-  const {charRefs, ref} = props;
+function Caret(props: ICaretProps) {
+  const {charRefs} = props;
 
-
+  const {state} = useGameState();
   const [caretPosition, setCaretPosition] = useState({top: 0, left: 0});
-
-  const [caretIndex, setCaretIndex] = useState(0);
 
   const [blinking, setBlinking] = useState(true);
 
@@ -32,7 +31,7 @@ function Caret(props: ICaretProps & {ref: React.RefObject<{setCaretIndex: (posit
 
     // Clean up the timeout on component unmount
     return () => clearTimeout(blinkingTimeout);
-  }, [caretPosition, caretIndex]);
+  }, [caretPosition]);
 
   const updateCaretPosition = useCallback((index: number) => {
     const charElement = charRefs[index].current;
@@ -42,17 +41,11 @@ function Caret(props: ICaretProps & {ref: React.RefObject<{setCaretIndex: (posit
     }
   }, [charRefs]);
 
-  // Exposes our local function to the parent via the ref
-  useImperativeHandle(ref, () => ({
-    setCaretIndex: (position: number) => {
-      setCaretIndex(position);
-    },
-  }));
 
+  // Updates the cursor position anytime the user position changes
   useEffect(() => {
-    // Update cursor position every render
-    updateCaretPosition(caretIndex);
-  }, [caretIndex, updateCaretPosition]);
+    updateCaretPosition(state.userPosition);
+  }, [state.userPosition, updateCaretPosition]);
 
   return (
     <div

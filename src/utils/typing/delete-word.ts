@@ -2,6 +2,7 @@ import {CharacterState, ICharacter, WhitespaceTypes} from "@/types/character";
 import {getLineStart, getPreviousChar, getPreviousLineEnd, isFirstCharacter, resetCharactersInRange} from "@/utils/typing/shared";
 import {IGameState} from "@/types/game-state";
 import {AUTO_CLOSING_CHARS} from "@/constants/constants";
+import { ISnippet } from "@/types/snippet";
 
 const isWordSeparator = (char: ICharacter) =>
   char.value === "." ||
@@ -10,11 +11,13 @@ const isWordSeparator = (char: ICharacter) =>
   char.value === ":" ||
   char.value === "!" ||
   char.value === "?" ||
-  Object.values(AUTO_CLOSING_CHARS).includes(char.value);
+  Object.values(AUTO_CLOSING_CHARS).includes(char.value) ||
+  Object.keys(AUTO_CLOSING_CHARS).includes(char.value)
+  
 
-function getPreviousWordPosition(gameState: IGameState, position: number): number {
-  let currentChar = getPreviousChar(gameState, position);
-  const previousChar = getPreviousChar(gameState, position - 1);
+function getPreviousWordPosition(snippet: ISnippet, position: number): number {
+  let currentChar = getPreviousChar(snippet, position);
+  const previousChar = getPreviousChar(snippet, position - 1);
 
   if (!currentChar || !previousChar) {
     return 0;
@@ -23,7 +26,7 @@ function getPreviousWordPosition(gameState: IGameState, position: number): numbe
   if (currentChar.value === WhitespaceTypes.Space && previousChar.value === WhitespaceTypes.Space) {
     while (currentChar && currentChar.value === WhitespaceTypes.Space) {
       position--;
-      currentChar = getPreviousChar(gameState, position);
+      currentChar = getPreviousChar(snippet, position);
     }
     return position;
   }
@@ -34,35 +37,36 @@ function getPreviousWordPosition(gameState: IGameState, position: number): numbe
 
   do {
     position--;
-    currentChar = getPreviousChar(gameState, position);
+    currentChar = getPreviousChar(snippet, position);
   } while (currentChar && currentChar.value !== WhitespaceTypes.Space && !isWordSeparator(currentChar));
 
   return position;
 }
 
-export function deleteWord(gameState: IGameState, updateParsedSnippet: (parsedSnippet: ICharacter[]) => void, updateUserPosition: (position: number) => void) {
-  const position = gameState.userPosition;
+export function deleteWord(state: IGameState, updateParsedSnippet: (parsedSnippet: ISnippet) => void, updateUserPosition: (position: number) => void) {
+  const position = state.userPosition;
+  const snippet = state.snippet!.parsedSnippet;
   if (position === 0) return;
 
-  if (isFirstCharacter(gameState, position)) {
-    let previousLineEnd = getPreviousLineEnd(gameState, position);
+  if (isFirstCharacter(snippet, position)) {
+    let previousLineEnd = getPreviousLineEnd(snippet, position);
     if (previousLineEnd === undefined) {
       throw new Error("Couldn't find a previous line. This error should never happen.");
     }
 
-    while (previousLineEnd! > 0 && getLineStart(gameState, previousLineEnd!) === undefined) {
-      previousLineEnd = getPreviousLineEnd(gameState, previousLineEnd!);
+    while (previousLineEnd! > 0 && getLineStart(snippet, previousLineEnd!) === undefined) {
+      previousLineEnd = getPreviousLineEnd(snippet, previousLineEnd!);
     }
 
-    gameState.snippet!.parsedSnippet[previousLineEnd!].state = CharacterState.Default;
-    updateParsedSnippet([...gameState.snippet!.parsedSnippet]);
+    state.snippet!.parsedSnippet[previousLineEnd!].state = CharacterState.Default;
+    updateParsedSnippet([...state.snippet!.parsedSnippet]);
     updateUserPosition(previousLineEnd!);
     return;
   }
 
-  const previousWordPosition = getPreviousWordPosition(gameState, position);
-  resetCharactersInRange(gameState.snippet!.parsedSnippet, previousWordPosition, position);
+  const previousWordPosition = getPreviousWordPosition(snippet, position);
+  resetCharactersInRange(snippet, previousWordPosition, position);
 
-  updateParsedSnippet([...gameState.snippet!.parsedSnippet]);
+  updateParsedSnippet(snippet); //TODO: HERE
   updateUserPosition(previousWordPosition);
 }

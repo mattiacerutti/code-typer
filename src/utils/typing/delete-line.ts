@@ -1,34 +1,36 @@
-import {CharacterState, ICharacter} from "@/types/character";
+import {CharacterState} from "@/types/character";
 import {getLineStart, getPreviousLineEnd, isFirstCharacter, resetCharactersInRange} from "@/utils/typing/shared";
 import {IGameState} from "@/types/game-state";
+import { ISnippet } from "@/types/snippet";
 
-export function deleteLine(gameState: IGameState, updateParsedSnippet: (parsedSnippet: ICharacter[]) => void, updateUserPosition: (position: number) => void) {
-  const position = gameState.userPosition;
+export function deleteLine(state: IGameState, updateParsedSnippet: (parsedSnippet: ISnippet) => void, updateUserPosition: (position: number) => void) {
+  const position = state.userPosition;
+  const snippet = state.snippet!.parsedSnippet;
   if (position === 0) return;
 
-  if (isFirstCharacter(gameState, position)) {
-    let previousLineEnd = getPreviousLineEnd(gameState, position);
+  if (isFirstCharacter(snippet, position)) {
+    let previousLineEnd = getPreviousLineEnd(snippet, position);
     if (previousLineEnd === undefined) {
       throw new Error("Couldn't find a previous line. This error should never happen.");
     }
 
-    while (previousLineEnd! > 0 && getLineStart(gameState, previousLineEnd!) === undefined) {
-      previousLineEnd = getPreviousLineEnd(gameState, previousLineEnd!);
+    while (previousLineEnd! > 0 && getLineStart(snippet, previousLineEnd!) === undefined) {
+      previousLineEnd = getPreviousLineEnd(snippet, previousLineEnd!);
     }
 
-    gameState.snippet!.parsedSnippet[previousLineEnd!].state = CharacterState.Default;
-    updateParsedSnippet([...gameState.snippet!.parsedSnippet]);
+    state.snippet!.parsedSnippet[previousLineEnd!].state = CharacterState.Default;
+    updateParsedSnippet([...state.snippet!.parsedSnippet]);
     updateUserPosition(previousLineEnd!);
     return;
   }
 
-  const firstLineCharacterIndex = getLineStart(gameState, position);
+  const firstLineCharacterIndex = getLineStart(snippet, position);
   if (firstLineCharacterIndex === undefined) {
     return;
   }
 
-  resetCharactersInRange(gameState.snippet!.parsedSnippet, firstLineCharacterIndex, position);
+  resetCharactersInRange(snippet, firstLineCharacterIndex, position);
 
-  updateParsedSnippet([...gameState.snippet!.parsedSnippet]);
+  updateParsedSnippet([...state.snippet!.parsedSnippet]);
   updateUserPosition(firstLineCharacterIndex);
 }

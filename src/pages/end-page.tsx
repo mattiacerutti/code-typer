@@ -1,6 +1,6 @@
 "use client";
 
-import {useGameState} from "@/contexts/game-state/GameStateContext";
+import {useGameState} from "@/contexts/GameStateContext";
 import {calculateAccuracy, calculateWPM, humanizeTime} from "@/utils/game";
 
 interface IEndPageProps {
@@ -11,18 +11,18 @@ interface IEndPageProps {
 function EndPage(props: IEndPageProps) {
   const {totalTime, handleRestartGame} = props;
 
-  const {gameState} = useGameState();
+  const {state} = useGameState();
 
-  const validKeystrokes = gameState.validKeystrokes;
+  const validKeystrokes = state.validKeystrokes;
 
-  const wrongKeystrokes = gameState.wrongKeystrokes;
+  const wrongKeystrokes = state.wrongKeystrokes;
 
-  if (!gameState.snippet) return <div>Loading..</div>;
+  if (!state.snippet) return <div>Loading..</div>;
 
   return (
     <div className="flex flex-col gap-8">
       <div className="flex flex-row gap-4">
-        <div className="bg-slate-500 rounded-lg px-8 py-4 text-white shadow-lg">WPM {calculateWPM(totalTime, gameState.snippet.text.length)}</div>
+        <div className="bg-slate-500 rounded-lg px-8 py-4 text-white shadow-lg">WPM {calculateWPM(totalTime, state.snippet.text.length)}</div>
         <div className="bg-slate-500 rounded-lg px-8 py-4 text-white shadow-lg">Accuracy: {calculateAccuracy(validKeystrokes, wrongKeystrokes)}%</div>
         <div className="bg-slate-500 rounded-lg px-8 py-4 text-white shadow-lg">{humanizeTime(totalTime)}</div>
       </div>

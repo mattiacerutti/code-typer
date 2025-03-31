@@ -1,26 +1,28 @@
-import {IGameState} from "@/types/game-state";
 import {CharacterState, CharacterTypes, ICharacter, WhitespaceTypes} from "@/types/character";
 import {AUTO_CLOSING_CHARS, SHOULD_PRESERVE_CLOSING_CHAR_WHEN_DELETING} from "@/constants/constants";
 import {ISnippet} from "@/types/snippet";
-export function getChar(gameState: IGameState, position: number): ICharacter {
-  return gameState.snippet!.parsedSnippet[position];
+
+
+export function getChar(snippet: ISnippet, position: number): ICharacter {
+  return snippet[position];
 }
 
-export function getPreviousChar(gameState: IGameState, position: number) {
+
+export function getPreviousChar(snippet: ISnippet, position: number) {
   if (position <= 0) {
     return undefined;
   }
-  const prevChar = getChar(gameState, position - 1);
+  const prevChar = getChar(snippet, position - 1);
   if (prevChar.value === WhitespaceTypes.Tab) {
-    return getPreviousChar(gameState, position - 1);
+    return getPreviousChar(snippet, position - 1);
   }
   return prevChar;
 }
 
-export function getLineStart(gameState: IGameState, position: number): number | undefined {
+export function getLineStart(snippet: ISnippet, position: number): number | undefined {
   let nonWhitespaceChar = undefined;
   for (let i = position; i >= 0; i--) {
-    const char = getChar(gameState, i);
+    const char = getChar(snippet, i);
     if (char.value === WhitespaceTypes.NewLine && i !== position) {
       break;
     }
@@ -31,9 +33,9 @@ export function getLineStart(gameState: IGameState, position: number): number | 
   return nonWhitespaceChar;
 }
 
-export function setCharacterState(gameState: IGameState, position: number, updateParsedSnippet: (parsedSnippet: ICharacter[]) => void, state: CharacterState) {
-  gameState.snippet!.parsedSnippet[position].state = state;
-  updateParsedSnippet([...gameState.snippet!.parsedSnippet]);
+export function setCharacterState(snippet: ISnippet, position: number, updateParsedSnippet: (parsedSnippet: ISnippet) => void, state: CharacterState) {
+  snippet[position].state = state;
+  updateParsedSnippet(snippet);
 }
 
 export function getBindedClosingChar(snippet: ISnippet, char: ICharacter, position: number) {
@@ -54,14 +56,14 @@ export function getBindedClosingChar(snippet: ISnippet, char: ICharacter, positi
   return undefined;
 }
 
-export function hasOnlyWhitespacesBefore(gameState: IGameState, position: number): boolean {
-  let prevChar = getPreviousChar(gameState, position);
+export function hasOnlyWhitespacesBefore(snippet: ISnippet, position: number): boolean {
+  let prevChar = getPreviousChar(snippet, position);
   while (prevChar && prevChar.value !== WhitespaceTypes.NewLine) {
     if (prevChar.type !== CharacterTypes.Whitespace) {
       return false;
     }
     position--;
-    prevChar = getPreviousChar(gameState, position);
+    prevChar = getPreviousChar(snippet, position);
   }
   return true;
 }
@@ -70,25 +72,23 @@ export function isClosingCharacter(char: ICharacter): boolean {
   return Object.values(AUTO_CLOSING_CHARS).includes(char.value) && char.type === CharacterTypes.Normal;
 }
 
-export function isFirstCharacter(gameState: IGameState, position: number): boolean {
-  const prevChar = getPreviousChar(gameState, position);
-  return prevChar === undefined || (prevChar.type === CharacterTypes.Whitespace && prevChar.value === WhitespaceTypes.NewLine) || hasOnlyWhitespacesBefore(gameState, position);
+export function isFirstCharacter(snippet: ISnippet, position: number): boolean {
+  const prevChar = getPreviousChar(snippet, position);
+  return prevChar === undefined || (prevChar.type === CharacterTypes.Whitespace && prevChar.value === WhitespaceTypes.NewLine) || hasOnlyWhitespacesBefore(snippet, position);
 }
 
-export function getPreviousLineEnd(gameState: IGameState, position: number): number | undefined {
+export function getPreviousLineEnd(snippet: ISnippet, position: number): number | undefined {
   for (let i = position - 1; i >= 0; i--) {
-    if (gameState.snippet!.parsedSnippet[i].value === WhitespaceTypes.NewLine) {
+    if (snippet[i].value === WhitespaceTypes.NewLine) {
       return i;
     }
   }
   return undefined;
 }
 
-
 export function resetCharactersInRange(snippet: ISnippet, start: number, end: number) {
   for (let i = start; i <= end; i++) {
-
-    if(SHOULD_PRESERVE_CLOSING_CHAR_WHEN_DELETING && snippet[i].state === CharacterState.Right && isClosingCharacter(snippet[i])) {
+    if (SHOULD_PRESERVE_CLOSING_CHAR_WHEN_DELETING && snippet[i].state === CharacterState.Right && isClosingCharacter(snippet[i])) {
       continue;
     }
 
@@ -100,7 +100,4 @@ export function resetCharactersInRange(snippet: ISnippet, start: number, end: nu
       }
     }
   }
-
-
-  
 }

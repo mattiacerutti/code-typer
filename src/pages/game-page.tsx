@@ -1,6 +1,6 @@
 "use client";
 import {Language} from "@/constants/supported-languages";
-import {useGameState} from "@/contexts/game-state/GameStateContext";
+import {useGameState} from "@/contexts/GameStateContext";
 import { GameStatus } from "@/types/game-state";
 import TypingArea from "@/components/typing-area";
 import useTyping from "@/hooks/useTyping";
@@ -10,21 +10,20 @@ interface IGamePageProps {
   onGameStarted: () => void;
   changeSnippet: () => void;
   resetSnippet: () => void;
-  setSelectedLanguage: (language: Language) => void;
   isRefreshing: boolean;
 }
 
 function GamePage(props: IGamePageProps) {
-  const {onGameFinished, onGameStarted, changeSnippet: refreshSnippet, resetSnippet: restartGame, setSelectedLanguage, isRefreshing} = props;
+  const {onGameFinished, onGameStarted, changeSnippet: refreshSnippet, resetSnippet: restartGame, isRefreshing} = props;
 
-  const {gameState} = useGameState();
+  const {state, dispatch} = useGameState();
 
   const onWrongKeystroke = () => {
-    gameState.wrongKeystrokes += 1;
+    state.wrongKeystrokes += 1;
   };
 
   const onValidKeystroke = () => {
-    gameState.validKeystrokes += 1;
+    state.validKeystrokes += 1;
   };
 
 
@@ -40,7 +39,7 @@ function GamePage(props: IGamePageProps) {
           <button
             className="px-6 py-3 bg-slate-200 text-slate-900 font-medium rounded-md hover:bg-slate-300 disabled:opacity-20"
             onClick={restartGame}
-            disabled={isRefreshing || gameState.status !== GameStatus.Started}
+            disabled={isRefreshing || state.status !== GameStatus.Started}
           >
             <svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
               <path
@@ -58,9 +57,9 @@ function GamePage(props: IGamePageProps) {
           </button>
           <select
             disabled={isRefreshing}
-            value={gameState.language}
+            value={state.language}
             onChange={(e) => {
-              setSelectedLanguage(e.target.value as Language);
+              dispatch({type: "SET_LANGUAGE", payload: e.target.value as Language});
             }}
             className="px-6 py-3 bg-slate-200 text-slate-900 font-medium rounded-md hover:bg-slate-300 disabled:opacity-20"
           >

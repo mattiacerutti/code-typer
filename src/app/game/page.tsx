@@ -5,12 +5,12 @@ import {getRandomCodeSnippets} from "@/services/snippets/snippet.service";
 import useTimer from "@/hooks/useTimer";
 import {GameStatus} from "@/types/game-state";
 import {REFRESH_BUTTON_MIN_DELAY} from "@/constants/constants";
-import {useGameState} from "@/contexts/game-state/GameStateContext";
+import {useGameState} from "@/contexts/GameStateContext";
 import GamePage from "@/pages/game-page";
 import EndPage from "@/pages/end-page";
 
 function Home() {
-  const {setSnippet, setLanguage, resetGameState, gameState} = useGameState();
+  const {dispatch, state} = useGameState();
 
   const codeSnippets = useRef<string[]>([]);
 
@@ -21,30 +21,29 @@ function Home() {
 
   useEffect(() => {
     // Handles language change. We re-fetch the snippets and select a random one.
-    if (gameState.language) {
-      setSnippet(null);
-      resetGameState();
+    if (state.language) {
+      dispatch({type: "RESET_GAME_STATE", keepSnippet: true});
       resetTimer();
-      getRandomCodeSnippets(gameState.language).then((ret) => {
+      getRandomCodeSnippets(state.language).then((ret) => {
         codeSnippets.current = ret;
-        setSnippet(ret[0]);
+        dispatch({type: "SET_SNIPPET", payload: ret[0]});
       });
     }
-  }, [gameState.language, setSnippet, resetGameState, resetTimer]);
+  }, [state.language, dispatch, resetTimer]);
 
   const goToNextSnippet = async () => {
     // If we have only 3 snippet left, we re-fetch and append them to the end of the array
     if (codeSnippets.current.length <= 3) {
-      const randomSnippets = await getRandomCodeSnippets(gameState.language);
+      const randomSnippets = await getRandomCodeSnippets(state.language);
       codeSnippets.current.push(...randomSnippets);
     }
 
     codeSnippets.current.shift();
-    setSnippet(codeSnippets.current[0]);
+    dispatch({type: "SET_SNIPPET", payload: codeSnippets.current[0]});
   }
 
   const resetSnippet = () => {
-    resetGameState(false);
+    dispatch({type: "RESET_GAME_STATE", keepSnippet: false});
     resetTimer();
   }
 
@@ -80,7 +79,7 @@ function Home() {
   }
 
   const handleRestartGame = () => {
-    resetGameState();
+    dispatch({type: "RESET_GAME_STATE", keepSnippet: true});
     goToNextSnippet().then(() => {
       resetTimer();
       setIsGameOver(false);
@@ -89,7 +88,7 @@ function Home() {
 
 
 
-  if (isGameOver && gameState.status === GameStatus.Finished)
+  if (isGameOver && state.status === GameStatus.Finished)
     return (
       <>
         <EndPage totalTime={getTime()} handleRestartGame={handleRestartGame} />
@@ -98,18 +97,17 @@ function Home() {
 
   return (
     <>
-      {gameState.snippet && (
+      {state.snippet && (
         <GamePage
           onGameFinished={handleGameOver}
           onGameStarted={handleStartGame}
           changeSnippet={changeSnippet}
           resetSnippet={resetSnippet}
-          setSelectedLanguage={setLanguage}
           isRefreshing={isRefreshing}
-          key={gameState.snippet.text}
+          key={state.snippet.text}
         />
       )}
-      {!gameState.snippet && <div>Loading...</div>}
+      {!state.snippet && <div>Loading...</div>}
     </>
   );
 }
