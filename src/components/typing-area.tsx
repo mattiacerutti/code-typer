@@ -75,7 +75,7 @@ function TypingArea(props: ITypingAreaProps) {
                     const index = item.index;
                     const charRef = React.createRef<HTMLSpanElement>() as React.RefObject<HTMLSpanElement>;
                     charRefs.current[index] = charRef;
-                    return <Character key={index} char={item.char} charHighlighting={codeHighlight[index]} ref={charRefs.current[index]} />;
+                    return <Character key={index} char={item.char} charHighlighting={codeHighlight[index]} isSelected={index === state.userPosition} ref={charRefs.current[index]} />;
                   })}
                 </div>
               ));
