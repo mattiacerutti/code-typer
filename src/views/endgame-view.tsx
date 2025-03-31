@@ -3,12 +3,12 @@
 import {useGameState} from "@/contexts/GameStateContext";
 import {calculateAccuracy, calculateWPM, humanizeTime} from "@/utils/game";
 
-interface IEndPageProps {
+interface IEndgameViewProps {
   totalTime: number;
   handleRestartGame: () => void;
 }
 
-function EndPage(props: IEndPageProps) {
+function EndgameView(props: IEndgameViewProps) {
   const {totalTime, handleRestartGame} = props;
 
   const {state} = useGameState();
@@ -34,4 +34,4 @@ function EndPage(props: IEndPageProps) {
   );
 }
 
-export default EndPage;
+export default EndgameView;
