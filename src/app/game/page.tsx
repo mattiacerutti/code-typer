@@ -6,8 +6,8 @@ import useTimer from "@/hooks/useTimer";
 import {GameStatus} from "@/types/game-state";
 import {REFRESH_BUTTON_MIN_DELAY} from "@/constants/constants";
 import {useGameState} from "@/contexts/GameStateContext";
-import GamePage from "@/pages/game-page";
-import EndPage from "@/pages/end-page";
+import GameView from "@/views/game-view";
+import EndgameView from "@/views/endgame-view";
 
 function Home() {
   const {dispatch, state} = useGameState();
@@ -91,14 +91,14 @@ function Home() {
   if (isGameOver && state.status === GameStatus.Finished)
     return (
       <>
-        <EndPage totalTime={getTime()} handleRestartGame={handleRestartGame} />
+        <EndgameView totalTime={getTime()} handleRestartGame={handleRestartGame} />
       </>
     );
 
   return (
     <>
       {state.snippet && (
-        <GamePage
+        <GameView
           onGameFinished={handleGameOver}
           onGameStarted={handleStartGame}
           changeSnippet={changeSnippet}

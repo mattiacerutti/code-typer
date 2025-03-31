@@ -50,8 +50,8 @@ export function extractSnippets(fileContent: string, language: Language): string
 
   try {
     parsedCode = parser.parse(fileContent);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   } catch (error) {
-    // console.error('Error parsing code:', error);
     return [];
   }
 

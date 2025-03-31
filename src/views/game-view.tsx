@@ -5,7 +5,9 @@ import { GameStatus } from "@/types/game-state";
 import TypingArea from "@/components/typing-area";
 import useTyping from "@/hooks/useTyping";
 
-interface IGamePageProps {
+export const dynamic = 'force-dynamic';
+
+interface IGameViewProps {
   onGameFinished: () => void;
   onGameStarted: () => void;
   changeSnippet: () => void;
@@ -13,7 +15,7 @@ interface IGamePageProps {
   isRefreshing: boolean;
 }
 
-function GamePage(props: IGamePageProps) {
+function GameView(props: IGameViewProps) {
   const {onGameFinished, onGameStarted, changeSnippet: refreshSnippet, resetSnippet: restartGame, isRefreshing} = props;
 
   const {state, dispatch} = useGameState();
@@ -75,4 +77,4 @@ function GamePage(props: IGamePageProps) {
   );
 }
 
-export default GamePage;
+export default GameView;
