@@ -1,7 +1,7 @@
-import {Language} from "@/constants/supported-languages";
+import { LanguageId } from "@/types/language";
 
-export async function fetchRandomSnippets(language: Language): Promise<string[]> {
-  const url = `api/snippets/random?language=${encodeURIComponent(language)}`;
+export async function fetchRandomSnippets(languageId: LanguageId): Promise<string[]> {
+  const url = `api/snippets/random?language=${encodeURIComponent(languageId)}`;
 
   const response = await fetch(url);
 
@@ -9,5 +9,5 @@ export async function fetchRandomSnippets(language: Language): Promise<string[]>
     throw new Error(`Request failed with status code ${response.status}`);
   }
 
-  return response.json();
+  return await response.json();
 }

@@ -1,95 +1,105 @@
-import { MIN_CACHED_SNIPPETS, SNIPPETS_SIMULTANEOUS_REQUESTS } from "@/constants/api/snippets";
-import { Language } from "@/constants/supported-languages";
-import { fetchRandomCodeFiles, getFileContent } from "@/services/api/snippet-fetch.service";
-import { extractSnippets, filterSnippets, formatCode } from "@/services/api/snippet-process.service";
-import { getUniqueRandomIndexes } from "@/utils/api/snippet-utils";
-import { NextResponse } from "next/server";
+import {MIN_SNIPPETS_PER_LANGUAGE, RANDOM_SNIPPETS_FETCHED, MAX_SNIPPETS_FETCH_ATTEMPTS} from "@/constants/api/snippets";
+import {doesLanguageExist} from "@/repositories/language.repository";
+import {getFileContent} from "@/services/api/snippet-fetch.service";
+import {extractSnippets, filterSnippets, formatCode} from "@/services/api/snippet-process.service";
+import {NextResponse} from "next/server";
+import {LanguageId} from "@/types/language";
+import {fetchRandomSnippets, setSnippetAsNonValid} from "@/repositories/snippet.repository";
 
 export async function GET(request: Request) {
-  console.log("language");
-  const { searchParams } = new URL(request.url);
-  const language = searchParams.get('language');
-  console.log("languagasdsadasde", language);
+  const {searchParams} = new URL(request.url);
+  let languageId = searchParams.get("language") as LanguageId;
 
-  const snippets = await getRandomCodeSnippets(language as Language);
+  if (!languageId) {
+    return NextResponse.json({error: "Language not provided"}, {status: 400});
+  }
 
-  return NextResponse.json(snippets);
+  languageId = languageId.toLowerCase() as LanguageId;
+
+  // Check if language provided exists
+  const languageExists = await doesLanguageExist(languageId);
+  if (!languageExists) {
+    return NextResponse.json({error: "Language not found"}, {status: 404});
+  }
+
+  try {
+    const snippets = await getRandomSnippets(languageId, RANDOM_SNIPPETS_FETCHED);
+    return NextResponse.json(snippets);
+  } catch (error) {
+    console.error("Error fetching random snippets:", error);
+    return NextResponse.json({error: "Failed to fetch random snippets"}, {status: 500});
+  }
 }
 
-async function getRandomCodeSnippets(language: Language): Promise<string[]> {
-  const snippetUrls = await fetchRandomCodeFiles(language)
-    .catch((error) => {
-      console.error('Error fetching random files:', error);
+async function getRandomSnippets(languageId: LanguageId, quantity: number): Promise<string[]> {
+  const snippets: string[] = [];
+  const fetchedUrls: string[] = [];
+
+  let attempts = 0;
+  while (snippets.length < MIN_SNIPPETS_PER_LANGUAGE && attempts < MAX_SNIPPETS_FETCH_ATTEMPTS) {
+    // Fetch n random snippetUrls from DB
+    const fileUrls = await fetchRandomSnippets(languageId, quantity, fetchedUrls).catch((error) => {
+      console.error("Error fetching random files:", error);
       return [];
     });
 
-  const codeSnippets: string[] = await getSnippetsBatch(
-    snippetUrls,
-    language,
-  );
+    // Add fileUrls to fetchedUrls array
+    fetchedUrls.push(...fileUrls);
 
-  if (codeSnippets.length === 0)
-    throw "Couldn't find any valid nodes in any of the fetched files";
+    // Get processed snippets from snippetUrls
+    const retrievedSnippets = await getSnippetsFromUrls(fileUrls, languageId);
 
-  // Shuffle snippets before returning
-  return codeSnippets.sort(() => 0.5 - Math.random());
-};
+    snippets.push(...retrievedSnippets);
+    attempts++;
+  }
 
-async function getSnippetsFromLink(
-  link: string,
-  language: Language,
-): Promise<string[]> {
-  const fileContent = await getFileContent(link);
+  if (snippets.length < MIN_SNIPPETS_PER_LANGUAGE) {
+    throw new Error(`Failed to fetch enough snippets in ${MAX_SNIPPETS_FETCH_ATTEMPTS} attempts`);
+  }
 
-  const extractedSnippets = extractSnippets(
-    fileContent,
-    language,
-  );
+  // Shuffle snippets and return them
+  return snippets.sort(() => Math.random() - 0.5);
+}
 
+function processSnippets(fileContent: string, languageId: LanguageId): string[] {
+  // Extract snippets from file content
+  const extractedSnippets = extractSnippets(fileContent, languageId);
+
+  // Format snippets
   let codeSnippets = extractedSnippets
     .map((snippet) => {
       const formattedSnippet = formatCode(snippet);
 
-      // console.log("Raw snippet:", JSON.stringify(snippet));
-
       if (!formattedSnippet) return null;
-
-      // console.log("Formatted snippet:", JSON.stringify(formattedSnippet));
 
       return formattedSnippet;
     })
     .filter((snippet) => snippet !== null);
 
+  // Filter snippets
   codeSnippets = filterSnippets(codeSnippets);
 
   return codeSnippets;
 }
 
-async function getSnippetsBatch(
-  snippetUrls: string[],
-  language: Language,
-): Promise<string[]> {
-  const codeSnippets: string[] = [];
-  while (codeSnippets.length < MIN_CACHED_SNIPPETS) {
-    if (snippetUrls.length === 0) break;
+async function getSnippetsFromUrls(snippetUrls: string[], languageId: LanguageId): Promise<string[]> {
+  const processSnippetsPromises = snippetUrls.map(async (snippetUrl: string) => {
+    // Get file content from snippetUrl
+    const fileContent = await getFileContent(snippetUrl);
 
-    // Gets N unquie random indexes. Number could be changed to increase concurrency
-    const randomIndexes = getUniqueRandomIndexes(
-      snippetUrls.length,
-      SNIPPETS_SIMULTANEOUS_REQUESTS,
-    );
+    // Process snippets from file content
+    const snippets = processSnippets(fileContent, languageId);
 
-    // Simultaneously get snippets different files
-    const snippetPromises = randomIndexes.map((randomIndex) =>
-      getSnippetsFromLink(snippetUrls[randomIndex], language),
-    );
-    const snippets = (await Promise.all(snippetPromises)).flat();
+    if (snippets.length === 0) {
+      // If after processing no snippets are found from that URL, async set it to NON VALID
+      setSnippetAsNonValid(snippetUrl);
+    }
 
-    codeSnippets.push(...snippets);
+    return snippets;
+  });
 
-    // Removes already fetched files
-    snippetUrls = snippetUrls.filter((_, i) => !randomIndexes.includes(i));
-  }
+  // Process snippets from all file contents simultaneously
+  const processedSnippets = (await Promise.all(processSnippetsPromises)).flat();
 
-  return codeSnippets;
+  return processedSnippets;
 }

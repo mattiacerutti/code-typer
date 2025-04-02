@@ -1,4 +1,4 @@
-import {Language} from "@/constants/supported-languages"; // Import the LanguageName type from the appropriate module
+import {LanguageId} from "@/types/language"; // Import the LanguageName type from the appropriate module
 import { ISnippet } from "./snippet";
 
 export enum GameStatus {
@@ -13,7 +13,7 @@ export interface IGameState {
     text: string;
     parsedSnippet: ISnippet;
   } | null;
-  language: Language;
+  language: LanguageId;
   wrongKeystrokes: number;
   validKeystrokes: number;
   userPosition: number;

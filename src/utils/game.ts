@@ -1,7 +1,6 @@
 import {SUPPORTED_LANGUAGES} from "@/constants/supported-languages";
 import {CharacterState, CharacterTypes, WhitespaceTypes} from "@/types/character";
-import {Language} from "@/constants/supported-languages";
-import {ILanguage} from "@/types/language";
+import {ILanguage, LanguageId} from "@/types/language";
 import { ISnippet } from "@/types/snippet";
 
 export function isGameFinished(parsedSnippets: ISnippet) {
@@ -9,6 +8,7 @@ export function isGameFinished(parsedSnippets: ISnippet) {
     (char) =>
       char.state === CharacterState.Right ||
       char.value === WhitespaceTypes.Tab ||
+      (char.value === WhitespaceTypes.NewLine && char.state === CharacterState.Default) ||
       char.type === CharacterTypes.EOF
   );
 
@@ -31,9 +31,9 @@ export function humanizeTime(milliseconds: number) {
   return `${seconds}s`;
 }
 
-export function getSupportedLanguage(language: Language): ILanguage {
-  if (!SUPPORTED_LANGUAGES[language]) {
-    throw `Language ${language} not supported.`;
+export function getSupportedLanguage(languageId: LanguageId): ILanguage {
+  if (!SUPPORTED_LANGUAGES[languageId]) {
+    throw `Language ${languageId} not supported.`;
   }
-  return SUPPORTED_LANGUAGES[language];
+  return SUPPORTED_LANGUAGES[languageId];
 }

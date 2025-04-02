@@ -1,8 +1,8 @@
 import {filterLineLength, filterLinesNumber, filterSnippetLength, filterSnippetSpecialCharacters, filterTabsInBetween, isValidNode} from "@/utils/api/snippet-filters";
 import {adjustIndentationOffset, countInitialWhitespaces, detectIndentationStyle, getNodeText, removeInvalidWhitespaces} from "@/utils/api/snippet-utils";
-import {Language} from "@/constants/supported-languages";
 import IParser from "tree-sitter";
 import {getTSParser} from "./snippet-parser.service";
+import {LanguageId} from "@/types/language";
 
 function findValidNodes(node: IParser.SyntaxNode): IParser.SyntaxNode[] {
   let nodes: IParser.SyntaxNode[] = [];
@@ -43,8 +43,8 @@ function convertSnippetToText(node: IParser.SyntaxNode, sourceCode: string): str
   return initialIndentation + getNodeText(node);
 }
 
-export function extractSnippets(fileContent: string, language: Language): string[] {
-  const parser = getTSParser(language);
+export function extractSnippets(fileContent: string, languageId: LanguageId): string[] {
+  const parser = getTSParser(languageId);
 
   let parsedCode: IParser.Tree;
 
