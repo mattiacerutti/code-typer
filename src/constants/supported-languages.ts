@@ -1,54 +1,52 @@
-import {ILanguage} from "@/types/language";
+import {ILanguage, LanguageId} from "@/types/language";
 
-export enum Language {
-  JAVASCRIPT = "JavaScript",
-  TYPESCRIPT = "TypeScript",
-  C = "C",
-  CPP = "C++",
-  CSHARP = "C#",
-  JAVA = "Java",
-  PYTHON = "Python",
-  LUA = "Lua",
-}
 
-export const SUPPORTED_LANGUAGES: Record<Language, ILanguage> = {
-  [Language.JAVASCRIPT]: {
-    name: Language.JAVASCRIPT,
+export const SUPPORTED_LANGUAGES: Record<LanguageId, ILanguage> = {
+  [LanguageId.JAVASCRIPT]: {
+    id: LanguageId.JAVASCRIPT,
+    name: "JavaScript",
     extensions: ["js", "jsx"],
     highlightAlias: "javascript",
   },
-  [Language.TYPESCRIPT]: {
-    name: Language.TYPESCRIPT,
+  [LanguageId.TYPESCRIPT]: {
+    id: LanguageId.TYPESCRIPT,
+    name: "TypeScript",
     extensions: ["ts", "tsx"],
     highlightAlias: "typescript",
   },
-  [Language.C]: {
-    name: Language.C,
+  [LanguageId.C]: {
+    id: LanguageId.C,
+    name: "C",
     extensions: ["c"],
-    highlightAlias: "cpp",
+    highlightAlias: "c",
   },
-  [Language.CPP]: {
-    name: Language.CPP,
+  [LanguageId.CPP]: {
+    id: LanguageId.CPP,
+    name: "C++",
     extensions: ["cpp"],
     highlightAlias: "cpp",
   },
-  [Language.CSHARP]: {
-    name: Language.CSHARP,
+  [LanguageId.CSHARP]: {
+    id: LanguageId.CSHARP,
+    name: "C#",
     extensions: ["cs"],
     highlightAlias: "csharp",
   },
-  [Language.JAVA]: {
-    name: Language.JAVA,
+  [LanguageId.JAVA]: {
+    id: LanguageId.JAVA,
+    name: "Java",
     extensions: ["java"],
     highlightAlias: "java",
   },
-  [Language.PYTHON]: {
-    name: Language.PYTHON,
+  [LanguageId.PYTHON]: {
+    id: LanguageId.PYTHON,
+    name: "Python",
     extensions: ["py"],
     highlightAlias: "python",
   },
-  [Language.LUA]: {
-    name: Language.LUA,
+  [LanguageId.LUA]: {
+    id: LanguageId.LUA,
+    name: "Lua",
     extensions: ["lua"],
     highlightAlias: "lua",
   },

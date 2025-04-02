@@ -1,10 +1,10 @@
 "use client";
-import {Language} from "@/constants/supported-languages";
 import {useGameState} from "@/contexts/GameStateContext";
 import { GameStatus } from "@/types/game-state";
 import TypingArea from "@/components/typing-area";
 import useTyping from "@/hooks/useTyping";
-
+import { LanguageId } from "@/types/language";
+import { SUPPORTED_LANGUAGES } from "@/constants/supported-languages";
 export const dynamic = 'force-dynamic';
 
 interface IGameViewProps {
@@ -61,13 +61,13 @@ function GameView(props: IGameViewProps) {
             disabled={isRefreshing}
             value={state.language}
             onChange={(e) => {
-              dispatch({type: "SET_LANGUAGE", payload: e.target.value as Language});
+              dispatch({type: "SET_LANGUAGE", payload: e.target.value as LanguageId});
             }}
             className="px-6 py-3 bg-slate-200 text-slate-900 font-medium rounded-md hover:bg-slate-300 disabled:opacity-20"
           >
-            {Object.values(Language).map((language) => (
-              <option key={language} value={language}>
-                {language}
+            {Object.values(LanguageId).map((languageId) => (
+              <option key={languageId} value={languageId}>
+                {SUPPORTED_LANGUAGES[languageId].name}
               </option>
             ))}
           </select>
