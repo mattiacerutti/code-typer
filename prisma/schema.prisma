@@ -1,0 +1,27 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../../node_modules/.prisma/client"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Language {
+  id             String    @id @unique
+  name           String    @unique
+  lastUpdatedAt  DateTime  @default(now())
+  extensions     String[]
+  highlightAlias String
+  snippets       Snippet[]
+}
+
+model Snippet {
+  url        String   @id @unique
+  languageId String
+  isValid    Boolean  @default(true)
+  language   Language @relation(fields: [languageId], references: [id])
+
+  @@index([languageId])
+}

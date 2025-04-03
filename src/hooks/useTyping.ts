@@ -1,23 +1,41 @@
 import {useGameState} from "@/contexts/GameStateContext";
-import {hasModifierKey, isAValidKey, isAValidShortcutKey} from "@/utils/typing/keys";
-import {deleteCharacter} from "@/utils/typing/delete-character";
+import {hasModifierKey, isAValidKey, isAValidShortcutKey} from "@/lib/client/typing/keys";
+import {deleteCharacter} from "@/lib/client/typing/delete-character";
 import {useCallback, useEffect, useState} from "react";
-import {addCharacter} from "@/utils/typing/add-character";
-import {deleteWord} from "@/utils/typing/delete-word";
-import {deleteLine} from "@/utils/typing/delete-line";
-import { ISnippet } from "@/types/snippet";
+import {addCharacter} from "@/lib/client/typing/add-character";
+import {deleteWord} from "@/lib/client/typing/delete-word";
+import {deleteLine} from "@/lib/client/typing/delete-line";
+import {IParsedSnippet} from "@/types/snippet";
+import {GameStatus} from "@/types/game-state";
 
-const useTyping = (onWrongKeystroke: () => void, onValidKeystroke: () => void) => {
+interface IUseTypingProps {
+  onWrongKeystroke: () => void;
+  onValidKeystroke: () => void;
+  onStartTyping: () => void;
+}
+
+const useTyping = (props: IUseTypingProps) => {
+  const {onWrongKeystroke, onValidKeystroke, onStartTyping} = props;
   const {state, dispatch} = useGameState();
   const [isCapsLockOn, setIsCapsLockOn] = useState(false);
 
-  const updateParsedSnippet = useCallback((parsedSnippet: ISnippet) => {
-    dispatch({type: "UPDATE_PARSED_SNIPPET", payload: parsedSnippet});
-  }, [dispatch])
+  if (state.status !== GameStatus.PLAYING && state.status !== GameStatus.READY) {
+    throw new Error("Typing: Received invalid game status");
+  }
 
-  const updateUserPosition = useCallback((position: number) => {
-    dispatch({type: "UPDATE_USER_POSITION", payload: position});
-  }, [dispatch])
+  const updateParsedSnippet = useCallback(
+    (parsedSnippet: IParsedSnippet) => {
+      dispatch({type: "UPDATE_CURRENT_SNIPPET", payload: parsedSnippet});
+    },
+    [dispatch]
+  );
+
+  const updateUserPosition = useCallback(
+    (position: number) => {
+      dispatch({type: "UPDATE_USER_POSITION", payload: position});
+    },
+    [dispatch]
+  );
 
   const registerKeyStroke = useCallback(
     (isCorrect: boolean) => {
@@ -35,7 +53,7 @@ const useTyping = (onWrongKeystroke: () => void, onValidKeystroke: () => void) =
       if (event.ctrlKey || event.metaKey) {
         switch (event.key) {
           case "Backspace":
-            deleteLine(state, (updateParsedSnippet), updateUserPosition);
+            deleteLine(state, updateParsedSnippet, updateUserPosition);
             break;
         }
       } else if (event.altKey) {
@@ -50,7 +68,6 @@ const useTyping = (onWrongKeystroke: () => void, onValidKeystroke: () => void) =
   );
   const handleKeyPress = useCallback(
     (event: KeyboardEvent) => {
-
       const isShortcut = hasModifierKey(event) && isAValidShortcutKey(event);
       if (isShortcut) {
         handleKeyShortcut(event);
@@ -63,14 +80,18 @@ const useTyping = (onWrongKeystroke: () => void, onValidKeystroke: () => void) =
 
       if (isAValidKey(event)) {
         if (event.key === "Backspace") {
-          deleteCharacter(state.snippet!.parsedSnippet, state.userPosition, updateParsedSnippet, updateUserPosition);
+          deleteCharacter(state.currentSnippet.parsedSnippet, state.userPosition, updateParsedSnippet, updateUserPosition);
           return;
+        }
+
+        if (state.status === GameStatus.READY) {
+          onStartTyping();
         }
 
         addCharacter(state, event.key, updateParsedSnippet, updateUserPosition, registerKeyStroke);
       }
     },
-    [state, updateParsedSnippet, updateUserPosition, registerKeyStroke, handleKeyShortcut]
+    [state, updateParsedSnippet, updateUserPosition, registerKeyStroke, handleKeyShortcut, onStartTyping]
   );
 
   useEffect(() => {
