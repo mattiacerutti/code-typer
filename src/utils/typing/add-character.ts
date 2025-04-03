@@ -1,9 +1,9 @@
-import {IGameState} from "@/types/game-state";
+import {IGameState, IGameStatePlaying, IGameStateReady} from "@/types/game-state";
 import {getBindedClosingChar, getChar, getPreviousChar, hasOnlyWhitespacesBefore, setCharacterState} from "@/utils/typing/shared";
 import {CharacterState, CharacterTypes, ICharacter} from "@/types/character";
-import { ISnippet } from "@/types/snippet";
+import { IParsedSnippet } from "@/types/snippet";
 
-function handleAutoClosingCharacter(snippet: ISnippet, position: number, char: ICharacter) {
+function handleAutoClosingCharacter(snippet: IParsedSnippet, position: number, char: ICharacter) {
   const closingCharacter = getBindedClosingChar(snippet, char, position);
   if (closingCharacter) {
     closingCharacter.state = CharacterState.Right;
@@ -12,7 +12,7 @@ function handleAutoClosingCharacter(snippet: ISnippet, position: number, char: I
   throw new Error("Couldn't find a closing parenthesis");
 }
 
-function incrementCursor(snippet: ISnippet, position: number, updateUserPosition: (position: number) => void) {
+function incrementCursor(snippet: IParsedSnippet, position: number, updateUserPosition: (position: number) => void) {
 
 
   const newChar = getChar(snippet, position + 1);
@@ -29,15 +29,15 @@ function incrementCursor(snippet: ISnippet, position: number, updateUserPosition
 }
 
 export function addCharacter(
-  state: IGameState,
+  state: IGameStatePlaying | IGameStateReady,
   pressedKey: string,
-  updateParsedSnippet: (parsedSnippet: ISnippet) => void,
+  updateParsedSnippet: (parsedSnippet: IParsedSnippet) => void,
   updateUserPosition: (position: number) => void,
   registerKeyStroke: (isCorrect: boolean) => void
 ) {
 
   const position = state.userPosition;
-  const snippet = state.snippet!.parsedSnippet;
+  const snippet = state.currentSnippet.parsedSnippet;
 
   const expectedChar = getChar(snippet, position);
 

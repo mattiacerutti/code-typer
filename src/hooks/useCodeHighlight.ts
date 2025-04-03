@@ -4,7 +4,7 @@ import {LanguageId} from "@/types/language";
 import {getSupportedLanguage} from "@/utils/game";
 
 const useCodeHighlight = (snippet: string, languageId: LanguageId) => {
-  const [codeHighlight, setCodeHighlight] = useState<string[]>([]);
+  const [codeHighlight, setCodeHighlight] = useState<string[] | null>(null);
 
   const hasFinished = useRef(false);
 

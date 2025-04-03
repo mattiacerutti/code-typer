@@ -1,5 +1,3 @@
-import {Language} from "@/constants/supported-languages";
-
 export enum LanguageId{
   JAVASCRIPT = "js",
   TYPESCRIPT = "ts",
@@ -13,7 +11,7 @@ export enum LanguageId{
 
 export interface ILanguage {
   id: LanguageId;
-  name: Language;
+  name: string;
   extensions: string[];
   highlightAlias: string;
 }

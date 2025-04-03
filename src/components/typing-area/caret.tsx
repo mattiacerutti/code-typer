@@ -1,6 +1,7 @@
 "use client";
 
-import { useGameState } from "@/contexts/GameStateContext";
+import {useGameState} from "@/contexts/GameStateContext";
+import {GameStatus} from "@/types/game-state";
 import {useState, useEffect, useCallback} from "react";
 
 interface ICaretProps {
@@ -14,6 +15,10 @@ function Caret(props: ICaretProps) {
   const [caretPosition, setCaretPosition] = useState({top: 0, left: 0});
 
   const [blinking, setBlinking] = useState(true);
+
+  if (state.status !== GameStatus.PLAYING && state.status !== GameStatus.READY) {
+    throw new Error("Caret: Received invalid game status");
+  }
 
   useEffect(() => {
     let blinkingTimeout: NodeJS.Timeout | null = null;
@@ -33,14 +38,16 @@ function Caret(props: ICaretProps) {
     return () => clearTimeout(blinkingTimeout);
   }, [caretPosition]);
 
-  const updateCaretPosition = useCallback((index: number) => {
-    const charElement = charRefs[index].current;
-    if (charElement) {
+  const updateCaretPosition = useCallback(
+    (index: number) => {
+      const charElement = charRefs[index].current;
+      if (charElement) {
         const {offsetTop, offsetLeft} = charElement;
-      setCaretPosition({top: offsetTop, left: offsetLeft});
-    }
-  }, [charRefs]);
-
+        setCaretPosition({top: offsetTop, left: offsetLeft});
+      }
+    },
+    [charRefs]
+  );
 
   // Updates the cursor position anytime the user position changes
   useEffect(() => {

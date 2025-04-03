@@ -1,9 +1,9 @@
 import {SUPPORTED_LANGUAGES} from "@/constants/supported-languages";
 import {CharacterState, CharacterTypes, WhitespaceTypes} from "@/types/character";
 import {ILanguage, LanguageId} from "@/types/language";
-import { ISnippet } from "@/types/snippet";
+import { IParsedSnippet } from "@/types/snippet";
 
-export function isGameFinished(parsedSnippets: ISnippet) {
+export function isGameFinished(parsedSnippets: IParsedSnippet) {
   const allCorrect = parsedSnippets.every(
     (char) =>
       char.state === CharacterState.Right ||
