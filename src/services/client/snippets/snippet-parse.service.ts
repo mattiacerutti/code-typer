@@ -1,6 +1,6 @@
 import {CharacterState, CharacterTypes, WhitespaceTypes} from "@/types/character";
 import { IParsedSnippet } from "@/types/snippet";
-import { AUTO_CLOSING_CHARS } from "@/constants/constants";
+import { AUTO_CLOSING_CHARS } from "@/constants/game";
 export const parseSnippet = (originalText: string): IParsedSnippet => {
   let mostRecentAutoClosingChar: string | undefined = undefined;
 

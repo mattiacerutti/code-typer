@@ -1,7 +1,7 @@
 import {CharacterState, ICharacter, WhitespaceTypes} from "@/types/character";
-import {getLineStart, getPreviousChar, getPreviousLineEnd, isFirstCharacter, resetCharactersInRange} from "@/utils/typing/shared";
+import {getLineStart, getPreviousChar, getPreviousLineEnd, isFirstCharacter, resetCharactersInRange} from "@/lib/client/typing/shared";
 import {IGameStatePlaying, IGameStateReady} from "@/types/game-state";
-import {AUTO_CLOSING_CHARS} from "@/constants/constants";
+import {AUTO_CLOSING_CHARS} from "@/constants/game";
 import {IParsedSnippet} from "@/types/snippet";
 
 const isWordSeparator = (char: ICharacter) =>

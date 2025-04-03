@@ -1,5 +1,5 @@
-import {filterLineLength, filterLinesNumber, filterSnippetLength, filterSnippetSpecialCharacters, filterTabsInBetween, isValidNode} from "@/utils/api/snippet-filters";
-import {adjustIndentationOffset, countInitialWhitespaces, detectIndentationStyle, getNodeText, removeInvalidWhitespaces} from "@/utils/api/snippet-utils";
+import {filterLineLength, filterLinesNumber, filterSnippetLength, filterSnippetSpecialCharacters, filterTabsInBetween, isValidNode} from "@/lib/server/snippet/snippet-filters";
+import {adjustIndentationOffset, countInitialWhitespaces, detectIndentationStyle, getNodeText, removeInvalidWhitespaces} from "@/lib/server/snippet/snippet-utils";
 import IParser from "tree-sitter";
 import {getTSParser} from "./snippet-parser.service";
 

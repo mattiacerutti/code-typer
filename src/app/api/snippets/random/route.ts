@@ -1,7 +1,7 @@
-import {MIN_SNIPPETS_PER_LANGUAGE, RANDOM_SNIPPETS_FETCHED, MAX_SNIPPETS_FETCH_ATTEMPTS} from "@/constants/api/snippets";
+import {MIN_SNIPPETS_PER_LANGUAGE, RANDOM_SNIPPETS_FETCHED, MAX_SNIPPETS_FETCH_ATTEMPTS} from "@/constants/snippets.server";
 import {doesLanguageExist} from "@/repositories/language.repository";
-import {getFileContent} from "@/services/api/snippet-fetch.service";
-import {extractSnippets, filterSnippets, formatCode} from "@/services/api/snippet-process.service";
+import {getFileContent} from "@/services/server/snippet-fetch.service";
+import {extractSnippets, filterSnippets, formatCode} from "@/services/server/snippet-process.service";
 import {NextResponse} from "next/server";
 import {fetchRandomSnippets, setSnippetAsNonValid} from "@/repositories/snippet.repository";
 
