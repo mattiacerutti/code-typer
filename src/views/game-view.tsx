@@ -1,47 +1,52 @@
 "use client";
-import {Language} from "@/constants/supported-languages";
+
 import {useGameState} from "@/contexts/GameStateContext";
-import { GameStatus } from "@/types/game-state";
+import {GameStatus} from "@/types/game-state";
 import TypingArea from "@/components/typing-area";
 import useTyping from "@/hooks/useTyping";
-
-export const dynamic = 'force-dynamic';
+import {ILanguage} from "@/types/language";
 
 interface IGameViewProps {
   onGameFinished: () => void;
   onGameStarted: () => void;
   changeSnippet: () => void;
   resetSnippet: () => void;
+  changeLanguage: (language: ILanguage) => void;
+  availableLanguages: {[key: string]: ILanguage};
   isRefreshing: boolean;
 }
 
 function GameView(props: IGameViewProps) {
-  const {onGameFinished, onGameStarted, changeSnippet: refreshSnippet, resetSnippet: restartGame, isRefreshing} = props;
+  const {onGameFinished, onGameStarted, changeSnippet, resetSnippet, isRefreshing, changeLanguage, availableLanguages} = props;
 
   const {state, dispatch} = useGameState();
 
+  if (state.status === GameStatus.LOADING || state.status === GameStatus.FINISHED) {
+    throw new Error("GameView: Received invalid game state");
+  }
+
   const onWrongKeystroke = () => {
+    if (state.status !== GameStatus.PLAYING) return;
     state.wrongKeystrokes += 1;
   };
 
   const onValidKeystroke = () => {
+    if (state.status !== GameStatus.PLAYING) return;
     state.validKeystrokes += 1;
   };
 
-
-  const {isCapsLockOn} =  useTyping(onWrongKeystroke, onValidKeystroke);
-
+  const {isCapsLockOn} = useTyping({onWrongKeystroke, onValidKeystroke, onStartTyping: onGameStarted});
 
   return (
     <>
       <div className={`text-red-500 relative bottom-8 ${!isCapsLockOn && "opacity-0"} font-bold text-2xl`}>Caps Lock is on</div>
       <div className="flex flex-col gap-10 justify-center items-center">
-        <TypingArea onGameFinished={onGameFinished} onGameStarted={onGameStarted} />
+        <TypingArea onGameFinished={onGameFinished} />
         <div className="flex flex-row gap-1.5 content-between">
           <button
             className="px-6 py-3 bg-slate-200 text-slate-900 font-medium rounded-md hover:bg-slate-300 disabled:opacity-20"
-            onClick={restartGame}
-            disabled={isRefreshing || state.status !== GameStatus.Started}
+            onClick={resetSnippet}
+            disabled={isRefreshing || state.status !== GameStatus.PLAYING}
           >
             <svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
               <path
@@ -52,22 +57,23 @@ function GameView(props: IGameViewProps) {
           </button>
           <button
             className="px-6 py-3 bg-slate-200 text-slate-900 font-medium rounded-md hover:bg-slate-300 disabled:opacity-20"
-            onClick={() => refreshSnippet()}
+            onClick={changeSnippet}
             disabled={isRefreshing}
           >
             {!isRefreshing ? "Change Snippet" : "Wait.."}
           </button>
           <select
             disabled={isRefreshing}
-            value={state.language}
+            value={state.language.id}
             onChange={(e) => {
-              dispatch({type: "SET_LANGUAGE", payload: e.target.value as Language});
+              dispatch({type: "SET_GAME_STATUS", payload: GameStatus.LOADING});
+              changeLanguage(availableLanguages[e.target.value]);
             }}
             className="px-6 py-3 bg-slate-200 text-slate-900 font-medium rounded-md hover:bg-slate-300 disabled:opacity-20"
           >
-            {Object.values(Language).map((language) => (
-              <option key={language} value={language}>
-                {language}
+            {Object.values(availableLanguages).map((language) => (
+              <option key={language.id} value={language.id}>
+                {language.name}
               </option>
             ))}
           </select>

@@ -1,7 +1,8 @@
 "use client";
 
 import {useGameState} from "@/contexts/GameStateContext";
-import {calculateAccuracy, calculateWPM, humanizeTime} from "@/utils/game";
+import {GameStatus} from "@/types/game-state";
+import {calculateAccuracy, calculateWPM, humanizeTime} from "@/utils/typing-metrics";
 
 interface IEndgameViewProps {
   totalTime: number;
@@ -13,16 +14,18 @@ function EndgameView(props: IEndgameViewProps) {
 
   const {state} = useGameState();
 
+  if (state.status !== GameStatus.FINISHED) {
+    throw new Error("EndgameView: Received invalid game status");
+  }
+
   const validKeystrokes = state.validKeystrokes;
 
   const wrongKeystrokes = state.wrongKeystrokes;
 
-  if (!state.snippet) return <div>Loading..</div>;
-
   return (
     <div className="flex flex-col gap-8">
       <div className="flex flex-row gap-4">
-        <div className="bg-slate-500 rounded-lg px-8 py-4 text-white shadow-lg">WPM {calculateWPM(totalTime, state.snippet.text.length)}</div>
+        <div className="bg-slate-500 rounded-lg px-8 py-4 text-white shadow-lg">WPM {calculateWPM(totalTime, state.currentSnippet.text.length)}</div>
         <div className="bg-slate-500 rounded-lg px-8 py-4 text-white shadow-lg">Accuracy: {calculateAccuracy(validKeystrokes, wrongKeystrokes)}%</div>
         <div className="bg-slate-500 rounded-lg px-8 py-4 text-white shadow-lg">{humanizeTime(totalTime)}</div>
       </div>

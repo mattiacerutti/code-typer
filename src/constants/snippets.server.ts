@@ -26,5 +26,6 @@ export const VALID_NODES = [
   'if_statement',
 ];
 
-export const MIN_CACHED_SNIPPETS = 10;
-export const SNIPPETS_SIMULTANEOUS_REQUESTS = 10;
+export const MIN_SNIPPETS_PER_LANGUAGE = 10;
+export const RANDOM_SNIPPETS_FETCHED = 10;
+export const MAX_SNIPPETS_FETCH_ATTEMPTS = 20;

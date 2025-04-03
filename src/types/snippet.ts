@@ -1,3 +1,8 @@
 import {ICharacter} from "@/types/character";
 
-export type ISnippet = ICharacter[];
+export type IParsedSnippet = ICharacter[];
+
+export interface ISnippet {
+  text: string;
+  parsedSnippet: IParsedSnippet;
+}

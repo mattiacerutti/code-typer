@@ -1,12 +1,12 @@
-import {SHOULD_PRESERVE_CLOSING_CHAR_WHEN_DELETING} from "@/constants/constants";
+import {SHOULD_PRESERVE_CLOSING_CHAR_WHEN_DELETING} from "@/constants/game";
 import {CharacterState, CharacterTypes, ICharacter} from "@/types/character";
-import { ISnippet } from "@/types/snippet";
-import {getBindedClosingChar, getPreviousChar, hasOnlyWhitespacesBefore, isClosingCharacter, setCharacterState} from "@/utils/typing/shared";
+import { IParsedSnippet } from "@/types/snippet";
+import {getBindedClosingChar, getPreviousChar, hasOnlyWhitespacesBefore, isClosingCharacter, setCharacterState} from "@/lib/client/typing/shared";
 
 export function deleteCharacter(
-  snippet: ISnippet,
+  snippet: IParsedSnippet,
   position: number,
-  updateParsedSnippet: (parsedSnippet: ISnippet) => void,
+  updateParsedSnippet: (parsedSnippet: IParsedSnippet) => void,
   updateUserPosition: (position: number) => void,
 ) {
   if(position === 0) {

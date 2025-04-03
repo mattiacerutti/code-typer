@@ -1,4 +1,4 @@
-import {MAX_LINE_LENGTH, MAX_LINES, MAX_SNIPPET_LENGTH, MIN_LINES, MIN_SNIPPET_LENGTH, VALID_NODES} from "@/constants/api/snippets";
+import {MAX_LINE_LENGTH, MAX_LINES, MAX_SNIPPET_LENGTH, MIN_LINES, MIN_SNIPPET_LENGTH, VALID_NODES} from "@/constants/snippets.server";
 import IParser from "tree-sitter";
 
 export function filterLinesNumber(snippet: string): boolean {

@@ -2,18 +2,19 @@ import {ICharacter, CharacterState, WhitespaceTypes} from "@/types/character";
 
 interface ICharacterProps {
   char: ICharacter;
-  charHighlighting: string;
+  charHighlighting: string | null;
   isSelected?: boolean;
 }
 
 function Character(props: ICharacterProps & {ref: React.RefObject<HTMLSpanElement>}) {
   const {char, charHighlighting, ref, isSelected = false} = props;
 
+  
   let elementClasses = "character-default";
   let elementText = char.value;
-
+  
   if (char.state == CharacterState.Right) {
-    elementClasses = charHighlighting;
+    elementClasses = charHighlighting ?? "character-default";
   }
 
   if (char.state == CharacterState.Wrong) {
