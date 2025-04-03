@@ -1,5 +1,5 @@
 import {CharacterState} from "@/types/character";
-import {getLineStart, getPreviousLineEnd, isFirstCharacter, resetCharactersInRange} from "@/utils/typing/shared";
+import {getLineStart, getPreviousLineEnd, isFirstCharacter, resetCharactersInRange} from "@/lib/client/typing/shared";
 import {IGameStatePlaying, IGameStateReady} from "@/types/game-state";
 import {IParsedSnippet} from "@/types/snippet";
 

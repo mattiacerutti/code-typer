@@ -1,5 +1,5 @@
 import {CharacterState, CharacterTypes, ICharacter, WhitespaceTypes} from "@/types/character";
-import {AUTO_CLOSING_CHARS, SHOULD_PRESERVE_CLOSING_CHAR_WHEN_DELETING} from "@/constants/constants";
+import {AUTO_CLOSING_CHARS, SHOULD_PRESERVE_CLOSING_CHAR_WHEN_DELETING} from "@/constants/game";
 import {IParsedSnippet} from "@/types/snippet";
 
 

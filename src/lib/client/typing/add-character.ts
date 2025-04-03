@@ -1,5 +1,5 @@
-import {IGameState, IGameStatePlaying, IGameStateReady} from "@/types/game-state";
-import {getBindedClosingChar, getChar, getPreviousChar, hasOnlyWhitespacesBefore, setCharacterState} from "@/utils/typing/shared";
+import {IGameStatePlaying, IGameStateReady} from "@/types/game-state";
+import {getBindedClosingChar, getChar, getPreviousChar, hasOnlyWhitespacesBefore, setCharacterState} from "@/lib/client/typing/shared";
 import {CharacterState, CharacterTypes, ICharacter} from "@/types/character";
 import { IParsedSnippet } from "@/types/snippet";
 

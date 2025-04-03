@@ -3,8 +3,7 @@
 import React, {useRef, useEffect} from "react";
 import useCodeHighlight from "@/hooks/useCodeHighlight";
 import {CharacterTypes, ICharacter, WhitespaceTypes} from "@/types/character";
-import {ILanguage} from "@/types/language";
-import {isGameFinished} from "@/utils/game";
+import {isGameFinished} from "@/lib/client/game-logic";
 import {GameStatus} from "@/types/game-state";
 import {useGameState} from "@/contexts/GameStateContext";
 import Caret from "./typing-area/caret";

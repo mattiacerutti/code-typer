@@ -1,10 +1,10 @@
 import {useGameState} from "@/contexts/GameStateContext";
-import {hasModifierKey, isAValidKey, isAValidShortcutKey} from "@/utils/typing/keys";
-import {deleteCharacter} from "@/utils/typing/delete-character";
+import {hasModifierKey, isAValidKey, isAValidShortcutKey} from "@/lib/client/typing/keys";
+import {deleteCharacter} from "@/lib/client/typing/delete-character";
 import {useCallback, useEffect, useState} from "react";
-import {addCharacter} from "@/utils/typing/add-character";
-import {deleteWord} from "@/utils/typing/delete-word";
-import {deleteLine} from "@/utils/typing/delete-line";
+import {addCharacter} from "@/lib/client/typing/add-character";
+import {deleteWord} from "@/lib/client/typing/delete-word";
+import {deleteLine} from "@/lib/client/typing/delete-line";
 import {IParsedSnippet} from "@/types/snippet";
 import {GameStatus} from "@/types/game-state";
 
