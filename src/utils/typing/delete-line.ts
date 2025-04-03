@@ -1,11 +1,15 @@
 import {CharacterState} from "@/types/character";
 import {getLineStart, getPreviousLineEnd, isFirstCharacter, resetCharactersInRange} from "@/utils/typing/shared";
-import {IGameState} from "@/types/game-state";
-import { ISnippet } from "@/types/snippet";
+import {IGameStatePlaying, IGameStateReady} from "@/types/game-state";
+import {IParsedSnippet} from "@/types/snippet";
 
-export function deleteLine(state: IGameState, updateParsedSnippet: (parsedSnippet: ISnippet) => void, updateUserPosition: (position: number) => void) {
+export function deleteLine(
+  state: IGameStatePlaying | IGameStateReady,
+  updateParsedSnippet: (parsedSnippet: IParsedSnippet) => void,
+  updateUserPosition: (position: number) => void
+) {
   const position = state.userPosition;
-  const snippet = state.snippet!.parsedSnippet;
+  const snippet = state.currentSnippet.parsedSnippet;
   if (position === 0) return;
 
   if (isFirstCharacter(snippet, position)) {
@@ -18,8 +22,8 @@ export function deleteLine(state: IGameState, updateParsedSnippet: (parsedSnippe
       previousLineEnd = getPreviousLineEnd(snippet, previousLineEnd!);
     }
 
-    state.snippet!.parsedSnippet[previousLineEnd!].state = CharacterState.Default;
-    updateParsedSnippet([...state.snippet!.parsedSnippet]);
+    state.currentSnippet.parsedSnippet[previousLineEnd!].state = CharacterState.Default;
+    updateParsedSnippet([...state.currentSnippet.parsedSnippet]);
     updateUserPosition(previousLineEnd!);
     return;
   }
@@ -31,6 +35,6 @@ export function deleteLine(state: IGameState, updateParsedSnippet: (parsedSnippe
 
   resetCharactersInRange(snippet, firstLineCharacterIndex, position);
 
-  updateParsedSnippet([...state.snippet!.parsedSnippet]);
+  updateParsedSnippet([...state.currentSnippet.parsedSnippet]);
   updateUserPosition(firstLineCharacterIndex);
 }

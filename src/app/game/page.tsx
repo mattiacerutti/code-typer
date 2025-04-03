@@ -1,114 +1,124 @@
 "use client";
 
-import {useEffect, useRef, useState} from "react";
-import {getRandomCodeSnippets} from "@/services/snippets/snippet.service";
+import {useCallback, useEffect, useRef, useState} from "react";
+import {getRandomCodeSnippets as getRandomSnippets} from "@/services/snippets/snippet.service";
 import useTimer from "@/hooks/useTimer";
 import {GameStatus} from "@/types/game-state";
-import {REFRESH_BUTTON_MIN_DELAY} from "@/constants/constants";
+import {REFRESH_BUTTON_MIN_DELAY, DEFAULT_LANGUAGE} from "@/constants/constants";
 import {useGameState} from "@/contexts/GameStateContext";
 import GameView from "@/views/game-view";
 import EndgameView from "@/views/endgame-view";
-
+import {LanguageId} from "@/types/language";
+import {ISnippet} from "@/types/snippet";
 function Home() {
   const {dispatch, state} = useGameState();
 
-  const codeSnippets = useRef<string[]>([]);
-
-  const [isGameOver, setIsGameOver] = useState<boolean>(false);
-  const [isRefreshing, setIsRefreshing] = useState<boolean>(false);
-
   const {startTimer, stopTimer, getTime, resetTimer} = useTimer();
 
-  useEffect(() => {
-    // Handles language change. We re-fetch the snippets and select a random one.
-    if (state.language) {
-      dispatch({type: "RESET_GAME_STATE", keepSnippet: true});
-      resetTimer();
-      getRandomCodeSnippets(state.language).then((ret) => {
-        codeSnippets.current = ret;
-        dispatch({type: "SET_SNIPPET", payload: ret[0]});
+  const [isNextButtonLocked, setIsNextButtonLocked] = useState(false);
+  const backgroundFetchPromise = useRef<Promise<void> | null>(null);
+
+  const setSnippets = useCallback(
+    async (language: LanguageId) => {
+      const snippets = await getRandomSnippets(language);
+      dispatch({
+        type: "SET_SNIPPETS",
+        payload: {snippets, language},
       });
-    }
-  }, [state.language, dispatch, resetTimer]);
+    },
+    [dispatch]
+  );
+
+  useEffect(() => {
+    resetTimer();
+    setSnippets(DEFAULT_LANGUAGE);
+  }, [resetTimer, setSnippets]);
+
+  const backgroundGetSnippets = async () => {
+    if (!state.snippetQueue) return;
+
+    const snippets = await getRandomSnippets(state.language);
+
+    dispatch({type: "ADD_SNIPPETS_TO_QUEUE", payload: {snippets}});
+  };
 
   const goToNextSnippet = async () => {
-    // If we have only 3 snippet left, we re-fetch and append them to the end of the array
-    if (codeSnippets.current.length <= 3) {
-      const randomSnippets = await getRandomCodeSnippets(state.language);
-      codeSnippets.current.push(...randomSnippets);
-    }
-
-    codeSnippets.current.shift();
-    dispatch({type: "SET_SNIPPET", payload: codeSnippets.current[0]});
-  }
-
-  const resetSnippet = () => {
-    dispatch({type: "RESET_GAME_STATE", keepSnippet: false});
-    resetTimer();
-  }
-
-  const changeSnippet = () => {
-    setIsRefreshing(true);
-
-    resetSnippet();
+    if (state.status !== GameStatus.PLAYING && state.status !== GameStatus.READY && state.status !== GameStatus.FINISHED) return;
 
     const startTime = Date.now();
-    goToNextSnippet().then(() => {
-      const elapsedTime = Date.now() - startTime;
+    setIsNextButtonLocked(true);
 
-      const remainingTime = REFRESH_BUTTON_MIN_DELAY - elapsedTime;
+    if (state.snippetQueue.length === 0) {
+      //If we're here the background fetch either failed or is still going
+      dispatch({type: "SET_GAME_STATUS", payload: GameStatus.LOADING});
 
-      // If going to the next snippet took less than the minimum delay, we wait for the remaining time (we do this to prevent refresh spamming)
-      if (remainingTime > 0) {
-        setTimeout(() => {
-          setIsRefreshing(false);
-        }, remainingTime);
+      if (backgroundFetchPromise.current) {
+        // If the background fetch is still going, we wait.
+        await backgroundFetchPromise.current;
+        backgroundFetchPromise.current = null;
       } else {
-        setIsRefreshing(false);
+        // Fallback: something went wrong with the background fetch
+        setSnippets(state.language);
+        return;
       }
-    });
-  }
+    } else if (state.snippetQueue.length <= 3 && !backgroundFetchPromise.current) {
+      // If we have only 3 snippet left, we re-fetch in the background
+      backgroundFetchPromise.current = backgroundGetSnippets();
+    }
+
+    const elapsedTime = Date.now() - startTime;
+    const remainingTime = REFRESH_BUTTON_MIN_DELAY - elapsedTime;
+
+    dispatch({type: "GO_TO_NEXT_SNIPPET"});
+
+    setTimeout(() => {
+      setIsNextButtonLocked(false);
+    }, remainingTime);
+  };
+
+  const resetSnippet = () => {
+    resetTimer();
+    dispatch({type: "RESET_GAME_STATE"});
+  };
 
   const handleStartGame = () => {
     startTimer();
-  }
+  };
 
-  const handleGameOver = () => {
+  const handleEndGame = () => {
     stopTimer();
-    setIsGameOver(true);
-  }
+  };
 
-  const handleRestartGame = () => {
-    dispatch({type: "RESET_GAME_STATE", keepSnippet: true});
-    goToNextSnippet().then(() => {
-      resetTimer();
-      setIsGameOver(false);
-    });
-  }
+  const handleRestartGame = async () => {
+    dispatch({type: "SET_GAME_STATUS", payload: GameStatus.LOADING});
+    await goToNextSnippet();
+    resetTimer();
+  };
 
-
-
-  if (isGameOver && state.status === GameStatus.Finished)
+  if (state.status === GameStatus.FINISHED)
     return (
       <>
         <EndgameView totalTime={getTime()} handleRestartGame={handleRestartGame} />
       </>
     );
 
+  if (state.status === GameStatus.LOADING)
+    return (
+      <>
+        <div>Loading...</div>
+      </>
+    );
+
   return (
-    <>
-      {state.snippet && (
-        <GameView
-          onGameFinished={handleGameOver}
-          onGameStarted={handleStartGame}
-          changeSnippet={changeSnippet}
-          resetSnippet={resetSnippet}
-          isRefreshing={isRefreshing}
-          key={state.snippet.text}
-        />
-      )}
-      {!state.snippet && <div>Loading...</div>}
-    </>
+    <GameView
+      onGameFinished={handleEndGame}
+      onGameStarted={handleStartGame}
+      changeSnippet={goToNextSnippet}
+      resetSnippet={resetSnippet}
+      changeLanguage={setSnippets}
+      isRefreshing={isNextButtonLocked}
+      key={state.currentSnippet.text}
+    />
   );
 }
 

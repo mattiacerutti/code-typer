@@ -1,8 +1,8 @@
 import {CharacterState, ICharacter, WhitespaceTypes} from "@/types/character";
 import {getLineStart, getPreviousChar, getPreviousLineEnd, isFirstCharacter, resetCharactersInRange} from "@/utils/typing/shared";
-import {IGameState} from "@/types/game-state";
+import {IGameStatePlaying, IGameStateReady} from "@/types/game-state";
 import {AUTO_CLOSING_CHARS} from "@/constants/constants";
-import { ISnippet } from "@/types/snippet";
+import {IParsedSnippet} from "@/types/snippet";
 
 const isWordSeparator = (char: ICharacter) =>
   char.value === "." ||
@@ -12,10 +12,9 @@ const isWordSeparator = (char: ICharacter) =>
   char.value === "!" ||
   char.value === "?" ||
   Object.values(AUTO_CLOSING_CHARS).includes(char.value) ||
-  Object.keys(AUTO_CLOSING_CHARS).includes(char.value)
-  
+  Object.keys(AUTO_CLOSING_CHARS).includes(char.value);
 
-function getPreviousWordPosition(snippet: ISnippet, position: number): number {
+function getPreviousWordPosition(snippet: IParsedSnippet, position: number): number {
   let currentChar = getPreviousChar(snippet, position);
   const previousChar = getPreviousChar(snippet, position - 1);
 
@@ -43,9 +42,13 @@ function getPreviousWordPosition(snippet: ISnippet, position: number): number {
   return position;
 }
 
-export function deleteWord(state: IGameState, updateParsedSnippet: (parsedSnippet: ISnippet) => void, updateUserPosition: (position: number) => void) {
+export function deleteWord(
+  state: IGameStatePlaying | IGameStateReady,
+  updateParsedSnippet: (parsedSnippet: IParsedSnippet) => void,
+  updateUserPosition: (position: number) => void
+) {
   const position = state.userPosition;
-  const snippet = state.snippet!.parsedSnippet;
+  const snippet = state.currentSnippet.parsedSnippet;
   if (position === 0) return;
 
   if (isFirstCharacter(snippet, position)) {
@@ -58,8 +61,8 @@ export function deleteWord(state: IGameState, updateParsedSnippet: (parsedSnippe
       previousLineEnd = getPreviousLineEnd(snippet, previousLineEnd!);
     }
 
-    state.snippet!.parsedSnippet[previousLineEnd!].state = CharacterState.Default;
-    updateParsedSnippet([...state.snippet!.parsedSnippet]);
+    state.currentSnippet.parsedSnippet[previousLineEnd!].state = CharacterState.Default;
+    updateParsedSnippet([...state.currentSnippet.parsedSnippet]);
     updateUserPosition(previousLineEnd!);
     return;
   }
@@ -67,6 +70,6 @@ export function deleteWord(state: IGameState, updateParsedSnippet: (parsedSnippe
   const previousWordPosition = getPreviousWordPosition(snippet, position);
   resetCharactersInRange(snippet, previousWordPosition, position);
 
-  updateParsedSnippet(snippet); //TODO: HERE
+  updateParsedSnippet(snippet);
   updateUserPosition(previousWordPosition);
 }
