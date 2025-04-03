@@ -14,9 +14,8 @@ import Python from "tree-sitter-python";
 // @ts-expect-error tree-sitter packages have no types
 import Lua from "tree-sitter-lua";
 import {convertLanguage} from "tree-sitter-compat";
-import { LanguageId } from "@/types/language";
 
-export function getTSParser(languageId: LanguageId): Parser {
+export function getTSParser(languageId: string): Parser {
   const parser = new Parser();
 
   const languageName = getLanguage(languageId);
@@ -26,23 +25,23 @@ export function getTSParser(languageId: LanguageId): Parser {
   return parser;
 }
 
-function getLanguage(languageId: LanguageId) {
+function getLanguage(languageId: string) {
   switch (languageId) {
-    case LanguageId.JAVASCRIPT:
+    case "js":
       return JavaScript;
-    case LanguageId.TYPESCRIPT:
+    case "ts":
       return TypeScript;
-    case LanguageId.C:
+    case "c":
       return C;
-    case LanguageId.CPP:
+    case "cpp":
       return Cpp;
-    case LanguageId.CSHARP:
+    case "cs":
       return CSharp;
-    case LanguageId.JAVA:
+    case "java":
       return Java;
-    case LanguageId.PYTHON:
+    case "py":
       return Python;
-    case LanguageId.LUA:
+    case "lua":
       return Lua;
     default:
       throw new Error(`Language ${languageId} not supported.`);

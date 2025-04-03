@@ -1,8 +1,7 @@
 import {PrismaClient} from "@prisma/client";
-import { LanguageId } from "@/types/language";
 const prisma = new PrismaClient();
 
-export async function fetchRandomSnippets(languageId: LanguageId, quantity: number, alreadyFetched: string[]): Promise<string[]> {
+export async function fetchRandomSnippets(languageId: string, quantity: number, alreadyFetched: string[]): Promise<string[]> {
   const alreadyFetchedList = alreadyFetched.length > 0 ? `AND "url" NOT IN (${alreadyFetched.map((_, i) => `$${i + 2}`).join(", ")})` : "";
 
   const query = `

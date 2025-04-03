@@ -1,9 +1,6 @@
 import {useState, useEffect, useCallback, useRef} from "react";
 import hljs from "highlight.js";
-import {LanguageId} from "@/types/language";
-import {getSupportedLanguage} from "@/utils/game";
-
-const useCodeHighlight = (snippet: string, languageId: LanguageId) => {
+const useCodeHighlight = (snippet: string, languageHighlightAlias: string) => {
   const [codeHighlight, setCodeHighlight] = useState<string[] | null>(null);
 
   const hasFinished = useRef(false);
@@ -58,12 +55,12 @@ const useCodeHighlight = (snippet: string, languageId: LanguageId) => {
   );
 
   const getCodeHighlighting = useCallback(
-    (code: string, languageId: LanguageId) => {
-      const hljsLanguage = hljs.getLanguage(getSupportedLanguage(languageId).highlightAlias);
+    (snippet: string, languageHighlightAlias: string) => {
+      const hljsLanguage = hljs.getLanguage(languageHighlightAlias);
       const validLanguage = hljsLanguage && hljsLanguage.name ? hljsLanguage.name : "plaintext";
 
       // Create a temporary list of Span that contain all the code
-      const wrappedCode = wrapCharactersInSpans(code);
+      const wrappedCode = wrapCharactersInSpans(snippet);
 
       // Create a temporary parent element
       const tempElement = document.createElement("div");
@@ -83,11 +80,11 @@ const useCodeHighlight = (snippet: string, languageId: LanguageId) => {
 
   useEffect(() => {
     if (!hasFinished.current) {
-      const codeHighlighting = getCodeHighlighting(snippet, languageId);
+      const codeHighlighting = getCodeHighlighting(snippet, languageHighlightAlias);
       hasFinished.current = true;
       setCodeHighlight(codeHighlighting);
     }
-  }, [getCodeHighlighting, snippet, languageId]);
+  }, [getCodeHighlighting, snippet, languageHighlightAlias]);
 
   useEffect(() => {
     //@ts-expect-error custom theme for code highlighting

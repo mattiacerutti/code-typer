@@ -3,6 +3,7 @@
 import React, {useRef, useEffect} from "react";
 import useCodeHighlight from "@/hooks/useCodeHighlight";
 import {CharacterTypes, ICharacter, WhitespaceTypes} from "@/types/character";
+import {ILanguage} from "@/types/language";
 import {isGameFinished} from "@/utils/game";
 import {GameStatus} from "@/types/game-state";
 import {useGameState} from "@/contexts/GameStateContext";
@@ -23,7 +24,7 @@ function TypingArea(props: ITypingAreaProps) {
   }
 
   // Handles code styling
-  const {codeHighlight} = useCodeHighlight(state.currentSnippet.text, state.language);
+  const {codeHighlight} = useCodeHighlight(state.currentSnippet.text, state.language.highlightAlias);
 
   // Collection of all character refs, used to know where every character is at and to update caret position
   const charRefs = useRef<React.RefObject<HTMLSpanElement>[]>([]);

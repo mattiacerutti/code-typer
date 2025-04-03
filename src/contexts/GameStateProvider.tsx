@@ -2,12 +2,11 @@
 import React, {useReducer, ReactNode} from "react";
 import {GameStateContext, GameAction} from "./GameStateContext";
 import {GameStatus, IGameState, IGameStatePlaying} from "@/types/game-state";
-import {DEFAULT_LANGUAGE} from "@/constants/constants";
 import {CharacterState} from "@/types/character";
 
 const initialState: IGameState = {
   status: GameStatus.LOADING,
-  language: DEFAULT_LANGUAGE,
+  language: null,
   snippetQueue: null,
 };
 
@@ -49,6 +48,7 @@ function stateReducer(state: IGameState, action: GameAction): IGameState {
       }
 
       if (!state.snippetQueue || state.snippetQueue.length === 0) throw new Error("GO_TO_NEXT_SNIPPET called with no snippet queue");
+      if (!state.language) throw new Error("GO_TO_NEXT_SNIPPET called with no language");
 
       const [nextSnippet, ...newSnippetQueue] = state.snippetQueue;
 

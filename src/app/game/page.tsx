@@ -8,19 +8,22 @@ import {REFRESH_BUTTON_MIN_DELAY, DEFAULT_LANGUAGE} from "@/constants/constants"
 import {useGameState} from "@/contexts/GameStateContext";
 import GameView from "@/views/game-view";
 import EndgameView from "@/views/endgame-view";
-import {LanguageId} from "@/types/language";
-import {ISnippet} from "@/types/snippet";
+import {ILanguage} from "@/types/language";
+import {fetchLanguages} from "@/services/snippets/snippet-fetch.service";
+
 function Home() {
   const {dispatch, state} = useGameState();
 
   const {startTimer, stopTimer, getTime, resetTimer} = useTimer();
 
   const [isNextButtonLocked, setIsNextButtonLocked] = useState(false);
+
   const backgroundFetchPromise = useRef<Promise<void> | null>(null);
+  const availableLanguages = useRef<{[key: string]: ILanguage} | null>(null);
 
   const setSnippets = useCallback(
-    async (language: LanguageId) => {
-      const snippets = await getRandomSnippets(language);
+    async (language: ILanguage) => {
+      const snippets = await getRandomSnippets(language.id);
       dispatch({
         type: "SET_SNIPPETS",
         payload: {snippets, language},
@@ -30,14 +33,20 @@ function Home() {
   );
 
   useEffect(() => {
-    resetTimer();
-    setSnippets(DEFAULT_LANGUAGE);
+    const initialize = async () => {
+      availableLanguages.current = await fetchLanguages();
+      resetTimer();
+      setSnippets(availableLanguages.current[DEFAULT_LANGUAGE] ?? availableLanguages.current[Object.keys(availableLanguages.current)[0]]);
+    };
+
+    initialize();
   }, [resetTimer, setSnippets]);
 
   const backgroundGetSnippets = async () => {
     if (!state.snippetQueue) return;
 
-    const snippets = await getRandomSnippets(state.language);
+    
+    const snippets = await getRandomSnippets(state.language?.id ?? DEFAULT_LANGUAGE);
 
     dispatch({type: "ADD_SNIPPETS_TO_QUEUE", payload: {snippets}});
   };
@@ -117,6 +126,7 @@ function Home() {
       resetSnippet={resetSnippet}
       changeLanguage={setSnippets}
       isRefreshing={isNextButtonLocked}
+      availableLanguages={availableLanguages.current!}
       key={state.currentSnippet.text}
     />
   );
