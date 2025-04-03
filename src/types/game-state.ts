@@ -1,5 +1,5 @@
 import {ISnippet} from "@/types/snippet";
-import { LanguageId } from "@/types/language";
+import {ILanguage} from "@/types/language";
 
 export enum GameStatus {
   LOADING = "LOADING",
@@ -10,7 +10,7 @@ export enum GameStatus {
 
 export interface IGameStateLoading {
   status: GameStatus.LOADING;
-  language: LanguageId;
+  language: ILanguage | null;
   snippetQueue: ISnippet[] | null;
 }
 
@@ -18,7 +18,7 @@ export interface IGameStateReady {
   status: GameStatus.READY;
   snippetQueue: ISnippet[];
   currentSnippet: ISnippet;
-  language: LanguageId;
+  language: ILanguage;
   userPosition: number;
 }
 
@@ -26,7 +26,7 @@ export interface IGameStatePlaying {
   status: GameStatus.PLAYING;
   snippetQueue: ISnippet[];
   currentSnippet: ISnippet;
-  language: LanguageId;
+  language: ILanguage;
   wrongKeystrokes: number;
   validKeystrokes: number;
   userPosition: number;
@@ -36,7 +36,7 @@ export interface IGameStateFinished {
   status: GameStatus.FINISHED;
   snippetQueue: ISnippet[];
   currentSnippet: ISnippet;
-  language: LanguageId;
+  language: ILanguage;
   wrongKeystrokes: number;
   validKeystrokes: number;
 }

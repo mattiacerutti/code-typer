@@ -1,6 +1,4 @@
-import {SUPPORTED_LANGUAGES} from "@/constants/supported-languages";
 import {CharacterState, CharacterTypes, WhitespaceTypes} from "@/types/character";
-import {ILanguage, LanguageId} from "@/types/language";
 import { IParsedSnippet } from "@/types/snippet";
 
 export function isGameFinished(parsedSnippets: IParsedSnippet) {
@@ -29,11 +27,4 @@ export function calculateAccuracy(validKeystrokes: number, wrongKeystrokes: numb
 export function humanizeTime(milliseconds: number) {
   const seconds = (milliseconds / 1000).toFixed(1);
   return `${seconds}s`;
-}
-
-export function getSupportedLanguage(languageId: LanguageId): ILanguage {
-  if (!SUPPORTED_LANGUAGES[languageId]) {
-    throw `Language ${languageId} not supported.`;
-  }
-  return SUPPORTED_LANGUAGES[languageId];
 }

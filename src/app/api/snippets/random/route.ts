@@ -3,18 +3,17 @@ import {doesLanguageExist} from "@/repositories/language.repository";
 import {getFileContent} from "@/services/api/snippet-fetch.service";
 import {extractSnippets, filterSnippets, formatCode} from "@/services/api/snippet-process.service";
 import {NextResponse} from "next/server";
-import {LanguageId} from "@/types/language";
 import {fetchRandomSnippets, setSnippetAsNonValid} from "@/repositories/snippet.repository";
 
 export async function GET(request: Request) {
   const {searchParams} = new URL(request.url);
-  let languageId = searchParams.get("language") as LanguageId;
+  let languageId = searchParams.get("language");
 
   if (!languageId) {
     return NextResponse.json({error: "Language not provided"}, {status: 400});
   }
 
-  languageId = languageId.toLowerCase() as LanguageId;
+  languageId = languageId.toLowerCase();
 
   // Check if language provided exists
   const languageExists = await doesLanguageExist(languageId);
@@ -31,7 +30,7 @@ export async function GET(request: Request) {
   }
 }
 
-async function getRandomSnippets(languageId: LanguageId, quantity: number): Promise<string[]> {
+async function getRandomSnippets(languageId: string, quantity: number): Promise<string[]> {
   const snippets: string[] = [];
   const fetchedUrls: string[] = [];
 
@@ -61,7 +60,7 @@ async function getRandomSnippets(languageId: LanguageId, quantity: number): Prom
   return snippets.sort(() => Math.random() - 0.5);
 }
 
-function processSnippets(fileContent: string, languageId: LanguageId): string[] {
+function processSnippets(fileContent: string, languageId: string): string[] {
   // Extract snippets from file content
   const extractedSnippets = extractSnippets(fileContent, languageId);
 
@@ -82,7 +81,7 @@ function processSnippets(fileContent: string, languageId: LanguageId): string[] 
   return codeSnippets;
 }
 
-async function getSnippetsFromUrls(snippetUrls: string[], languageId: LanguageId): Promise<string[]> {
+async function getSnippetsFromUrls(snippetUrls: string[], languageId: string): Promise<string[]> {
   const processSnippetsPromises = snippetUrls.map(async (snippetUrl: string) => {
     // Get file content from snippetUrl
     const fileContent = await getFileContent(snippetUrl);

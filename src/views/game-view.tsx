@@ -4,22 +4,26 @@ import {useGameState} from "@/contexts/GameStateContext";
 import {GameStatus} from "@/types/game-state";
 import TypingArea from "@/components/typing-area";
 import useTyping from "@/hooks/useTyping";
-import {LanguageId} from "@/types/language";
-import {SUPPORTED_LANGUAGES} from "@/constants/supported-languages";
+import {ILanguage} from "@/types/language";
 
 interface IGameViewProps {
   onGameFinished: () => void;
   onGameStarted: () => void;
   changeSnippet: () => void;
   resetSnippet: () => void;
-  changeLanguage: (language: LanguageId) => void;
+  changeLanguage: (language: ILanguage) => void;
+  availableLanguages: {[key: string]: ILanguage};
   isRefreshing: boolean;
 }
 
 function GameView(props: IGameViewProps) {
-  const {onGameFinished, onGameStarted, changeSnippet: refreshSnippet, resetSnippet: restartGame, isRefreshing, changeLanguage} = props;
+  const {onGameFinished, onGameStarted, changeSnippet, resetSnippet, isRefreshing, changeLanguage, availableLanguages} = props;
 
   const {state, dispatch} = useGameState();
+
+  if (state.status === GameStatus.LOADING || state.status === GameStatus.FINISHED) {
+    throw new Error("GameView: Received invalid game state");
+  }
 
   const onWrongKeystroke = () => {
     if (state.status !== GameStatus.PLAYING) return;
@@ -41,7 +45,7 @@ function GameView(props: IGameViewProps) {
         <div className="flex flex-row gap-1.5 content-between">
           <button
             className="px-6 py-3 bg-slate-200 text-slate-900 font-medium rounded-md hover:bg-slate-300 disabled:opacity-20"
-            onClick={restartGame}
+            onClick={resetSnippet}
             disabled={isRefreshing || state.status !== GameStatus.PLAYING}
           >
             <svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -53,23 +57,23 @@ function GameView(props: IGameViewProps) {
           </button>
           <button
             className="px-6 py-3 bg-slate-200 text-slate-900 font-medium rounded-md hover:bg-slate-300 disabled:opacity-20"
-            onClick={() => refreshSnippet()}
+            onClick={changeSnippet}
             disabled={isRefreshing}
           >
             {!isRefreshing ? "Change Snippet" : "Wait.."}
           </button>
           <select
             disabled={isRefreshing}
-            value={state.language}
+            value={state.language.id}
             onChange={(e) => {
               dispatch({type: "SET_GAME_STATUS", payload: GameStatus.LOADING});
-              changeLanguage(e.target.value as LanguageId);
+              changeLanguage(availableLanguages[e.target.value]);
             }}
             className="px-6 py-3 bg-slate-200 text-slate-900 font-medium rounded-md hover:bg-slate-300 disabled:opacity-20"
           >
-            {Object.values(LanguageId).map((languageId) => (
-              <option key={languageId} value={languageId}>
-                {SUPPORTED_LANGUAGES[languageId].name}
+            {Object.values(availableLanguages).map((language) => (
+              <option key={language.id} value={language.id}>
+                {language.name}
               </option>
             ))}
           </select>
