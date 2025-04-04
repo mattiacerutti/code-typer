@@ -7,6 +7,7 @@ export async function fetchRandomSnippets(languageId: string, quantity: number, 
   const query = `
     SELECT "url" FROM "Snippet"
     WHERE "languageId" = $1
+    AND "isValid" = true
     ${alreadyFetchedList}
     ORDER BY RANDOM()
     LIMIT $${alreadyFetched.length + 2};
