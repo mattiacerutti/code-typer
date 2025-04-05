@@ -1,5 +1,5 @@
 import {ICharacter, CharacterState, WhitespaceTypes} from "@/types/character";
-import {getCharacterText, getCharacterClasses} from "@/utils/character";
+import {getCharacterText, getCharacterClasses} from "@/utils/client/character";
 
 interface ICharacterProps {
   char: ICharacter;

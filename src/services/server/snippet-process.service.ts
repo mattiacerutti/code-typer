@@ -1,66 +1,10 @@
-import {filterLineLength, filterLinesNumber, filterSnippetLength, filterSnippetSpecialCharacters, filterTabsInBetween, isValidNode} from "@/lib/server/snippet/snippet-filters";
-import {adjustIndentationOffset, countInitialWhitespaces, detectIndentationStyle, getNodeText, removeInvalidWhitespaces} from "@/lib/server/snippet/snippet-utils";
-import IParser from "tree-sitter";
-import {getTSParser} from "./snippet-parser.service";
+import {adjustIndentationOffset, detectIndentationStyle} from "@/lib/server/snippets/indentation";
+import { extractSnippets } from "@/lib/server/snippets/snippet-parser";
+import {countInitialWhitespaces} from "@/utils/server/text";
+import {filterLineLength, filterLinesNumber, filterSnippetLength, filterSnippetSpecialCharacters, filterTabsInBetween} from "@/utils/server/snippet-filters";
 
-function findValidNodes(node: IParser.SyntaxNode): IParser.SyntaxNode[] {
-  let nodes: IParser.SyntaxNode[] = [];
-  if (isValidNode(node)) {
-    nodes.push(node);
-  }
 
-  node.children.forEach((child) => {
-    if (child === null) return;
-    nodes = nodes.concat(findValidNodes(child));
-  });
-
-  return nodes;
-}
-
-function getInitialIndentation(nodeStartIndex: number, sourceCode: string): string {
-  let startingPoint = nodeStartIndex - 1;
-
-  let buf: string = "";
-
-  while (sourceCode[startingPoint] !== "\n" && startingPoint >= 0) {
-    if (sourceCode[startingPoint] !== " " && sourceCode[startingPoint] !== "\t") {
-      buf = "";
-      startingPoint--;
-      continue;
-    }
-
-    buf += sourceCode[startingPoint];
-    startingPoint--;
-  }
-
-  return buf;
-}
-
-function convertSnippetToText(node: IParser.SyntaxNode, sourceCode: string): string {
-  const initialIndentation = getInitialIndentation(node.startIndex, sourceCode);
-
-  return initialIndentation + getNodeText(node);
-}
-
-export function extractSnippets(fileContent: string, languageId: string): string[] {
-  const parser = getTSParser(languageId);
-
-  let parsedCode: IParser.Tree;
-
-  try {
-    parsedCode = parser.parse(fileContent);
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  } catch (error) {
-    return [];
-  }
-
-  const validNodes = findValidNodes(parsedCode.rootNode);
-  const validSnippets = validNodes.map((node) => convertSnippetToText(node, fileContent));
-
-  return validSnippets;
-}
-
-export function filterSnippets(snippets: string[]): string[] {
+function filterSnippets(snippets: string[]): string[] {
   return snippets
     .filter((snippet) => filterSnippetLength(snippet))
     .filter((snippet) => filterLinesNumber(snippet))
@@ -69,37 +13,51 @@ export function filterSnippets(snippets: string[]): string[] {
     .filter((snippet) => filterTabsInBetween(snippet));
 }
 
-export function formatCode(code: string): string | null {
-  code = removeInvalidWhitespaces(code);
 
-  const indentationStyle = detectIndentationStyle(code);
-  // console.log("Detected indentation style:", indentationStyle);
+function cleanText(text: string): string {
+  // Cleans text from invalid whitespaces and whitespaces out of place
+  return text.replace(/[^\S\t\n ]/g, "").replace(/(?<=\n)[ \t]+(?=\n)/g, "");
+}
 
-  switch (indentationStyle.type) {
-    case "mixed":
-      // console.warn("Mixed indentation is not supported");
-      return null;
-    case "none":
-      return code;
-    case "space":
-      indentationStyle.value.unshift(0);
-      indentationStyle.value.sort((a, b) => a - b);
-      break;
+function formatCode(snippet: string): string | null {
+  // Clean raw snippet
+  snippet = cleanText(snippet);
+  const indentationStyle = detectIndentationStyle(snippet);
+
+  if (indentationStyle.type === "mixed") {
+    return null;
   }
 
-  let codeLines = code.split("\n").map((line) => {
+  if (indentationStyle.type === "none") {
+    return snippet;
+  }
+
+  // Convert raw snippet indentation style with standardized '\t' indentation
+  let codeLines = snippet.split("\n").map((line) => {
     const initialWhitespaces = countInitialWhitespaces(line);
 
-    line = line.trim();
+    const trimmedLine = line.trim();
 
-    if (!indentationStyle.value) {
-      return "\t".repeat(initialWhitespaces) + line;
+    if (indentationStyle.type === "space") {
+      return "\t".repeat(indentationStyle.value.indexOf(initialWhitespaces)) + trimmedLine;
     }
 
-    return "\t".repeat(indentationStyle.value.indexOf(initialWhitespaces)) + line;
+    return "\t".repeat(initialWhitespaces) + trimmedLine;
   });
 
+  // Adjust indentation offset
   codeLines = adjustIndentationOffset(codeLines);
 
   return codeLines.join("\n");
+}
+
+
+export function processSnippets(fileContent: string, languageId: string): string[] {
+  const extractedSnippets = extractSnippets(fileContent, languageId);
+
+  const formattedSnippets = extractedSnippets.map((snippet) => formatCode(snippet)).filter((snippet) => snippet !== null);
+
+  const filteredSnippets = filterSnippets(formattedSnippets);
+
+  return filteredSnippets;
 }
