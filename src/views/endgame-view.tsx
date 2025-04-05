@@ -2,7 +2,7 @@
 
 import {useGameState} from "@/contexts/GameStateContext";
 import {GameStatus} from "@/types/game-state";
-import {calculateAccuracy, calculateWPM, humanizeTime} from "@/utils/typing-metrics";
+import {calculateAccuracy, calculateWPM, humanizeTime} from "@/utils/client/typing-metrics";
 
 interface IEndgameViewProps {
   totalTime: number;
