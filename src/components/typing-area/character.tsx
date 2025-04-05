@@ -1,52 +1,29 @@
 import {ICharacter, CharacterState, WhitespaceTypes} from "@/types/character";
+import {getCharacterText, getCharacterClasses} from "@/utils/character";
 
 interface ICharacterProps {
   char: ICharacter;
   charHighlighting: string | null;
-  isSelected?: boolean;
+  isSelected: boolean;
+  isInvisible: boolean;
 }
 
-function Character(props: ICharacterProps & {ref: React.RefObject<HTMLSpanElement>}) {
-  const {char, charHighlighting, ref, isSelected = false} = props;
+function Character(props: ICharacterProps & {ref: React.RefObject<HTMLSpanElement | null>}) {
+  const {char, charHighlighting, ref, isSelected, isInvisible} = props;
 
-  
-  let elementClasses = "character-default";
-  let elementText = char.value;
-  
-  if (char.state == CharacterState.Right) {
-    elementClasses = charHighlighting ?? "character-default";
-  }
+  const elementClasses = getCharacterClasses(char, charHighlighting);
+  const elementText = getCharacterText(char);
 
-  if (char.state == CharacterState.Wrong) {
-    elementClasses = "character-wrong";
-  }
+  const hasOpacity = !isInvisible && !(char.value === WhitespaceTypes.NewLine && !isSelected && char.state !== CharacterState.Wrong);
 
-  if (char.value == WhitespaceTypes.Space) {
-    elementText = "\u00A0";
-  }
-
-  if (char.value == WhitespaceTypes.NewLine) {
-    elementText = "\u00A0\u00A0⮐";
-  }
-
-  if (char.value == WhitespaceTypes.Tab) {
-    elementText = "\u00A0\u00A0\u00A0";
-  }
-
-  if (char.value == "EOF") {
-    elementText = "";
-  }
+  const spanStyle = {
+    fontSize: char.value === WhitespaceTypes.NewLine ? "1rem" : "",
+    fontWeight: char.value === WhitespaceTypes.NewLine ? "bold" : "",
+    opacity: hasOpacity ? 1 : 0,
+  };
 
   return (
-    <span
-      className={`${elementClasses} flex items-center justify-center`}
-      ref={ref}
-      style={{
-        fontSize: char.value == WhitespaceTypes.NewLine ? "1rem" : "",
-        fontWeight: char.value == WhitespaceTypes.NewLine ? "bold" : "",
-        opacity: char.value == WhitespaceTypes.NewLine && !isSelected && char.state !== CharacterState.Wrong ? 0 : 1,
-      }}
-    >
+    <span className={`${elementClasses} flex items-center justify-center`} ref={ref} style={spanStyle}>
       {elementText}
     </span>
   );

@@ -1,7 +1,7 @@
 import {IGameStatePlaying, IGameStateReady} from "@/types/game-state";
-import {getBindedClosingChar, getChar, getPreviousChar, hasOnlyWhitespacesBefore, setCharacterState} from "@/lib/client/typing/shared";
+import {getBindedClosingChar, getChar, getPreviousChar, hasOnlyWhitespacesBefore} from "@/lib/client/typing/shared";
 import {CharacterState, CharacterTypes, ICharacter} from "@/types/character";
-import { IParsedSnippet } from "@/types/snippet";
+import {IParsedSnippet} from "@/types/snippet";
 
 function handleAutoClosingCharacter(snippet: IParsedSnippet, position: number, char: ICharacter) {
   const closingCharacter = getBindedClosingChar(snippet, char, position);
@@ -12,20 +12,14 @@ function handleAutoClosingCharacter(snippet: IParsedSnippet, position: number, c
   throw new Error("Couldn't find a closing parenthesis");
 }
 
-function incrementCursor(snippet: IParsedSnippet, position: number, updateUserPosition: (position: number) => void) {
-
-
+function incrementUserPosition(snippet: IParsedSnippet, position: number, updateUserPosition: (position: number) => void): number {
   const newChar = getChar(snippet, position + 1);
 
-  if (
-    (newChar.type === CharacterTypes.Whitespace && hasOnlyWhitespacesBefore(snippet, position + 1)) ||
-    newChar.state === CharacterState.Right
-  ) {
-    incrementCursor(snippet, position + 1, updateUserPosition);
-    return;
+  if ((newChar.type === CharacterTypes.Whitespace && hasOnlyWhitespacesBefore(snippet, position + 1)) || newChar.state === CharacterState.Right) {
+    return incrementUserPosition(snippet, position + 1, updateUserPosition);
   }
 
-  updateUserPosition(position + 1);
+  return position + 1;
 }
 
 export function addCharacter(
@@ -35,7 +29,6 @@ export function addCharacter(
   updateUserPosition: (position: number) => void,
   registerKeyStroke: (isCorrect: boolean) => void
 ) {
-
   const position = state.userPosition;
   const snippet = state.currentSnippet.parsedSnippet;
 
@@ -48,20 +41,28 @@ export function addCharacter(
   }
   let isPressedKeyCorrect = pressedKey === expectedChar.value;
 
+  if (isPressedKeyCorrect && expectedChar.type === CharacterTypes.AutoClosing) {
+    handleAutoClosingCharacter(snippet, position, expectedChar);
+  }
+
+  // Increments the user position
+  const newPosition = incrementUserPosition(snippet, position, updateUserPosition);
+
   // If the previous character was incorrect, we also set this to incorrect no matter what.
   const prevChar = getPreviousChar(snippet, position);
   if (prevChar && prevChar.state === CharacterState.Wrong) {
     isPressedKeyCorrect = false;
   }
 
-  if (isPressedKeyCorrect && expectedChar.type === CharacterTypes.AutoClosing) {
-    handleAutoClosingCharacter(snippet, position, expectedChar);
+  for (let i = position; i <= newPosition - 1; i++) {
+    snippet[i].state = isPressedKeyCorrect ? CharacterState.Right : CharacterState.Wrong;
   }
 
+  // Registers correct/incorrect key press for stats purposes
   registerKeyStroke(isPressedKeyCorrect);
 
-  setCharacterState(snippet, position, updateParsedSnippet, isPressedKeyCorrect ? CharacterState.Right : CharacterState.Wrong);
-  incrementCursor(snippet, position, updateUserPosition);
+  updateParsedSnippet(snippet);
+  updateUserPosition(newPosition);
 
   return;
 }
