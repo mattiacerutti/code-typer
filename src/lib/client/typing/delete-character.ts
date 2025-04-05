@@ -1,38 +1,33 @@
 import {SHOULD_PRESERVE_CLOSING_CHAR_WHEN_DELETING} from "@/constants/game";
 import {CharacterState, CharacterTypes, ICharacter} from "@/types/character";
-import { IParsedSnippet } from "@/types/snippet";
-import {getBindedClosingChar, getPreviousChar, hasOnlyWhitespacesBefore, isClosingCharacter, setCharacterState} from "@/lib/client/typing/shared";
+import {IParsedSnippet} from "@/types/snippet";
+import {getPreviousChar, hasOnlyWhitespacesBefore, isClosingCharacter, resetCharactersInRange} from "@/lib/client/typing/shared";
+
+function decrementUserPosition(snippet: IParsedSnippet, position: number): number {
+  if (position === 0) return 0;
+  const prevChar = getPreviousChar(snippet, position) as ICharacter;
+  if (
+    (prevChar.type === CharacterTypes.Whitespace && hasOnlyWhitespacesBefore(snippet, position - 1)) ||
+    (SHOULD_PRESERVE_CLOSING_CHAR_WHEN_DELETING && prevChar.state === CharacterState.Right && isClosingCharacter(prevChar))
+  ) {
+    return decrementUserPosition(snippet, position - 1);
+  }
+  return position - 1;
+}
 
 export function deleteCharacter(
   snippet: IParsedSnippet,
   position: number,
   updateParsedSnippet: (parsedSnippet: IParsedSnippet) => void,
-  updateUserPosition: (position: number) => void,
+  updateUserPosition: (position: number) => void
 ) {
-  if(position === 0) {
+  if (position === 0) {
     return;
   }
+  const newPos = decrementUserPosition(snippet, position);
 
-  const newChar = getPreviousChar(snippet, position) as ICharacter;
+  resetCharactersInRange(snippet, newPos, position);
 
-  if (
-    (newChar.type === CharacterTypes.Whitespace && hasOnlyWhitespacesBefore(snippet, position - 1)) ||
-    (SHOULD_PRESERVE_CLOSING_CHAR_WHEN_DELETING && newChar.state === CharacterState.Right && isClosingCharacter(newChar))
-  ) {
-    deleteCharacter(snippet, position - 1, updateParsedSnippet, updateUserPosition);
-    return;
-  }
-
-  if (newChar.type === CharacterTypes.AutoClosing) {
-    const bindedClosingChar = getBindedClosingChar(snippet, newChar, position - 1);
-    if (bindedClosingChar) {
-      bindedClosingChar.state = CharacterState.Default;
-    } else {
-      throw new Error("Couldn't find a closing parenthesis");
-    }
-  }
-
-  setCharacterState(snippet, position - 1, updateParsedSnippet, CharacterState.Default);
-  updateUserPosition(position - 1);
+  updateParsedSnippet(snippet);
+  updateUserPosition(newPos);
 }
-

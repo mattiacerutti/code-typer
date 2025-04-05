@@ -5,7 +5,7 @@ import {GameStatus} from "@/types/game-state";
 import {useState, useEffect, useCallback} from "react";
 
 interface ICaretProps {
-  charRefs: React.RefObject<HTMLSpanElement>[];
+  charRefs: React.RefObject<HTMLSpanElement | null>[];
 }
 
 function Caret(props: ICaretProps) {

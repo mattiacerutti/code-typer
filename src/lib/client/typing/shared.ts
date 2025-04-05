@@ -19,8 +19,8 @@ export function getPreviousChar(snippet: IParsedSnippet, position: number) {
   return prevChar;
 }
 
-export function getLineStart(snippet: IParsedSnippet, position: number): number | undefined {
-  let nonWhitespaceChar = undefined;
+export function getLineStart(snippet: IParsedSnippet, position: number): number {
+  let nonWhitespaceChar = position;
   for (let i = position; i >= 0; i--) {
     const char = getChar(snippet, i);
     if (char.value === WhitespaceTypes.NewLine && i !== position) {

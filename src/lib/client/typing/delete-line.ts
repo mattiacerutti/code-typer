@@ -1,4 +1,3 @@
-import {CharacterState} from "@/types/character";
 import {getLineStart, getPreviousLineEnd, isFirstCharacter, resetCharactersInRange} from "@/lib/client/typing/shared";
 import {IGameStatePlaying, IGameStateReady} from "@/types/game-state";
 import {IParsedSnippet} from "@/types/snippet";
@@ -12,29 +11,24 @@ export function deleteLine(
   const snippet = state.currentSnippet.parsedSnippet;
   if (position === 0) return;
 
+  let newPos = getLineStart(snippet, position);
+
   if (isFirstCharacter(snippet, position)) {
     let previousLineEnd = getPreviousLineEnd(snippet, position);
-    if (previousLineEnd === undefined) {
+
+    while (previousLineEnd && getLineStart(snippet, previousLineEnd) === previousLineEnd) {
+      previousLineEnd = getPreviousLineEnd(snippet, previousLineEnd);
+    }
+
+    if (!previousLineEnd) {
       throw new Error("Couldn't find a previous line. This error should never happen.");
     }
 
-    while (previousLineEnd! > 0 && getLineStart(snippet, previousLineEnd!) === undefined) {
-      previousLineEnd = getPreviousLineEnd(snippet, previousLineEnd!);
-    }
-
-    state.currentSnippet.parsedSnippet[previousLineEnd!].state = CharacterState.Default;
-    updateParsedSnippet([...state.currentSnippet.parsedSnippet]);
-    updateUserPosition(previousLineEnd!);
-    return;
+    newPos = previousLineEnd;
   }
 
-  const firstLineCharacterIndex = getLineStart(snippet, position);
-  if (firstLineCharacterIndex === undefined) {
-    return;
-  }
+  resetCharactersInRange(snippet, newPos, position);
 
-  resetCharactersInRange(snippet, firstLineCharacterIndex, position);
-
-  updateParsedSnippet([...state.currentSnippet.parsedSnippet]);
-  updateUserPosition(firstLineCharacterIndex);
+  updateParsedSnippet(snippet);
+  updateUserPosition(newPos);
 }

@@ -1,4 +1,4 @@
-import {CharacterState, ICharacter, WhitespaceTypes} from "@/types/character";
+import {CharacterTypes, ICharacter, WhitespaceTypes} from "@/types/character";
 import {getLineStart, getPreviousChar, getPreviousLineEnd, isFirstCharacter, resetCharactersInRange} from "@/lib/client/typing/shared";
 import {IGameStatePlaying, IGameStateReady} from "@/types/game-state";
 import {AUTO_CLOSING_CHARS} from "@/constants/game";
@@ -37,7 +37,7 @@ function getPreviousWordPosition(snippet: IParsedSnippet, position: number): num
   do {
     position--;
     currentChar = getPreviousChar(snippet, position);
-  } while (currentChar && currentChar.value !== WhitespaceTypes.Space && !isWordSeparator(currentChar));
+  } while (currentChar && currentChar.type !== CharacterTypes.Whitespace && !isWordSeparator(currentChar));
 
   return position;
 }
@@ -49,25 +49,25 @@ export function deleteWord(
 ) {
   const position = state.userPosition;
   const snippet = state.currentSnippet.parsedSnippet;
+
   if (position === 0) return;
+
+  let previousWordPosition = getPreviousWordPosition(snippet, position);
 
   if (isFirstCharacter(snippet, position)) {
     let previousLineEnd = getPreviousLineEnd(snippet, position);
-    if (previousLineEnd === undefined) {
+
+    while (previousLineEnd && getLineStart(snippet, previousLineEnd) === previousLineEnd) {
+      previousLineEnd = getPreviousLineEnd(snippet, previousLineEnd);
+    }
+
+    if (!previousLineEnd) {
       throw new Error("Couldn't find a previous line. This error should never happen.");
     }
 
-    while (previousLineEnd! > 0 && getLineStart(snippet, previousLineEnd!) === undefined) {
-      previousLineEnd = getPreviousLineEnd(snippet, previousLineEnd!);
-    }
-
-    state.currentSnippet.parsedSnippet[previousLineEnd!].state = CharacterState.Default;
-    updateParsedSnippet([...state.currentSnippet.parsedSnippet]);
-    updateUserPosition(previousLineEnd!);
-    return;
+    previousWordPosition = previousLineEnd;
   }
 
-  const previousWordPosition = getPreviousWordPosition(snippet, position);
   resetCharactersInRange(snippet, previousWordPosition, position);
 
   updateParsedSnippet(snippet);
