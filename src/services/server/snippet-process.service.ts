@@ -15,14 +15,30 @@ function filterSnippets(snippets: string[]): string[] {
 
 
 function cleanText(text: string): string {
-  // Cleans text from invalid whitespaces and whitespaces out of place
-  return text.replace(/[^\S\t\n ]/g, "").replace(/(?<=\n)[ \t]+(?=\n)/g, "");
+
+  // Remove whitespaces from empty lines
+  text = text.replace(/(?<=\n)[ \t]+(?=\n)/g, "");
+
+  return text;
+}
+
+
+function hasProhibitedCharacters(input: string): boolean {
+  const regex = /((?:(?![ \t\n])\s)|\\)/;
+  return regex.test(input);
 }
 
 function formatCode(snippet: string): string | null {
   // Clean raw snippet
-  snippet = cleanText(snippet);
+
+  if(hasProhibitedCharacters(snippet)){
+    return null;
+  }
+
+  snippet = cleanText(snippet)
+
   const indentationStyle = detectIndentationStyle(snippet);
+
 
   if (indentationStyle.type === "mixed") {
     return null;
