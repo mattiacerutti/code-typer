@@ -1,12 +1,12 @@
 import {IGameStatePlaying, IGameStateReady} from "@/types/game-state";
 import {getChar, getPreviousChar, hasOnlyWhitespacesBefore, setCharacterState} from "@/lib/client/typing/shared";
-import {CharacterState, CharacterTypes, ICharacter} from "@/types/character";
+import {CharacterState, CharacterTypes} from "@/types/character";
 import {IParsedSnippet} from "@/types/snippet";
 
 function incrementUserPosition(snippet: IParsedSnippet, position: number, updateUserPosition: (position: number) => void): number {
   const newChar = getChar(snippet, position + 1);
 
-  if ((newChar.type === CharacterTypes.Whitespace && hasOnlyWhitespacesBefore(snippet, position + 1)) || newChar.state === CharacterState.Right) {
+  if ((newChar.type === CharacterTypes.Whitespace && hasOnlyWhitespacesBefore(snippet, position + 1)) || (newChar.type === CharacterTypes.AutoClosing && !newChar.isOpening)) {
     return incrementUserPosition(snippet, position + 1, updateUserPosition);
   }
 
