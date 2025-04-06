@@ -18,19 +18,18 @@ export enum CharacterTypes {
 }
 
 export interface IBaseCharacter {
-  type: CharacterTypes;
-  value: string | WhitespaceTypes;
   state: CharacterState;
+  value: string;
 }
 
 export interface INormalCharacter extends IBaseCharacter {
   type: CharacterTypes.Normal;
-  value: string;
 }
 
 export interface IAutoClosingCharacter extends IBaseCharacter {
   type: CharacterTypes.AutoClosing;
-  value: string;
+  isOpening: boolean;
+  pairedChar: number;
 }
 
 export interface IWhitespaceCharacter extends IBaseCharacter {

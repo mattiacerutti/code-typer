@@ -1,12 +1,10 @@
 import {CharacterState, CharacterTypes, ICharacter, WhitespaceTypes} from "@/types/character";
-import {AUTO_CLOSING_CHARS, SHOULD_PRESERVE_CLOSING_CHAR_WHEN_DELETING} from "@/constants/game";
+import {SHOULD_PRESERVE_CLOSING_CHAR_WHEN_DELETING} from "@/constants/game";
 import {IParsedSnippet} from "@/types/snippet";
-
 
 export function getChar(snippet: IParsedSnippet, position: number): ICharacter {
   return snippet[position];
 }
-
 
 export function getPreviousChar(snippet: IParsedSnippet, position: number) {
   if (position <= 0) {
@@ -33,27 +31,27 @@ export function getLineStart(snippet: IParsedSnippet, position: number): number 
   return nonWhitespaceChar;
 }
 
-export function setCharacterState(snippet: IParsedSnippet, position: number, updateParsedSnippet: (parsedSnippet: IParsedSnippet) => void, state: CharacterState) {
-  snippet[position].state = state;
-  updateParsedSnippet(snippet);
-}
+export function setCharacterState(snippet: IParsedSnippet, position: number, state: CharacterState) {
+  const char = snippet[position];
 
-export function getBindedClosingChar(snippet: IParsedSnippet, char: ICharacter, position: number) {
-  let cont = 1;
-
-  for (let i = position + 1; i < snippet.length; i++) {
-    const currentChar = snippet[i];
-    if (currentChar.value === AUTO_CLOSING_CHARS[char.value]) {
-      cont--;
-      if (cont === 0) {
-        return currentChar;
-      }
-    }
-    if (currentChar.value === char.value) {
-      cont++;
-    }
+  if (char.state === state) {
+    return;
   }
-  return undefined;
+
+  if (state === CharacterState.Wrong) {
+    char.state = CharacterState.Wrong;
+    return;
+  }
+
+  if (char.type === CharacterTypes.AutoClosing) {
+    snippet[position].state = state;
+    if (char.isOpening) {
+      snippet[char.pairedChar].state = state;
+    }
+    return;
+  }
+
+  snippet[position].state = state;
 }
 
 export function hasOnlyWhitespacesBefore(snippet: IParsedSnippet, position: number): boolean {
@@ -66,10 +64,6 @@ export function hasOnlyWhitespacesBefore(snippet: IParsedSnippet, position: numb
     prevChar = getPreviousChar(snippet, position);
   }
   return true;
-}
-
-export function isClosingCharacter(char: ICharacter): boolean {
-  return Object.values(AUTO_CLOSING_CHARS).includes(char.value) && char.type === CharacterTypes.Normal;
 }
 
 export function isFirstCharacter(snippet: IParsedSnippet, position: number): boolean {
@@ -88,16 +82,10 @@ export function getPreviousLineEnd(snippet: IParsedSnippet, position: number): n
 
 export function resetCharactersInRange(snippet: IParsedSnippet, start: number, end: number) {
   for (let i = start; i <= end; i++) {
-    if (SHOULD_PRESERVE_CLOSING_CHAR_WHEN_DELETING && snippet[i].state === CharacterState.Right && isClosingCharacter(snippet[i])) {
+    const char = snippet[i];
+    if (char.type === CharacterTypes.AutoClosing && !char.isOpening && SHOULD_PRESERVE_CLOSING_CHAR_WHEN_DELETING && char.state === CharacterState.Right) {
       continue;
     }
-
-    snippet[i].state = CharacterState.Default;
-    if (snippet[i].type === CharacterTypes.AutoClosing) {
-      const bindedClosingChar = getBindedClosingChar(snippet, snippet[i], i);
-      if (bindedClosingChar) {
-        bindedClosingChar.state = CharacterState.Default;
-      }
-    }
+    setCharacterState(snippet, i, CharacterState.Default);
   }
 }

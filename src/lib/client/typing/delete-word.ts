@@ -11,7 +11,7 @@ const isWordSeparator = (char: ICharacter) =>
   char.value === ":" ||
   char.value === "!" ||
   char.value === "?" ||
-  Object.values(AUTO_CLOSING_CHARS).includes(char.value) ||
+  (Object.values(AUTO_CLOSING_CHARS).includes(char.value) && char.type !== CharacterTypes.AutoClosing) ||
   Object.keys(AUTO_CLOSING_CHARS).includes(char.value);
 
 function getPreviousWordPosition(snippet: IParsedSnippet, position: number): number {
