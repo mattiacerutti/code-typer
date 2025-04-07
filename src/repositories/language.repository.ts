@@ -17,7 +17,7 @@ export async function getLanguages(): Promise<{
   [key: string]: ILanguage;
 }> {
   const languages = await prisma.language.findMany();
-  return languages.reduce((acc: { [key: string]: ILanguage}, language) => {
+  return languages.reduce((acc, language) => {
     acc[language.id] = language;
     return acc;
   }, {} as {[key: string]: ILanguage});
