@@ -59,17 +59,7 @@ function stateReducer(state: IGameState, action: GameAction): IGameState {
         language: state.language,
         userPosition: 0,
       };
-
-    case "SET_LANGUAGE":
-      if (state.status !== GameStatus.READY && state.status !== GameStatus.PLAYING) {
-        throw new Error("Cannot set language if game is not in READY or PLAYING state");
-      }
-
-      return {
-        ...state,
-        language: action.payload,
-      };
-
+      
     case "RESET_GAME_STATE":
       if (state.status !== GameStatus.PLAYING) {
         throw new Error("Cannot reset game state if game is not in PLAYING state");

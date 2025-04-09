@@ -8,7 +8,6 @@ export type GameAction =
   | {type: "SET_SNIPPETS"; payload: {snippets: ISnippet[]; language: ILanguage}}
   | {type: "ADD_SNIPPETS_TO_QUEUE"; payload: {snippets: ISnippet[]}}
   | {type: "GO_TO_NEXT_SNIPPET"}
-  | {type: "SET_LANGUAGE"; payload: ILanguage}
   | {type: "RESET_GAME_STATE"}
   | {type: "UPDATE_CURRENT_SNIPPET"; payload: IParsedSnippet}
   | {type: "UPDATE_USER_POSITION"; payload: number}
