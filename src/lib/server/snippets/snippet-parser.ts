@@ -1,6 +1,6 @@
-import { getTSParser } from "@/services/server/parser.factory";
-import { getInitialIndentation } from "./indentation";
-import { isValidNode } from "@/utils/server/snippet-filters";
+import {getTSParser} from "@/services/server/parser.factory";
+import {getInitialIndentation} from "./indentation";
+import {isValidNode} from "@/utils/server/snippet-filters";
 import IParser from "tree-sitter";
 
 export function findValidNodes(node: IParser.SyntaxNode): IParser.SyntaxNode[] {
@@ -16,7 +16,6 @@ export function findValidNodes(node: IParser.SyntaxNode): IParser.SyntaxNode[] {
 
   return nodes;
 }
-
 
 export function convertSnippetToText(node: IParser.SyntaxNode, sourceCode: string): string {
   const initialIndentation = getInitialIndentation(node.startIndex, sourceCode);
@@ -36,7 +35,6 @@ export function extractAutoCompleteDisabledRanges(fileContent: string, languageI
     return [];
   }
 
-
   const ranges: {startIndex: number; endIndex: number}[] = [];
   const queue: IParser.SyntaxNode[] = [parsedCode.rootNode];
 
@@ -45,14 +43,21 @@ export function extractAutoCompleteDisabledRanges(fileContent: string, languageI
     if (!current) continue;
 
     if (current.type === "string" || current.type === "string_literal" || current.type === "comment") {
-      const actualStartIndex = current.startIndex + 1;
-      const actualEndIndex = current.endIndex - 1;
-
-      if (actualStartIndex < actualEndIndex) {
+      if (current.type === "comment") {
         ranges.push({
-          startIndex: actualStartIndex,
-          endIndex: actualEndIndex,
+          startIndex: current.startIndex,
+          endIndex: current.endIndex,
         });
+      } else {
+        const actualStartIndex = current.startIndex + 1;
+        const actualEndIndex = current.endIndex - 2;
+
+        if (actualStartIndex < actualEndIndex) {
+          ranges.push({
+            startIndex: actualStartIndex,
+            endIndex: actualEndIndex,
+          });
+        }
       }
     }
 
