@@ -24,6 +24,49 @@ export function convertSnippetToText(node: IParser.SyntaxNode, sourceCode: strin
   return initialIndentation + getNodeText(node);
 }
 
+export function extractAutoCompleteDisabledRanges(fileContent: string, languageId: string): {startIndex: number; endIndex: number}[] {
+  const parser = getTSParser(languageId);
+
+  let parsedCode: IParser.Tree;
+
+  try {
+    parsedCode = parser.parse(fileContent);
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  } catch (error) {
+    return [];
+  }
+
+
+  const ranges: {startIndex: number; endIndex: number}[] = [];
+  const queue: IParser.SyntaxNode[] = [parsedCode.rootNode];
+
+  while (queue.length > 0) {
+    const current = queue.pop();
+    if (!current) continue;
+
+    if (current.type === "string" || current.type === "string_literal" || current.type === "comment") {
+      const actualStartIndex = current.startIndex + 1;
+      const actualEndIndex = current.endIndex - 1;
+
+      if (actualStartIndex < actualEndIndex) {
+        ranges.push({
+          startIndex: actualStartIndex,
+          endIndex: actualEndIndex,
+        });
+      }
+    }
+
+    for (let i = 0; i < current.namedChildCount; i++) {
+      const child = current.namedChild(i);
+      if (child) {
+        queue.push(child);
+      }
+    }
+  }
+
+  return ranges;
+}
+
 export function extractSnippets(fileContent: string, languageId: string): string[] {
   const parser = getTSParser(languageId);
 

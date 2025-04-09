@@ -1,6 +1,6 @@
 import { ILanguage } from "@/types/language";
-
-export async function fetchRandomSnippets(languageId: string): Promise<string[]> {
+import { ISnippet } from "@/types/server/snippet";
+export async function fetchRandomSnippets(languageId: string): Promise<ISnippet[]> {
   const url = `api/snippets/random?language=${encodeURIComponent(languageId)}`;
 
   const response = await fetch(url);

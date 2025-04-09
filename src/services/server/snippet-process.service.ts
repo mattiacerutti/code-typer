@@ -1,7 +1,8 @@
 import {adjustIndentationOffset, detectIndentationStyle} from "@/lib/server/snippets/indentation";
-import { extractSnippets } from "@/lib/server/snippets/snippet-parser";
+import { extractAutoCompleteDisabledRanges, extractSnippets } from "@/lib/server/snippets/snippet-parser";
 import {countInitialWhitespaces} from "@/utils/server/text";
 import {filterLineLength, filterLinesNumber, filterSnippetLength, filterSnippetSpecialCharacters, filterTabsInBetween} from "@/utils/server/snippet-filters";
+import { ISnippet } from "@/types/server/snippet";
 
 
 function filterSnippets(snippets: string[]): string[] {
@@ -29,12 +30,12 @@ function hasProhibitedCharacters(input: string): boolean {
 }
 
 function formatCode(snippet: string): string | null {
-  // Clean raw snippet
-
+  
   if(hasProhibitedCharacters(snippet)){
     return null;
   }
-
+  
+  // Clean raw snippet
   snippet = cleanText(snippet)
 
   const indentationStyle = detectIndentationStyle(snippet);
@@ -68,12 +69,29 @@ function formatCode(snippet: string): string | null {
 }
 
 
-export function processSnippets(fileContent: string, languageId: string): string[] {
+export function processSnippets(fileContent: string, languageId: string): ISnippet[] {
   const extractedSnippets = extractSnippets(fileContent, languageId);
+
 
   const formattedSnippets = extractedSnippets.map((snippet) => formatCode(snippet)).filter((snippet) => snippet !== null);
 
+
   const filteredSnippets = filterSnippets(formattedSnippets);
 
-  return filteredSnippets;
+  
+  const finalSnippets = filteredSnippets.map((snippet) => {
+    const disabledRanges = extractAutoCompleteDisabledRanges(snippet, languageId);
+
+
+    return {
+      content: snippet,
+      disabledRanges,
+    };
+  });
+
+
+  return finalSnippets;
 }
+
+
+

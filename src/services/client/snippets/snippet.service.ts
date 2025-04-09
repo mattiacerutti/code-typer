@@ -6,7 +6,7 @@ export const getRandomCodeSnippets = async (languageId: string): Promise<ISnippe
   const rawSnippets = await fetchRandomSnippets(languageId);
   return rawSnippets.map((rawSnippet) => {
     const parsedSnippet = parseSnippet(rawSnippet);
-    return {text: rawSnippet, parsedSnippet};
+    return {text: rawSnippet.content, parsedSnippet};
   });
 };
 
