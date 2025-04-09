@@ -12,6 +12,7 @@ function createAutoClosingMaps(snippet: ISnippet): {autoClosingMap: Record<numbe
   // Helper functions for clarity
   const isOpeningChar = (char: string): boolean => Object.keys(AUTO_CLOSING_CHARS).includes(char);
   const isClosingChar = (char: string): boolean => Object.values(AUTO_CLOSING_CHARS).includes(char);
+  const isStringDelimiter = (char: string): boolean => AUTO_CLOSING_CHARS[char] === char;
 
   for (let i = 0; i < snippet.content.length; i++) {
     const char = snippet.content[i];
@@ -21,7 +22,17 @@ function createAutoClosingMaps(snippet: ISnippet): {autoClosingMap: Record<numbe
       continue;
     }
 
-    if (isOpeningChar(char)) {
+    if (isStringDelimiter(char)) {
+      // Since string delimiters cannot "stack", if we already have one in the queue the current one is a closure character.
+      if (pendingPairs[char] && pendingPairs[char].length > 0) {
+        const lastIndex = pendingPairs[char].pop() as number;
+        autoClosingMap[lastIndex] = i;
+        reverseAutoClosingMap[i] = lastIndex;
+      } else {
+        pendingPairs[char] = pendingPairs[char] || [];
+        pendingPairs[char].push(i);
+      }
+    } else if (isOpeningChar(char)) {
       // For opening characters, push the index onto the stack for its expected closing character
       const expectedClosingChar = AUTO_CLOSING_CHARS[char];
       pendingPairs[expectedClosingChar] = pendingPairs[expectedClosingChar] || [];
@@ -40,9 +51,17 @@ function createAutoClosingMaps(snippet: ISnippet): {autoClosingMap: Record<numbe
   return {autoClosingMap, reverseAutoClosingMap};
 }
 
-export const parseSnippet = (snippet: ISnippet): IParsedSnippet => {
+export const parseSnippet = (snippet: ISnippet): IParsedSnippet | null => {
   const characters: string[] = snippet.content.split("");
-  const {autoClosingMap, reverseAutoClosingMap} = createAutoClosingMaps(snippet);
+
+  let autoClosingMap: Record<number, number> = {};
+  let reverseAutoClosingMap: Record<number, number> = {};
+  try {
+    ({autoClosingMap, reverseAutoClosingMap} = createAutoClosingMaps(snippet));
+  } catch (error) {
+    console.warn("Error creating auto closing maps", error, "Snippet: ", snippet.content);
+    return null;
+  }
 
   const parsedText: IParsedSnippet = characters.map((char: string, index: number) => {
     if (autoClosingMap[index] !== undefined) {
@@ -100,6 +119,8 @@ export const parseSnippet = (snippet: ISnippet): IParsedSnippet => {
     value: "EOF",
     state: CharacterState.Default,
   });
+
+  console.log("Parsed text", parsedText);
 
   return parsedText;
 };
