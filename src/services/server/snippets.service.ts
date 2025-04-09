@@ -5,7 +5,7 @@ import {fetchRandomFiles as getRandomFiles, setSnippetAsNonValid} from "@/reposi
 import {getFilesFromUrls} from "./snippet-fetch.service";
 import {processSnippets as processFile} from "./snippet-process.service";
 import {ISnippet} from "@/types/server/snippet";
-
+import {isDev} from "@/constants/env";
 export async function getRandomSnippets(languageId: string): Promise<ISnippet[]> {
   const snippets: ISnippet[] = [];
   const fetchedFilesUrls: string[] = [];
@@ -30,7 +30,7 @@ export async function getRandomSnippets(languageId: string): Promise<ISnippet[]>
 
         if (snippets.length === 0) {
           // If after processing no snippets are found from that URL, async set it to NON VALID
-          if (process.env.NODE_ENV === "production") {
+          if (!isDev) {
             setSnippetAsNonValid(file.url);
           }
         }
