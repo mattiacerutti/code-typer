@@ -1,48 +1,31 @@
 import {CharacterState, CharacterTypes, WhitespaceTypes} from "@/types/character";
 import {IParsedSnippet} from "@/types/snippet";
 import {AUTO_CLOSING_CHARS} from "@/constants/game";
+import {ISnippet} from "@/types/server/snippet";
 
-function createAutoClosingMaps(originalText: string): {autoClosingMap: Record<number, number>; reverseAutoClosingMap: Record<number, number>} {
+function createAutoClosingMaps(snippet: ISnippet): {autoClosingMap: Record<number, number>; reverseAutoClosingMap: Record<number, number>} {
   const pendingPairs: Record<string, number[]> = {};
 
   const autoClosingMap: Record<number, number> = {};
   const reverseAutoClosingMap: Record<number, number> = {};
 
-  let currentStringOpener: string | null = null;
-
   // Helper functions for clarity
-  const isStringIdentifier = (char: string): boolean => AUTO_CLOSING_CHARS[char] === char;
   const isOpeningChar = (char: string): boolean => Object.keys(AUTO_CLOSING_CHARS).includes(char);
   const isClosingChar = (char: string): boolean => Object.values(AUTO_CLOSING_CHARS).includes(char);
 
-  for (let i = 0; i < originalText.length; i++) {
-    const char = originalText[i];
+  for (let i = 0; i < snippet.content.length; i++) {
+    const char = snippet.content[i];
 
-    // If we're inside a string literal, only process the matching closing character
-    if (currentStringOpener && char !== currentStringOpener) {
+    // If we're inside a disabled range, skip
+    if (snippet.disabledRanges.some((range) => range.startIndex <= i && range.endIndex >= i)) {
       continue;
     }
 
-    if (isStringIdentifier(char)) {
-      // Toggle string context: if not in a string, start one; if matching, end it
-      if (!currentStringOpener) {
-        currentStringOpener = char;
-      } else if (currentStringOpener === char) {
-        currentStringOpener = null;
-      }
-
-      // Attempt to pair the string delimiter
-      const openingIndex = pendingPairs[char]?.pop();
-
-      if (openingIndex === undefined) {
-        // No previous opening found; record this index for pairing when the closing delimiter is found
-        pendingPairs[char] = pendingPairs[char] || [];
-        pendingPairs[char].push(i);
-      } else {
-        // Found a matching opening; record the pairing
-        autoClosingMap[openingIndex] = i;
-        reverseAutoClosingMap[i] = openingIndex;
-      }
+    if (isOpeningChar(char)) {
+      // For opening characters, push the index onto the stack for its expected closing character
+      const expectedClosingChar = AUTO_CLOSING_CHARS[char];
+      pendingPairs[expectedClosingChar] = pendingPairs[expectedClosingChar] || [];
+      pendingPairs[expectedClosingChar].push(i);
     } else if (isClosingChar(char)) {
       // For non-string closing characters, retrieve the corresponding opening index
       const openingIndex = pendingPairs[char]?.pop();
@@ -51,26 +34,17 @@ function createAutoClosingMaps(originalText: string): {autoClosingMap: Record<nu
       }
       autoClosingMap[openingIndex] = i;
       reverseAutoClosingMap[i] = openingIndex;
-    } else if (isOpeningChar(char)) {
-      // For opening characters, push the index onto the stack for its expected closing character
-      const expectedClosingChar = AUTO_CLOSING_CHARS[char];
-      pendingPairs[expectedClosingChar] = pendingPairs[expectedClosingChar] || [];
-      pendingPairs[expectedClosingChar].push(i);
-    } else {
-      // Other characters are ignored
-      continue;
     }
   }
 
   return {autoClosingMap, reverseAutoClosingMap};
 }
 
-export const parseSnippet = (originalText: string): IParsedSnippet => {
-  const characters: string[] = originalText.split("");
-  const {autoClosingMap, reverseAutoClosingMap} = createAutoClosingMaps(originalText);
+export const parseSnippet = (snippet: ISnippet): IParsedSnippet => {
+  const characters: string[] = snippet.content.split("");
+  const {autoClosingMap, reverseAutoClosingMap} = createAutoClosingMaps(snippet);
 
   const parsedText: IParsedSnippet = characters.map((char: string, index: number) => {
-
     if (autoClosingMap[index] !== undefined) {
       return {
         type: CharacterTypes.AutoClosing,

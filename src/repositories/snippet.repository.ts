@@ -1,7 +1,7 @@
 import {PrismaClient} from "@prisma/client";
 const prisma = new PrismaClient();
 
-export async function fetchRandomSnippets(languageId: string, quantity: number, alreadyFetched: string[]): Promise<string[]> {
+export async function fetchRandomFiles(languageId: string, quantity: number, alreadyFetched: string[]): Promise<string[]> {
   const alreadyFetchedList = alreadyFetched.length > 0 ? `AND "url" NOT IN (${alreadyFetched.map((_, i) => `$${i + 2}`).join(", ")})` : "";
 
   const query = `
@@ -13,9 +13,9 @@ export async function fetchRandomSnippets(languageId: string, quantity: number, 
     LIMIT $${alreadyFetched.length + 2};
   `;
 
-  const snippets = await prisma.$queryRawUnsafe(query, languageId, ...alreadyFetched, quantity) as {url: string}[];
+  const files = await prisma.$queryRawUnsafe(query, languageId, ...alreadyFetched, quantity) as {url: string}[];
 
-  return snippets.map((snippet) => snippet.url);
+  return files.map((snippet) => snippet.url);
 }
 
 export async function setSnippetAsNonValid(url: string) {
