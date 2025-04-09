@@ -1,9 +1,13 @@
+import { rateLimit } from "@/lib/server/middleware/rate-limiter";
 import {doesLanguageExist} from "@/repositories/language.repository";
 import { getRandomSnippets } from "@/services/server/snippets.service";
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 
 
-export async function GET(request: Request) {
+export async function GET(request: NextRequest) {
+  const resRateLimit = rateLimit(request);
+  if (resRateLimit) return resRateLimit;
+
   const {searchParams} = new URL(request.url);
   let languageId = searchParams.get("language");
 
