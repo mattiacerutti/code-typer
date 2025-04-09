@@ -1,7 +1,11 @@
+import { rateLimit } from "@/lib/server/middleware/rate-limiter";
 import {getLanguages} from "@/repositories/language.repository";
-import {NextResponse} from "next/server";
+import {NextRequest, NextResponse} from "next/server";
 
-export async function GET() {
+export async function GET(request: NextRequest) {
+  const resRateLimit = rateLimit(request);
+  if (resRateLimit) return resRateLimit;
+  
   const languages = await getLanguages();
   return NextResponse.json(languages);
 }
