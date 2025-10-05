@@ -1,6 +1,6 @@
 import {NextResponse} from "next/server";
 import type {NextRequest} from "next/server";
-import {isDev} from "@/constants/env";
+import {isDev} from "@/core/config/env";
 
 export async function middleware(req: NextRequest) {
   if (!isDev) {

@@ -1,4 +1,4 @@
-import {ILanguage} from "@/types/language";
+import { ILanguage } from "@/shared/types/language";
 import {PrismaClient} from "@prisma/client";
 
 const GITHUB_API_URL = "https://api.github.com";

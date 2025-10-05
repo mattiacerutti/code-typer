@@ -1,6 +1,6 @@
-import { rateLimit } from "@/lib/server/middleware/rate-limiter";
-import {doesLanguageExist} from "@/repositories/language.repository";
-import { getRandomSnippets } from "@/services/server/snippets.service";
+import { rateLimit } from "@/core/middleware/rate-limiter";
+import {doesLanguageExist} from "@/features/snippets/infrastructure/repositories/language.repository.server";
+import { getRandomSnippets } from "@/features/snippets/services/get-random-snippets.server";
 import { NextRequest, NextResponse } from "next/server";
 
 

@@ -1,15 +1,15 @@
 "use client";
 
 import {useCallback, useEffect, useRef, useState} from "react";
-import {getRandomCodeSnippets as getRandomSnippets} from "@/services/client/snippets/snippet.service";
-import useTimer from "@/hooks/useTimer";
-import {GameStatus} from "@/types/game-state";
-import {REFRESH_BUTTON_MIN_DELAY, DEFAULT_LANGUAGE} from "@/constants/game";
-import {useGameState} from "@/contexts/GameStateContext";
-import GameView from "@/views/game-view";
-import EndgameView from "@/views/endgame-view";
-import {ILanguage} from "@/types/language";
-import {fetchLanguages} from "@/services/client/snippets/snippet-fetch.service";
+import {getRandomCodeSnippets as getRandomSnippets} from "@/features/snippets/services/get-random-snippets.client";
+import useTimer from "@/features/game/hooks/useTimer";
+import {GameStatus} from "@/features/game/types/game-state";
+import {REFRESH_BUTTON_MIN_DELAY, DEFAULT_LANGUAGE} from "@/features/game/config/game";
+import {useGameState} from "@/features/game/state/GameStateContext";
+import GameView from "@/features/game/components/game-view";
+import EndgameView from "@/features/game/components/endgame-view";
+import {ILanguage} from "@/shared/types/language";
+import {fetchLanguages} from "@/features/snippets/infrastructure/adapters/snippet-fetch.client";
 
 function Home() {
   const {dispatch, state} = useGameState();
