@@ -21,11 +21,11 @@
     "axios-cache-interceptor": "^1.7.0",
     "dotenv": "^16.4.7",
     "highlight.js": "^11.11.1",
-    "next": "15.2.4",
+    "next": "15.5.4",
     "prisma": "^6.5.0",
     "rate-limiter-flexible": "^7.0.0",
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0",
+    "react": "19.2.0",
+    "react-dom": "19.2.0",
     "rxjs": "^7.8.2",
     "tree-sitter": "^0.21.1",
     "tree-sitter-c": "^0.20.0",
@@ -42,10 +42,10 @@
     "@eslint/eslintrc": "^3",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
-    "@types/react": "^19",
-    "@types/react-dom": "^19",
+    "@types/react": "19.2.0",
+    "@types/react-dom": "19.2.0",
     "eslint": "^9",
-    "eslint-config-next": "15.2.4",
+    "eslint-config-next": "15.5.4",
     "eslint-plugin-react-hooks": "^5.2.0",
     "node-loader": "^2.1.0",
     "tailwindcss": "^4",
@@ -55,5 +55,9 @@
   "optionalDependencies": {
     "@tailwindcss/oxide-linux-x64-gnu": "^4.0.1",
     "lightningcss-linux-x64-gnu": "^1.29.1"
+  },
+  "overrides": {
+    "@types/react": "19.2.0",
+    "@types/react-dom": "19.2.0"
   }
 }
