@@ -117,7 +117,7 @@ function Home() {
     stopTimer();
   };
 
-  const handleRestartGame = async () => {
+  const handleChangeSnippet = async () => {
     setStatus(GameStatus.LOADING);
     await goToNextSnippetWithPrefetch();
     resetTimer();
@@ -127,7 +127,7 @@ function Home() {
     return (
       <EndgameView
         totalTime={elapsedTime}
-        handleRestartGame={handleRestartGame}
+        handleRestartGame={handleChangeSnippet}
         currentSnippet={currentSnippet}
         validKeystrokes={validKeystrokes}
         wrongKeystrokes={wrongKeystrokes}
@@ -143,7 +143,7 @@ function Home() {
     <GameView
       onGameFinished={handleEndGame}
       onGameStarted={handleStartGame}
-      changeSnippet={goToNextSnippetWithPrefetch}
+      changeSnippet={handleChangeSnippet}
       resetSnippet={resetSnippet}
       changeLanguage={setSnippets}
       isRefreshing={isNextButtonLocked}
