@@ -1,4 +1,3 @@
-import {IGameStatePlaying, IGameStateReady} from "@/features/game/types/game-state";
 import {getChar, getPreviousChar, hasOnlyWhitespacesBefore, setCharacterState} from "@/features/game/logic/typing/shared";
 import {CharacterState, CharacterTypes} from "@/shared/types/character";
 import {IParsedSnippet} from "@/shared/types/snippet";
@@ -14,15 +13,13 @@ function incrementUserPosition(snippet: IParsedSnippet, position: number, update
 }
 
 export function addCharacter(
-  state: IGameStatePlaying | IGameStateReady,
+  snippet: IParsedSnippet,
+  position: number,
   pressedKey: string,
   updateParsedSnippet: (parsedSnippet: IParsedSnippet) => void,
   updateUserPosition: (position: number) => void,
   registerKeyStroke: (isCorrect: boolean) => void
 ) {
-  const position = state.userPosition;
-  const snippet = state.currentSnippet.parsedSnippet;
-
   const expectedChar = getChar(snippet, position);
 
   if (expectedChar.value === "EOF") return;
@@ -32,7 +29,6 @@ export function addCharacter(
   }
   let isPressedKeyCorrect = pressedKey === expectedChar.value;
 
-  // Increments the user position
   const newPosition = incrementUserPosition(snippet, position, updateUserPosition);
 
   // If the previous character was incorrect, we also set this to incorrect no matter what.
@@ -49,11 +45,8 @@ export function addCharacter(
     setCharacterState(snippet, i, isPressedKeyCorrect ? CharacterState.Right : CharacterState.Wrong);
   }
 
-  // Registers correct/incorrect key press for stats purposes
   registerKeyStroke(isPressedKeyCorrect);
 
   updateParsedSnippet(snippet);
   updateUserPosition(newPosition);
-
-  return;
 }

@@ -1,40 +1,24 @@
 "use client";
 
-import {useGameState} from "@/features/game/state/GameStateContext";
-import {GameStatus} from "@/features/game/types/game-state";
 import {useState, useEffect, useCallback} from "react";
 
 interface ICaretProps {
   charRefs: React.RefObject<HTMLSpanElement | null>[];
+  userPosition: number;
 }
 
 function Caret(props: ICaretProps) {
-  const {charRefs} = props;
-
-  const {state} = useGameState();
+  const {charRefs, userPosition} = props;
   const [caretPosition, setCaretPosition] = useState({top: 0, left: 0});
-
   const [blinking, setBlinking] = useState(true);
 
-  if (state.status !== GameStatus.PLAYING && state.status !== GameStatus.READY) {
-    throw new Error("Caret: Received invalid game status");
-  }
-
   useEffect(() => {
-    let blinkingTimeout: NodeJS.Timeout | null = null;
-
-    // Clear any existing timeouts to reset the delay
-    if (blinkingTimeout) {
-      clearTimeout(blinkingTimeout);
-    }
-
-    // Remove the blinking animation class and set a timeout to add it after 0.5 seconds of inactivity
-    setBlinking(false);
-    blinkingTimeout = setTimeout(() => {
+    const blinkingTimeout = setTimeout(() => {
       setBlinking(true);
     }, 500);
 
-    // Clean up the timeout on component unmount
+    setBlinking(false);
+
     return () => clearTimeout(blinkingTimeout);
   }, [caretPosition]);
 
@@ -49,10 +33,9 @@ function Caret(props: ICaretProps) {
     [charRefs]
   );
 
-  // Updates the cursor position anytime the user position changes
   useEffect(() => {
-    updateCaretPosition(state.userPosition);
-  }, [state.userPosition, updateCaretPosition]);
+    updateCaretPosition(userPosition);
+  }, [userPosition, updateCaretPosition]);
 
   return (
     <div

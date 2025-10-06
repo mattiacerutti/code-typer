@@ -120,7 +120,5 @@ export const parseSnippet = (snippet: ISnippet): IParsedSnippet | null => {
     state: CharacterState.Default,
   });
 
-  console.log("Parsed text", parsedText);
-
   return parsedText;
 };

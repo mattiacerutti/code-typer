@@ -1,12 +1,13 @@
 "use client";
 
-import {useGameState} from "@/features/game/state/GameStateContext";
-import {GameStatus} from "@/features/game/types/game-state";
 import TypingArea from "@/features/game/components/typing-area";
 import useTyping from "@/features/game/hooks/useTyping";
-import {ILanguage} from "@/shared/types/language";
+import {GameStatus, IGameActions, IGameSnapshot} from "@/features/game/types/game-state";
+import type {ILanguage} from "@/shared/types/language";
 
 interface IGameViewProps {
+  game: IGameSnapshot;
+  actions: IGameActions;
   onGameFinished: () => void;
   onGameStarted: () => void;
   changeSnippet: () => void;
@@ -17,36 +18,46 @@ interface IGameViewProps {
 }
 
 function GameView(props: IGameViewProps) {
-  const {onGameFinished, onGameStarted, changeSnippet, resetSnippet, isRefreshing, changeLanguage, availableLanguages} = props;
+  const {
+    game,
+    actions,
+    onGameFinished,
+    onGameStarted,
+    changeSnippet,
+    resetSnippet,
+    changeLanguage,
+    availableLanguages,
+    isRefreshing,
+  } = props;
 
-  const {state, dispatch} = useGameState();
+  const {status, language, currentSnippet, userPosition} = game;
 
-  if (state.status === GameStatus.LOADING || state.status === GameStatus.FINISHED) {
-    throw new Error("GameView: Received invalid game state");
-  }
+  const {isCapsLockOn} = useTyping({
+    status,
+    snippet: currentSnippet.parsedSnippet,
+    userPosition,
+    onSnippetUpdate: actions.setParsedSnippet,
+    onUserPositionChange: actions.setUserPosition,
+    onStartTyping: onGameStarted,
+    onWrongKeystroke: actions.incrementWrongKeystroke,
+    onValidKeystroke: actions.incrementValidKeystroke,
+  });
 
-  const onWrongKeystroke = () => {
-    if (state.status !== GameStatus.PLAYING) return;
-    state.wrongKeystrokes += 1;
+  const handleSnippetFinished = () => {
+    actions.setStatus(GameStatus.FINISHED);
+    onGameFinished();
   };
-
-  const onValidKeystroke = () => {
-    if (state.status !== GameStatus.PLAYING) return;
-    state.validKeystrokes += 1;
-  };
-
-  const {isCapsLockOn} = useTyping({onWrongKeystroke, onValidKeystroke, onStartTyping: onGameStarted});
 
   return (
     <>
       <div className={`text-red-500 relative bottom-8 ${!isCapsLockOn && "opacity-0"} font-bold text-2xl`}>Caps Lock is on</div>
       <div className="flex flex-col gap-10 justify-center items-center">
-        <TypingArea onGameFinished={onGameFinished} />
+        <TypingArea onGameFinished={handleSnippetFinished} game={game} />
         <div className="flex flex-row gap-1.5 content-between">
           <button
             className="px-6 py-3 bg-slate-200 text-slate-900 font-medium rounded-md hover:bg-slate-300 disabled:opacity-20"
             onClick={resetSnippet}
-            disabled={isRefreshing || state.status !== GameStatus.PLAYING}
+            disabled={isRefreshing || status !== GameStatus.PLAYING}
           >
             <svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
               <path
@@ -64,16 +75,16 @@ function GameView(props: IGameViewProps) {
           </button>
           <select
             disabled={isRefreshing}
-            value={state.language.id}
-            onChange={(e) => {
-              dispatch({type: "SET_GAME_STATUS", payload: GameStatus.LOADING});
-              changeLanguage(availableLanguages[e.target.value]);
+            value={language.id}
+            onChange={(event) => {
+              actions.setStatus(GameStatus.LOADING);
+              changeLanguage(availableLanguages[event.target.value]);
             }}
             className="px-6 py-3 bg-slate-200 text-slate-900 font-medium rounded-md hover:bg-slate-300 disabled:opacity-20"
           >
-            {Object.values(availableLanguages).map((language) => (
-              <option key={language.id} value={language.id}>
-                {language.name}
+            {Object.values(availableLanguages).map((availableLanguage) => (
+              <option key={availableLanguage.id} value={availableLanguage.id}>
+                {availableLanguage.name}
               </option>
             ))}
           </select>

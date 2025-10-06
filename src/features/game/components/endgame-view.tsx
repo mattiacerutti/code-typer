@@ -1,31 +1,23 @@
 "use client";
 
-import {useGameState} from "@/features/game/state/GameStateContext";
-import {GameStatus} from "@/features/game/types/game-state";
 import {calculateAccuracy, calculateWPM, humanizeTime} from "@/features/game/utils/typing-metrics";
+import type {ISnippet} from "@/shared/types/snippet";
 
 interface IEndgameViewProps {
   totalTime: number;
   handleRestartGame: () => void;
+  currentSnippet: ISnippet;
+  validKeystrokes: number;
+  wrongKeystrokes: number;
 }
 
 function EndgameView(props: IEndgameViewProps) {
-  const {totalTime, handleRestartGame} = props;
-
-  const {state} = useGameState();
-
-  if (state.status !== GameStatus.FINISHED) {
-    throw new Error("EndgameView: Received invalid game status");
-  }
-
-  const validKeystrokes = state.validKeystrokes;
-
-  const wrongKeystrokes = state.wrongKeystrokes;
+  const {totalTime, handleRestartGame, currentSnippet, validKeystrokes, wrongKeystrokes} = props;
 
   return (
     <div className="flex flex-col gap-8">
       <div className="flex flex-row gap-4">
-        <div className="bg-slate-500 rounded-lg px-8 py-4 text-white shadow-lg">WPM {calculateWPM(totalTime, state.currentSnippet.text.length)}</div>
+        <div className="bg-slate-500 rounded-lg px-8 py-4 text-white shadow-lg">WPM {calculateWPM(totalTime, currentSnippet.text.length)}</div>
         <div className="bg-slate-500 rounded-lg px-8 py-4 text-white shadow-lg">Accuracy: {calculateAccuracy(validKeystrokes, wrongKeystrokes)}%</div>
         <div className="bg-slate-500 rounded-lg px-8 py-4 text-white shadow-lg">{humanizeTime(totalTime)}</div>
       </div>

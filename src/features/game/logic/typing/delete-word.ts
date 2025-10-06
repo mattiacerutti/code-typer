@@ -1,6 +1,5 @@
 import {CharacterTypes, ICharacter, WhitespaceTypes} from "@/shared/types/character";
 import {getLineStart, getPreviousChar, getPreviousLineEnd, isFirstCharacter, resetCharactersInRange} from "@/features/game/logic/typing/shared";
-import {IGameStatePlaying, IGameStateReady} from "@/features/game/types/game-state";
 import {AUTO_CLOSING_CHARS} from "@/features/game/config/game";
 import {IParsedSnippet} from "@/shared/types/snippet";
 
@@ -43,13 +42,11 @@ function getPreviousWordPosition(snippet: IParsedSnippet, position: number): num
 }
 
 export function deleteWord(
-  state: IGameStatePlaying | IGameStateReady,
+  snippet: IParsedSnippet,
+  position: number,
   updateParsedSnippet: (parsedSnippet: IParsedSnippet) => void,
   updateUserPosition: (position: number) => void
 ) {
-  const position = state.userPosition;
-  const snippet = state.currentSnippet.parsedSnippet;
-
   if (position === 0) return;
 
   let previousWordPosition = getPreviousWordPosition(snippet, position);
