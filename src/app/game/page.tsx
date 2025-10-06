@@ -29,7 +29,13 @@ function Home() {
   const incrementWrongKeystroke = useGameStore((state) => state.incrementWrongKeystroke);
   const incrementValidKeystroke = useGameStore((state) => state.incrementValidKeystroke);
 
-  const {startTimer, stopTimer, getTime, resetTimer} = useTimer();
+  const [elapsedTime, setElapsedTime] = useState(0);
+
+  const onTick = useCallback((elapsedTime: number) => {
+    setElapsedTime(elapsedTime);
+  }, [setElapsedTime]);
+
+  const {startTimer, stopTimer, resetTimer} = useTimer(onTick);
 
   const [isNextButtonLocked, setIsNextButtonLocked] = useState(false);
 
@@ -120,7 +126,7 @@ function Home() {
   if (status === GameStatus.FINISHED && currentSnippet) {
     return (
       <EndgameView
-        totalTime={getTime()}
+        totalTime={elapsedTime}
         handleRestartGame={handleRestartGame}
         currentSnippet={currentSnippet}
         validKeystrokes={validKeystrokes}
@@ -157,6 +163,7 @@ function Home() {
         incrementWrongKeystroke,
         incrementValidKeystroke,
       }}
+      elapsedTime={elapsedTime}
       key={currentSnippet.text}
     />
   );

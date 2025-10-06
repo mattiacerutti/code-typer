@@ -1,6 +1,6 @@
 import { useRef, useCallback } from 'react';
 
-const useTimer = () => {
+const useTimer = (onTick: (elapsedTime: number) => void) => {
   const startTimeRef = useRef<number | null>(null);
   const elapsedTimeRef = useRef(0);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
@@ -10,9 +10,10 @@ const useTimer = () => {
       startTimeRef.current = Date.now() - elapsedTimeRef.current;
       timerRef.current = setInterval(() => {
         elapsedTimeRef.current = Date.now() - startTimeRef.current!;
-      }, 1000);
+        onTick(elapsedTimeRef.current);
+      }, 1);
     }
-  }, []);
+  }, [onTick]);
 
   const stopTimer = useCallback(() => {
     if (timerRef.current) {
@@ -25,7 +26,8 @@ const useTimer = () => {
     stopTimer();
     elapsedTimeRef.current = 0;
     startTimeRef.current = null;
-  }, [stopTimer]);
+    onTick(0);
+  }, [stopTimer, onTick]);
 
   const getTime = useCallback(() => {
     if (!startTimeRef.current) return elapsedTimeRef.current;

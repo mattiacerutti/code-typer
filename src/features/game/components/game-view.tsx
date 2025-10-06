@@ -4,6 +4,7 @@ import TypingArea from "@/features/game/components/typing-area";
 import useTyping from "@/features/game/hooks/useTyping";
 import {GameStatus, IGameActions, IGameSnapshot} from "@/features/game/types/game-state";
 import type {ILanguage} from "@/shared/types/language";
+import { humanizeTime } from "@/features/game/utils/typing-metrics";
 
 interface IGameViewProps {
   game: IGameSnapshot;
@@ -15,6 +16,7 @@ interface IGameViewProps {
   changeLanguage: (language: ILanguage) => void;
   availableLanguages: {[key: string]: ILanguage};
   isRefreshing: boolean;
+  elapsedTime: number;
 }
 
 function GameView(props: IGameViewProps) {
@@ -28,6 +30,7 @@ function GameView(props: IGameViewProps) {
     changeLanguage,
     availableLanguages,
     isRefreshing,
+    elapsedTime
   } = props;
 
   const {status, language, currentSnippet, userPosition} = game;
@@ -52,6 +55,9 @@ function GameView(props: IGameViewProps) {
     <>
       <div className={`text-red-500 relative bottom-8 ${!isCapsLockOn && "opacity-0"} font-bold text-2xl`}>Caps Lock is on</div>
       <div className="flex flex-col gap-10 justify-center items-center">
+        <div className="bg-slate-100 text-slate-900 px-4 py-2 rounded-md font-medium text-center">
+          {humanizeTime(elapsedTime)}
+        </div>
         <TypingArea onGameFinished={handleSnippetFinished} game={game} />
         <div className="flex flex-row gap-1.5 content-between">
           <button
