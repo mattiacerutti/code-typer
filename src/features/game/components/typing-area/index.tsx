@@ -43,7 +43,7 @@ function TypingArea(props: ITypingAreaProps) {
 
   // Everytime the state updates, we check if the user is at the end. If so we check every character.
   useEffect(() => {
-    if (status === GameStatus.PLAYING && userPosition === currentSnippet.parsedSnippet.length - 1) {
+    if (status === GameStatus.PLAYING) {
       if (!isGameFinished(currentSnippet.parsedSnippet)) {
         return;
       }
