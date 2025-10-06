@@ -52,7 +52,7 @@ export function extractAutoCompleteDisabledRanges(fileContent: string, languageI
         const actualStartIndex = current.startIndex + 1;
         const actualEndIndex = current.endIndex - 2;
 
-        if (actualStartIndex < actualEndIndex) {
+        if (actualStartIndex <= actualEndIndex) {
           ranges.push({
             startIndex: actualStartIndex,
             endIndex: actualEndIndex,
