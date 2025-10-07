@@ -27,5 +27,5 @@ export const VALID_NODES = [
 ];
 
 export const MIN_SNIPPETS_PER_LANGUAGE = 10;
-export const RANDOM_FILES_FETCHED = 5;
+export const RANDOM_FILES_FETCHED = 30;
 export const MAX_SNIPPETS_FETCH_ATTEMPTS = 20;
