@@ -1,14 +1,12 @@
-"use client";
-
 import TypingArea from "@/features/game/components/typing-area";
 import useTyping from "@/features/game/hooks/useTyping";
-import {GameStatus, IGameActions, IGameSnapshot} from "@/features/game/types/game-state";
+import {GameStatus} from "@/features/game/types/game-state";
 import type {ILanguage} from "@/shared/types/language";
 import { humanizeTime } from "@/features/game/utils/typing-metrics";
+import { useGameStore } from "../state/game-store";
+import { useCallback } from "react";
 
 interface IGameViewProps {
-  game: IGameSnapshot;
-  actions: IGameActions;
   onGameFinished: () => void;
   onGameStarted: () => void;
   changeSnippet: () => void;
@@ -21,8 +19,6 @@ interface IGameViewProps {
 
 function GameView(props: IGameViewProps) {
   const {
-    game,
-    actions,
     onGameFinished,
     onGameStarted,
     changeSnippet,
@@ -33,23 +29,31 @@ function GameView(props: IGameViewProps) {
     elapsedTime
   } = props;
 
-  const {status, language, currentSnippet, userPosition} = game;
+  const status = useGameStore((state) => state.status);
+  const language = useGameStore((state) => state.language)!;
+  const currentSnippet = useGameStore((state) => state.currentSnippet)!;
+  const userPosition = useGameStore((state) => state.userPosition);
+  const setParsedSnippet = useGameStore((state) => state.setParsedSnippet);
+  const setUserPosition = useGameStore((state) => state.setUserPosition)
+  const setStatus = useGameStore((state) => state.setStatus);
+  const incrementWrongKeystroke = useGameStore((state) => state.incrementWrongKeystroke);
+  const incrementValidKeystroke = useGameStore((state) => state.incrementValidKeystroke);
 
   const {isCapsLockOn} = useTyping({
     status,
     snippet: currentSnippet.parsedSnippet,
     userPosition,
-    onSnippetUpdate: actions.setParsedSnippet,
-    onUserPositionChange: actions.setUserPosition,
+    onSnippetUpdate: setParsedSnippet,
+    onUserPositionChange: setUserPosition,
     onStartTyping: onGameStarted,
-    onWrongKeystroke: actions.incrementWrongKeystroke,
-    onValidKeystroke: actions.incrementValidKeystroke,
+    onWrongKeystroke: incrementWrongKeystroke,
+    onValidKeystroke: incrementValidKeystroke,
   });
 
-  const handleSnippetFinished = () => {
-    actions.setStatus(GameStatus.FINISHED);
+  const handleSnippetFinished = useCallback(() => {
+    setStatus(GameStatus.FINISHED);
     onGameFinished();
-  };
+  }, [setStatus, onGameFinished]);
 
   return (
     <>
@@ -58,7 +62,7 @@ function GameView(props: IGameViewProps) {
         <div className="bg-slate-100 text-slate-900 px-4 py-2 rounded-md font-medium text-center">
           {humanizeTime(elapsedTime)}
         </div>
-        <TypingArea onGameFinished={handleSnippetFinished} game={game} />
+        <TypingArea onGameFinished={handleSnippetFinished}/>
         <div className="flex flex-row gap-1.5 content-between">
           <button
             className="px-6 py-3 bg-slate-200 text-slate-900 font-medium rounded-md hover:bg-slate-300 disabled:opacity-20"
@@ -83,7 +87,7 @@ function GameView(props: IGameViewProps) {
             disabled={isRefreshing}
             value={language.id}
             onChange={(event) => {
-              actions.setStatus(GameStatus.LOADING);
+              setStatus(GameStatus.LOADING);
               changeLanguage(availableLanguages[event.target.value]);
             }}
             className="px-6 py-3 bg-slate-200 text-slate-900 font-medium rounded-md hover:bg-slate-300 disabled:opacity-20"

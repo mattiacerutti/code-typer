@@ -3,7 +3,7 @@
 import {useCallback, useEffect, useRef, useState} from "react";
 import {getRandomCodeSnippets} from "@/features/snippets/services/get-random-snippets.client";
 import {fetchLanguages} from "@/features/snippets/infrastructure/adapters/snippet-fetch.client";
-import useTimer from "@/features/game/hooks/useTimer";
+import useStopwatch from "@/features/game/hooks/useStopwatch";
 import {GameStatus} from "@/features/game/types/game-state";
 import {REFRESH_BUTTON_MIN_DELAY, DEFAULT_LANGUAGE} from "@/features/game/config/game";
 import {useGameStore} from "@/features/game/state/game-store";
@@ -16,26 +16,19 @@ function Home() {
   const snippetQueue = useGameStore((state) => state.snippetQueue);
   const language = useGameStore((state) => state.language);
   const currentSnippet = useGameStore((state) => state.currentSnippet);
-  const userPosition = useGameStore((state) => state.userPosition);
-  const wrongKeystrokes = useGameStore((state) => state.wrongKeystrokes);
-  const validKeystrokes = useGameStore((state) => state.validKeystrokes);
   const initialize = useGameStore((state) => state.initialize);
   const addSnippetsToQueue = useGameStore((state) => state.addSnippetsToQueue);
   const goToNextSnippet = useGameStore((state) => state.goToNextSnippet);
   const resetCurrentSnippet = useGameStore((state) => state.resetCurrentSnippet);
-  const setParsedSnippet = useGameStore((state) => state.setParsedSnippet);
-  const setUserPosition = useGameStore((state) => state.setUserPosition);
   const setStatus = useGameStore((state) => state.setStatus);
-  const incrementWrongKeystroke = useGameStore((state) => state.incrementWrongKeystroke);
-  const incrementValidKeystroke = useGameStore((state) => state.incrementValidKeystroke);
 
   const [elapsedTime, setElapsedTime] = useState(0);
 
   const onTick = useCallback((elapsedTime: number) => {
     setElapsedTime(elapsedTime);
-  }, [setElapsedTime]);
+  }, []);
 
-  const {startTimer, stopTimer, resetTimer} = useTimer(onTick);
+  const {startStopwatch, stopstopWatch, resetStopwatch} = useStopwatch(onTick);
 
   const [isNextButtonLocked, setIsNextButtonLocked] = useState(false);
 
@@ -50,28 +43,15 @@ function Home() {
     [initialize]
   );
 
-  useEffect(() => {
-    const initializeGame = async () => {
-      const languages = await fetchLanguages();
-      availableLanguages.current = languages;
-
-      const defaultLanguage = languages[DEFAULT_LANGUAGE] ?? languages[Object.keys(languages)[0]];
-      await setSnippets(defaultLanguage);
-      resetTimer();
-    };
-
-    initializeGame();
-  }, [resetTimer, setSnippets]);
-
-  const backgroundGetSnippets = useCallback(async () => {
+  const backgroundGetSnippets = async () => {
     const activeLanguage = language ?? availableLanguages.current?.[DEFAULT_LANGUAGE];
     if (!activeLanguage) return;
 
     const snippets = await getRandomCodeSnippets(activeLanguage.id);
     addSnippetsToQueue(snippets);
-  }, [language, addSnippetsToQueue]);
+  };
 
-  const goToNextSnippetWithPrefetch = useCallback(async () => {
+  const goToNextSnippetWithPrefetch = async () => {
     if (status !== GameStatus.PLAYING && status !== GameStatus.READY && status !== GameStatus.FINISHED) return;
 
     const startTime = Date.now();
@@ -102,37 +82,42 @@ function Home() {
     setTimeout(() => {
       setIsNextButtonLocked(false);
     }, remainingTime);
-  }, [status, snippetQueue.length, setStatus, language, backgroundGetSnippets, setSnippets, goToNextSnippet]);
+  };
 
-  const resetSnippet = useCallback(() => {
-    resetTimer();
+  const resetSnippet = () => {
+    resetStopwatch();
     resetCurrentSnippet();
-  }, [resetTimer, resetCurrentSnippet]);
+  };
 
   const handleStartGame = () => {
-    startTimer();
+    startStopwatch();
   };
 
-  const handleEndGame = () => {
-    stopTimer();
-  };
+  const handleEndGame = useCallback(() => {
+    stopstopWatch();
+  }, [stopstopWatch]);
 
   const handleChangeSnippet = async () => {
     setStatus(GameStatus.LOADING);
     await goToNextSnippetWithPrefetch();
-    resetTimer();
+    resetStopwatch();
   };
 
+  useEffect(() => {
+    const initializeGame = async () => {
+      const languages = await fetchLanguages();
+      availableLanguages.current = languages;
+
+      const defaultLanguage = languages[DEFAULT_LANGUAGE] ?? languages[Object.keys(languages)[0]];
+      await setSnippets(defaultLanguage);
+      resetStopwatch();
+    };
+
+    initializeGame();
+  }, [setSnippets, resetStopwatch]);
+
   if (status === GameStatus.FINISHED && currentSnippet) {
-    return (
-      <EndgameView
-        totalTime={elapsedTime}
-        handleRestartGame={handleChangeSnippet}
-        currentSnippet={currentSnippet}
-        validKeystrokes={validKeystrokes}
-        wrongKeystrokes={wrongKeystrokes}
-      />
-    );
+    return <EndgameView totalTime={elapsedTime} handleRestartGame={handleChangeSnippet} />;
   }
 
   if (status === GameStatus.LOADING || !availableLanguages.current || !currentSnippet || !language) {
@@ -148,23 +133,7 @@ function Home() {
       changeLanguage={setSnippets}
       isRefreshing={isNextButtonLocked}
       availableLanguages={availableLanguages.current}
-      game={{
-        status,
-        language,
-        currentSnippet,
-        userPosition,
-        wrongKeystrokes,
-        validKeystrokes,
-      }}
-      actions={{
-        setStatus,
-        setParsedSnippet,
-        setUserPosition,
-        incrementWrongKeystroke,
-        incrementValidKeystroke,
-      }}
       elapsedTime={elapsedTime}
-      key={currentSnippet.text}
     />
   );
 }

@@ -1,18 +1,17 @@
-"use client";
-
 import {calculateAccuracy, calculateWPM, humanizeTime} from "@/features/game/utils/typing-metrics";
-import type {ISnippet} from "@/shared/types/snippet";
+import {useGameStore} from "@/features/game/state/game-store";
 
 interface IEndgameViewProps {
   totalTime: number;
   handleRestartGame: () => void;
-  currentSnippet: ISnippet;
-  validKeystrokes: number;
-  wrongKeystrokes: number;
 }
 
 function EndgameView(props: IEndgameViewProps) {
-  const {totalTime, handleRestartGame, currentSnippet, validKeystrokes, wrongKeystrokes} = props;
+  const {totalTime, handleRestartGame} = props;
+
+  const currentSnippet = useGameStore((state) => state.currentSnippet)!;
+  const validKeystrokes = useGameStore((state) => state.validKeystrokes);
+  const wrongKeystrokes = useGameStore((state) => state.wrongKeystrokes);
 
   return (
     <div className="flex flex-col gap-8">

@@ -1,23 +1,23 @@
-"use client";
-
-import React, {useEffect, useMemo} from "react";
+import React, {memo, useEffect, useMemo} from "react";
 import useCodeHighlight from "@/features/game/hooks/useCodeHighlight";
 import {CharacterTypes, ICharacter, WhitespaceTypes} from "@/shared/types/character";
 import {isGameFinished} from "@/features/game/logic/game-logic";
-import {GameStatus, IGameSnapshot} from "@/features/game/types/game-state";
+import {GameStatus} from "@/features/game/types/game-state";
 import Caret from "./caret";
 import Character from "./character";
+import { useGameStore } from "@/features/game/state/game-store";
 
 interface ITypingAreaProps {
-  game: IGameSnapshot
   onGameFinished: () => void;
 }
 
 function TypingArea(props: ITypingAreaProps) {
-  const {
-    game: {status, currentSnippet, language, userPosition},
-    onGameFinished,
-  } = props;
+  const {onGameFinished} = props;
+
+    const status = useGameStore((state) => state.status);
+    const language = useGameStore((state) => state.language)!;
+    const currentSnippet = useGameStore((state) => state.currentSnippet)!;
+    const userPosition = useGameStore((state) => state.userPosition);
 
   // Handles code styling and syntax highlighting
   const {codeHighlight} = useCodeHighlight(currentSnippet.text, language.highlightAlias);
@@ -84,4 +84,4 @@ function TypingArea(props: ITypingAreaProps) {
   );
 }
 
-export default TypingArea;
+export default memo(TypingArea);

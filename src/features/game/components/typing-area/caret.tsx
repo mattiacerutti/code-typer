@@ -1,6 +1,4 @@
-"use client";
-
-import {useState, useEffect, useCallback} from "react";
+import {useState, useEffect} from "react";
 
 interface ICaretProps {
   charRefs: React.RefObject<HTMLSpanElement | null>[];
@@ -22,20 +20,13 @@ function Caret(props: ICaretProps) {
     return () => clearTimeout(blinkingTimeout);
   }, [caretPosition]);
 
-  const updateCaretPosition = useCallback(
-    (index: number) => {
-      const charElement = charRefs[index].current;
-      if (charElement) {
-        const {offsetTop, offsetLeft} = charElement;
-        setCaretPosition({top: offsetTop, left: offsetLeft});
-      }
-    },
-    [charRefs]
-  );
-
   useEffect(() => {
-    updateCaretPosition(userPosition);
-  }, [userPosition, updateCaretPosition]);
+    const charElement = charRefs[userPosition].current;
+    if (charElement) {
+      const {offsetTop, offsetLeft} = charElement;
+      setCaretPosition({top: offsetTop, left: offsetLeft});
+    }
+  }, [userPosition, charRefs]);
 
   return (
     <div
