@@ -3,11 +3,12 @@ import {useGameStore} from "@/features/game/state/game-store";
 
 interface IEndgameViewProps {
   totalTime: number;
-  handleRestartGame: () => void;
+  handleRetrySnippet: () => void;
+  handleChangeSnippet: () => void;
 }
 
 function EndgameView(props: IEndgameViewProps) {
-  const {totalTime, handleRestartGame} = props;
+  const {totalTime, handleRetrySnippet, handleChangeSnippet} = props;
 
   const currentSnippet = useGameStore((state) => state.currentSnippet)!;
   const validKeystrokes = useGameStore((state) => state.validKeystrokes);
@@ -21,9 +22,14 @@ function EndgameView(props: IEndgameViewProps) {
         <div className="rounded-lg bg-slate-500 px-8 py-4 text-white shadow-lg">{humanizeTime(totalTime)}</div>
       </div>
 
-      <button className="rounded-md bg-slate-200 px-6 py-3 font-medium text-slate-900 hover:bg-slate-300 disabled:opacity-20" onClick={handleRestartGame}>
-        Restart
-      </button>
+      <div className="flex flex-row justify-center gap-4">
+        <button className="flex-1 rounded-md bg-slate-200 px-6 py-3 font-medium text-slate-900 hover:bg-slate-300 disabled:opacity-20" onClick={handleRetrySnippet}>
+          Retry snippet
+        </button>
+        <button className="flex-1 rounded-md bg-slate-200 px-6 py-3 font-medium text-slate-900 hover:bg-slate-300 disabled:opacity-20" onClick={handleChangeSnippet}>
+          Change snippet
+        </button>
+      </div>
     </div>
   );
 }

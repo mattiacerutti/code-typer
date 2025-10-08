@@ -118,7 +118,7 @@ function Home() {
   }, [setSnippets, resetStopwatch]);
 
   if (status === GameStatus.FINISHED && currentSnippet) {
-    return <EndgameView totalTime={elapsedTime} handleRestartGame={handleChangeSnippet} />;
+    return <EndgameView totalTime={elapsedTime} handleChangeSnippet={handleChangeSnippet} handleRetrySnippet={resetSnippet} />;
   }
 
   if (status === GameStatus.LOADING || !availableLanguages.current || !currentSnippet || !language) {
