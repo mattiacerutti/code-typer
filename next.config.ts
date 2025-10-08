@@ -23,7 +23,6 @@ const nextConfig: NextConfig = {
         "tree-sitter-python": "commonjs tree-sitter-python",
         "tree-sitter-lua": "commonjs tree-sitter-lua",
         "tree-sitter-compat": "commonjs tree-sitter-compat",
-        
       });
     }
 

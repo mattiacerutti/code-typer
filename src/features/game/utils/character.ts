@@ -1,5 +1,5 @@
-import { CharacterState } from "@/shared/types/character";
-import { ICharacter, WhitespaceTypes } from "@/shared/types/character";
+import {CharacterState} from "@/shared/types/character";
+import {ICharacter, WhitespaceTypes} from "@/shared/types/character";
 
 export function getCharacterText(char: ICharacter): string {
   switch (char.value) {
@@ -20,7 +20,7 @@ export function getCharacterClasses(char: ICharacter, charHighlighting: string |
   if (char.state === CharacterState.Wrong) {
     return "character-wrong";
   }
-  if (char.state === CharacterState.Right ) {
+  if (char.state === CharacterState.Right) {
     return charHighlighting ?? "";
   }
   return "character-default";

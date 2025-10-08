@@ -1,8 +1,7 @@
-import { rateLimit } from "@/core/middleware/rate-limiter";
+import {rateLimit} from "@/core/middleware/rate-limiter";
 import {doesLanguageExist} from "@/features/snippets/infrastructure/repositories/language.repository.server";
-import { getRandomSnippets } from "@/features/snippets/services/get-random-snippets.server";
-import { NextRequest, NextResponse } from "next/server";
-
+import {getRandomSnippets} from "@/features/snippets/services/get-random-snippets.server";
+import {NextRequest, NextResponse} from "next/server";
 
 export async function GET(request: NextRequest) {
   const resRateLimit = rateLimit(request);
@@ -31,7 +30,3 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({error: "Failed to fetch random snippets"}, {status: 500});
   }
 }
-
-
-
-

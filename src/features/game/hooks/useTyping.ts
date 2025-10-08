@@ -19,16 +19,7 @@ interface IUseTypingProps {
 }
 
 const useTyping = (props: IUseTypingProps) => {
-  const {
-    status,
-    snippet,
-    userPosition,
-    onSnippetUpdate,
-    onUserPositionChange,
-    onStartTyping,
-    onWrongKeystroke,
-    onValidKeystroke,
-  } = props;
+  const {status, snippet, userPosition, onSnippetUpdate, onUserPositionChange, onStartTyping, onWrongKeystroke, onValidKeystroke} = props;
 
   const [isCapsLockOn, setIsCapsLockOn] = useState(false);
 

@@ -1,9 +1,9 @@
-import { ILanguage } from "@/shared/types/language";
-import { ISnippet } from "@/shared/types/snippet.server";
+import {ILanguage} from "@/shared/types/language";
+import {ISnippet} from "@/shared/types/snippet.server";
 
 const internalApiHeader = {
   "x-internal-api": "true",
-}
+};
 
 export async function fetchRandomSnippets(languageId: string): Promise<ISnippet[]> {
   const url = `api/snippets/random?language=${encodeURIComponent(languageId)}`;

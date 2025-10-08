@@ -37,21 +37,18 @@ export function addCharacter(
   const expectedChar = getChar(snippet, position);
 
   if (expectedChar.value === "EOF") return;
-;
-
   if (pressedKey === "Enter") {
     pressedKey = "\n";
   }
   let isPressedKeyCorrect = pressedKey === expectedChar.value;
 
-    // If the previous character was incorrect, we also set this to incorrect no matter what.
-  const prevChar = getSignificantPreviousChar(snippet, position)
+  // If the previous character was incorrect, we also set this to incorrect no matter what.
+  const prevChar = getSignificantPreviousChar(snippet, position);
   if (prevChar && prevChar.state === CharacterState.Wrong) {
     isPressedKeyCorrect = false;
   }
 
   const newPosition = incrementUserPosition(snippet, position, updateUserPosition, isPressedKeyCorrect);
-
 
   for (let i = position; i <= newPosition - 1; i++) {
     const char = snippet[i];

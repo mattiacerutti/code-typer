@@ -1,4 +1,4 @@
-import { countInitialWhitespaces, removeInitialCharacters } from "./text.server";
+import {countInitialWhitespaces, removeInitialCharacters} from "./text.server";
 
 type IIndentationStyle = {type: "none" | "mixed" | "tab"} | {type: "space"; value: number[]};
 export function detectIndentationStyle(snippet: string): IIndentationStyle {
@@ -23,7 +23,7 @@ export function detectIndentationStyle(snippet: string): IIndentationStyle {
 
     const numberOfSpaces = leadingWhitespaces.length;
     spacesCount[numberOfSpaces] = (spacesCount[numberOfSpaces] ?? 0) + 1;
- }
+  }
 
   const spaceKeys = Object.keys(spacesCount).map(Number);
 

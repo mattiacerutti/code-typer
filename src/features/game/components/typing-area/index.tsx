@@ -5,7 +5,7 @@ import {isGameFinished} from "@/features/game/logic/game-logic";
 import {GameStatus} from "@/features/game/types/game-state";
 import Caret from "./caret";
 import Character from "./character";
-import { useGameStore } from "@/features/game/state/game-store";
+import {useGameStore} from "@/features/game/state/game-store";
 
 interface ITypingAreaProps {
   onGameFinished: () => void;
@@ -14,10 +14,10 @@ interface ITypingAreaProps {
 function TypingArea(props: ITypingAreaProps) {
   const {onGameFinished} = props;
 
-    const status = useGameStore((state) => state.status);
-    const language = useGameStore((state) => state.language)!;
-    const currentSnippet = useGameStore((state) => state.currentSnippet)!;
-    const userPosition = useGameStore((state) => state.userPosition);
+  const status = useGameStore((state) => state.status);
+  const language = useGameStore((state) => state.language)!;
+  const currentSnippet = useGameStore((state) => state.currentSnippet)!;
+  const userPosition = useGameStore((state) => state.userPosition);
 
   // Handles code styling and syntax highlighting
   const {codeHighlight} = useCodeHighlight(currentSnippet.text, language.highlightAlias);
@@ -53,9 +53,9 @@ function TypingArea(props: ITypingAreaProps) {
   }, [status, userPosition, currentSnippet.parsedSnippet, onGameFinished]);
 
   return (
-    <div className="flex flex-col justify-center items-center bg-slate-100 rounded-2xl shadow-lg p-10">
-      <div className="relative flex justify-center items-center">
-        <div className="text-slate-700 text-3xl flex flex-col gap-1.5 select-none">
+    <div className="flex flex-col items-center justify-center rounded-2xl bg-slate-100 p-10 shadow-lg">
+      <div className="relative flex items-center justify-center">
+        <div className="flex flex-col gap-1.5 text-3xl text-slate-700 select-none">
           {groupedCharacters.map((group, groupIndex) => (
             <div key={groupIndex} className="flex flex-row whitespace-pre">
               {group.map((item) => {

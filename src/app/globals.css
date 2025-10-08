@@ -38,6 +38,6 @@ root {
   }
 }
 
-.blinking-caret{
+.blinking-caret {
   animation: caret-blink 1s step-end infinite;
 }

@@ -21,5 +21,3 @@ export function removeInitialCharacters(lines: string[], quantity: number): stri
 
   return newLines;
 }
-
-

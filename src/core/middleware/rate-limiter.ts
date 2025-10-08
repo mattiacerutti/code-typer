@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+import {NextRequest, NextResponse} from "next/server";
 
 type RateLimitEntry = {
   count: number;
@@ -10,8 +10,8 @@ const WINDOW_MS = 60 * 1000; // 1 minute
 const MAX_REQUESTS = 30;
 
 export function rateLimit(req: NextRequest): NextResponse | void {
-  const forwarded = req.headers.get('x-forwarded-for');
-  const ip = forwarded?.split(',')[0]?.trim() || 'unknown';
+  const forwarded = req.headers.get("x-forwarded-for");
+  const ip = forwarded?.split(",")[0]?.trim() || "unknown";
 
   const now = Date.now();
   const entry = ipStore.get(ip);
@@ -19,7 +19,7 @@ export function rateLimit(req: NextRequest): NextResponse | void {
   if (entry) {
     if (now - entry.lastRequest < WINDOW_MS) {
       if (entry.count >= MAX_REQUESTS) {
-        return new NextResponse('Too Many Requests', { status: 429 });
+        return new NextResponse("Too Many Requests", {status: 429});
       }
       entry.count += 1;
     } else {
@@ -27,6 +27,6 @@ export function rateLimit(req: NextRequest): NextResponse | void {
       entry.lastRequest = now;
     }
   } else {
-    ipStore.set(ip, { count: 1, lastRequest: now });
+    ipStore.set(ip, {count: 1, lastRequest: now});
   }
 }

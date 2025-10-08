@@ -2,4 +2,4 @@ function Home() {
   return null;
 }
 
-export default Home
+export default Home;

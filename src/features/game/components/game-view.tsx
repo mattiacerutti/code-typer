@@ -2,9 +2,9 @@ import TypingArea from "@/features/game/components/typing-area";
 import useTyping from "@/features/game/hooks/useTyping";
 import {GameStatus} from "@/features/game/types/game-state";
 import type {ILanguage} from "@/shared/types/language";
-import { humanizeTime } from "@/features/game/utils/typing-metrics";
-import { useGameStore } from "../state/game-store";
-import { useCallback } from "react";
+import {humanizeTime} from "@/features/game/utils/typing-metrics";
+import {useGameStore} from "../state/game-store";
+import {useCallback} from "react";
 
 interface IGameViewProps {
   onGameFinished: () => void;
@@ -18,23 +18,14 @@ interface IGameViewProps {
 }
 
 function GameView(props: IGameViewProps) {
-  const {
-    onGameFinished,
-    onGameStarted,
-    changeSnippet,
-    resetSnippet,
-    changeLanguage,
-    availableLanguages,
-    isRefreshing,
-    elapsedTime
-  } = props;
+  const {onGameFinished, onGameStarted, changeSnippet, resetSnippet, changeLanguage, availableLanguages, isRefreshing, elapsedTime} = props;
 
   const status = useGameStore((state) => state.status);
   const language = useGameStore((state) => state.language)!;
   const currentSnippet = useGameStore((state) => state.currentSnippet)!;
   const userPosition = useGameStore((state) => state.userPosition);
   const setParsedSnippet = useGameStore((state) => state.setParsedSnippet);
-  const setUserPosition = useGameStore((state) => state.setUserPosition)
+  const setUserPosition = useGameStore((state) => state.setUserPosition);
   const setStatus = useGameStore((state) => state.setStatus);
   const incrementWrongKeystroke = useGameStore((state) => state.incrementWrongKeystroke);
   const incrementValidKeystroke = useGameStore((state) => state.incrementValidKeystroke);
@@ -57,15 +48,13 @@ function GameView(props: IGameViewProps) {
 
   return (
     <>
-      <div className={`text-red-500 relative bottom-8 ${!isCapsLockOn && "opacity-0"} font-bold text-2xl`}>Caps Lock is on</div>
-      <div className="flex flex-col gap-10 justify-center items-center">
-        <div className="bg-slate-100 text-slate-900 px-4 py-2 rounded-md font-medium text-center">
-          {humanizeTime(elapsedTime)}
-        </div>
-        <TypingArea onGameFinished={handleSnippetFinished}/>
-        <div className="flex flex-row gap-1.5 content-between">
+      <div className={`relative bottom-8 text-red-500 ${!isCapsLockOn && "opacity-0"} text-2xl font-bold`}>Caps Lock is on</div>
+      <div className="flex flex-col items-center justify-center gap-10">
+        <div className="rounded-md bg-slate-100 px-4 py-2 text-center font-medium text-slate-900">{humanizeTime(elapsedTime)}</div>
+        <TypingArea onGameFinished={handleSnippetFinished} />
+        <div className="flex flex-row content-between gap-1.5">
           <button
-            className="px-6 py-3 bg-slate-200 text-slate-900 font-medium rounded-md hover:bg-slate-300 disabled:opacity-20"
+            className="rounded-md bg-slate-200 px-6 py-3 font-medium text-slate-900 hover:bg-slate-300 disabled:opacity-20"
             onClick={resetSnippet}
             disabled={isRefreshing || status !== GameStatus.PLAYING}
           >
@@ -76,11 +65,7 @@ function GameView(props: IGameViewProps) {
               />
             </svg>
           </button>
-          <button
-            className="px-6 py-3 bg-slate-200 text-slate-900 font-medium rounded-md hover:bg-slate-300 disabled:opacity-20"
-            onClick={changeSnippet}
-            disabled={isRefreshing}
-          >
+          <button className="rounded-md bg-slate-200 px-6 py-3 font-medium text-slate-900 hover:bg-slate-300 disabled:opacity-20" onClick={changeSnippet} disabled={isRefreshing}>
             {!isRefreshing ? "Change Snippet" : "Wait.."}
           </button>
           <select
@@ -90,7 +75,7 @@ function GameView(props: IGameViewProps) {
               setStatus(GameStatus.LOADING);
               changeLanguage(availableLanguages[event.target.value]);
             }}
-            className="px-6 py-3 bg-slate-200 text-slate-900 font-medium rounded-md hover:bg-slate-300 disabled:opacity-20"
+            className="rounded-md bg-slate-200 px-6 py-3 font-medium text-slate-900 hover:bg-slate-300 disabled:opacity-20"
           >
             {Object.values(availableLanguages).map((availableLanguage) => (
               <option key={availableLanguage.id} value={availableLanguage.id}>

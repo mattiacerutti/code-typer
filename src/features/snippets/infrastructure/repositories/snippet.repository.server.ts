@@ -13,7 +13,7 @@ export async function fetchRandomFiles(languageId: string, quantity: number, alr
     LIMIT $${alreadyFetched.length + 2};
   `;
 
-  const files = await prisma.$queryRawUnsafe(query, languageId, ...alreadyFetched, quantity) as {url: string}[];
+  const files = (await prisma.$queryRawUnsafe(query, languageId, ...alreadyFetched, quantity)) as {url: string}[];
 
   return files.map((snippet) => snippet.url);
 }

@@ -1,5 +1,5 @@
 import {ILanguage} from "@/shared/types/language";
-import { PrismaClient } from '@prisma/client';
+import {PrismaClient} from "@prisma/client";
 
 export const SUPPORTED_LANGUAGES: ILanguage[] = [
   {

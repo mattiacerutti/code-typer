@@ -4,7 +4,6 @@ import {isDev} from "@/core/config/env";
 
 export async function middleware(req: NextRequest) {
   if (!isDev) {
-
     const internalApi = req.headers.get("x-internal-api");
 
     if (internalApi !== "true") {
