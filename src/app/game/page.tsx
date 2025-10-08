@@ -28,7 +28,7 @@ function Home() {
     setElapsedTime(elapsedTime);
   }, []);
 
-  const {startStopwatch, stopstopWatch, resetStopwatch} = useStopwatch(onTick);
+  const {startStopwatch, stopStopwatch, resetStopwatch} = useStopwatch(onTick);
 
   const [isNextButtonLocked, setIsNextButtonLocked] = useState(false);
 
@@ -37,10 +37,11 @@ function Home() {
 
   const setSnippets = useCallback(
     async (selectedLanguage: ILanguage) => {
+      resetStopwatch();
       const snippets = await getRandomCodeSnippets(selectedLanguage.id);
       initialize(selectedLanguage, snippets);
     },
-    [initialize]
+    [initialize, resetStopwatch]
   );
 
   const backgroundGetSnippets = async () => {
@@ -94,8 +95,8 @@ function Home() {
   };
 
   const handleEndGame = useCallback(() => {
-    stopstopWatch();
-  }, [stopstopWatch]);
+    stopStopwatch();
+  }, [stopStopwatch]);
 
   const handleChangeSnippet = async () => {
     setStatus(GameStatus.LOADING);

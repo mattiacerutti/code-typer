@@ -14,7 +14,7 @@ const useStopwatch = (onTick: (elapsedTime: number) => void) => {
     intervalRef.current = setInterval(() => onTick(getTime()), 1);
   }, [onTick, getTime]);
 
-  const stopstopWatch = useCallback(() => {
+  const stopStopwatch = useCallback(() => {
     if (intervalRef.current) {
       clearInterval(intervalRef.current);
       intervalRef.current = null;
@@ -22,12 +22,12 @@ const useStopwatch = (onTick: (elapsedTime: number) => void) => {
   }, []);
 
   const resetStopwatch = useCallback(() => {
-    stopstopWatch();
+    stopStopwatch();
     startRef.current = null;
     onTick(0);
-  }, [stopstopWatch, onTick]);
+  }, [stopStopwatch, onTick]);
 
-  return {startStopwatch, stopstopWatch, resetStopwatch, getTime};
+  return {startStopwatch, stopStopwatch, resetStopwatch, getTime};
 };
 
 export default useStopwatch;
