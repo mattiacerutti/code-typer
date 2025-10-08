@@ -21,6 +21,7 @@ function Home() {
   const goToNextSnippet = useGameStore((state) => state.goToNextSnippet);
   const resetCurrentSnippet = useGameStore((state) => state.resetCurrentSnippet);
   const setStatus = useGameStore((state) => state.setStatus);
+  const registerPositionSample = useGameStore((state) => state.registerPositionSample);
 
   const [elapsedTime, setElapsedTime] = useState(0);
 
@@ -28,7 +29,15 @@ function Home() {
     setElapsedTime(elapsedTime);
   }, []);
 
-  const {startStopwatch, stopStopwatch, resetStopwatch} = useStopwatch(onTick);
+  const pushPositionSample = useCallback(
+    (elapsedTime: number) => {
+      registerPositionSample(elapsedTime, useGameStore.getState().userPosition);
+      console.log("called with", elapsedTime, useGameStore.getState().userPosition);
+    },
+    [registerPositionSample]
+  );
+
+  const {startStopwatch, stopStopwatch, resetStopwatch, getTime} = useStopwatch({onTick, onInterval: pushPositionSample});
 
   const [isNextButtonLocked, setIsNextButtonLocked] = useState(false);
 
@@ -96,7 +105,9 @@ function Home() {
 
   const handleEndGame = useCallback(() => {
     stopStopwatch();
-  }, [stopStopwatch]);
+    pushPositionSample(getTime());
+    setStatus(GameStatus.FINISHED);
+  }, [stopStopwatch, getTime, pushPositionSample, setStatus]);
 
   const handleChangeSnippet = async () => {
     setStatus(GameStatus.LOADING);
@@ -118,7 +129,7 @@ function Home() {
   }, [setSnippets, resetStopwatch]);
 
   if (status === GameStatus.FINISHED && currentSnippet) {
-    return <EndgameView totalTime={elapsedTime} handleChangeSnippet={handleChangeSnippet} handleRetrySnippet={resetSnippet} />;
+    return <EndgameView handleChangeSnippet={handleChangeSnippet} handleRetrySnippet={resetSnippet} />;
   }
 
   if (status === GameStatus.LOADING || !availableLanguages.current || !currentSnippet || !language) {

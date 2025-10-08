@@ -12,6 +12,7 @@ export interface IGameStoreState {
   userPosition: number;
   wrongKeystrokes: number;
   validKeystrokes: number;
+  positionSamples: {time: number; position: number}[];
   initialize: (language: ILanguage, snippets: ISnippet[]) => void;
   addSnippetsToQueue: (snippets: ISnippet[]) => void;
   goToNextSnippet: () => void;
@@ -21,6 +22,7 @@ export interface IGameStoreState {
   setStatus: (status: GameStatus) => void;
   incrementWrongKeystroke: () => void;
   incrementValidKeystroke: () => void;
+  registerPositionSample: (time: number, position: number) => void;
 }
 
 function resetCharacters(snippet: ISnippet): ISnippet {
@@ -41,6 +43,7 @@ export const useGameStore = create<IGameStoreState>((set, get) => ({
   userPosition: 0,
   wrongKeystrokes: 0,
   validKeystrokes: 0,
+  positionSamples: [],
   initialize: (language, snippets) => {
     if (snippets.length === 0) {
       set({
@@ -51,6 +54,7 @@ export const useGameStore = create<IGameStoreState>((set, get) => ({
         userPosition: 0,
         wrongKeystrokes: 0,
         validKeystrokes: 0,
+        positionSamples: [],
       });
       return;
     }
@@ -64,6 +68,7 @@ export const useGameStore = create<IGameStoreState>((set, get) => ({
       userPosition: 0,
       wrongKeystrokes: 0,
       validKeystrokes: 0,
+      positionSamples: [],
     });
   },
   addSnippetsToQueue: (snippets) => {
@@ -85,6 +90,7 @@ export const useGameStore = create<IGameStoreState>((set, get) => ({
       userPosition: 0,
       wrongKeystrokes: 0,
       validKeystrokes: 0,
+      positionSamples: [],
     });
   },
   resetCurrentSnippet: () => {
@@ -99,10 +105,11 @@ export const useGameStore = create<IGameStoreState>((set, get) => ({
       userPosition: 0,
       wrongKeystrokes: 0,
       validKeystrokes: 0,
+      positionSamples: [],
     });
   },
   setParsedSnippet: (parsedSnippet) => {
-    const {currentSnippet, status, wrongKeystrokes, validKeystrokes} = get();
+    const {currentSnippet, status, wrongKeystrokes, validKeystrokes, positionSamples} = get();
     if (!currentSnippet) {
       return;
     }
@@ -115,15 +122,17 @@ export const useGameStore = create<IGameStoreState>((set, get) => ({
       },
       wrongKeystrokes: status === GameStatus.PLAYING ? wrongKeystrokes : 0,
       validKeystrokes: status === GameStatus.PLAYING ? validKeystrokes : 0,
+      positionSamples: status === GameStatus.PLAYING ? [...positionSamples] : [],
     });
   },
   setUserPosition: (position) => {
-    const {status, wrongKeystrokes, validKeystrokes} = get();
+    const {status, wrongKeystrokes, validKeystrokes, positionSamples} = get();
     set({
       status: GameStatus.PLAYING,
       userPosition: position,
       wrongKeystrokes: status === GameStatus.PLAYING ? wrongKeystrokes : 0,
       validKeystrokes: status === GameStatus.PLAYING ? validKeystrokes : 0,
+      positionSamples: status === GameStatus.PLAYING ? [...positionSamples] : [],
     });
   },
   setStatus: (status) => {
@@ -143,5 +152,9 @@ export const useGameStore = create<IGameStoreState>((set, get) => ({
     if (get().status !== GameStatus.PLAYING) return;
     const store = get();
     store.validKeystrokes += 1;
+  },
+  registerPositionSample: (time: number, position: number) => {
+    const store = get();
+    store.positionSamples.push({time, position});
   },
 }));

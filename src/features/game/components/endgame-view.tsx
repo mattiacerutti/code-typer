@@ -1,25 +1,48 @@
-import {calculateAccuracy, calculateWPM, humanizeTime} from "@/features/game/utils/typing-metrics";
+import {calculateAccuracy, calculateWPM, humanizeTime, normalizePositionSamples} from "@/features/game/utils/typing-metrics";
 import {useGameStore} from "@/features/game/state/game-store";
+import {useMemo} from "react";
+import {LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer} from "recharts";
 
 interface IEndgameViewProps {
-  totalTime: number;
   handleRetrySnippet: () => void;
   handleChangeSnippet: () => void;
 }
 
 function EndgameView(props: IEndgameViewProps) {
-  const {totalTime, handleRetrySnippet, handleChangeSnippet} = props;
+  const {handleRetrySnippet, handleChangeSnippet} = props;
 
   const currentSnippet = useGameStore((state) => state.currentSnippet)!;
   const validKeystrokes = useGameStore((state) => state.validKeystrokes);
   const wrongKeystrokes = useGameStore((state) => state.wrongKeystrokes);
+  const positionSamples = useGameStore((state) => state.positionSamples);
+
+  const normalizedPositionSamples = useMemo(() => normalizePositionSamples(positionSamples, currentSnippet.parsedSnippet), [positionSamples, currentSnippet]);
+  const wpmSamples = useMemo(() => {
+    return normalizedPositionSamples.map((sample) => ({
+      time: humanizeTime(sample.time),
+      wpm: calculateWPM(sample.time, sample.position),
+    }));
+  }, [normalizedPositionSamples]);
+
+  const lastSample = wpmSamples.at(-1)!;
 
   return (
     <div className="flex flex-col gap-8">
       <div className="flex flex-row gap-4">
-        <div className="rounded-lg bg-slate-500 px-8 py-4 text-white shadow-lg">WPM {calculateWPM(totalTime, currentSnippet.text.length)}</div>
+        <div className="rounded-lg bg-slate-500 px-8 py-4 text-white shadow-lg">WPM {lastSample.wpm}</div>
         <div className="rounded-lg bg-slate-500 px-8 py-4 text-white shadow-lg">Accuracy: {calculateAccuracy(validKeystrokes, wrongKeystrokes)}%</div>
-        <div className="rounded-lg bg-slate-500 px-8 py-4 text-white shadow-lg">{humanizeTime(totalTime)}</div>
+        <div className="rounded-lg bg-slate-500 px-8 py-4 text-white shadow-lg">{lastSample.time}</div>
+      </div>
+
+      <div className="flex justify-center [&_*:focus]:outline-none">
+        <ResponsiveContainer width="100%" height={300}>
+          <LineChart data={wpmSamples}>
+            <XAxis dataKey="time" />
+            <YAxis width={30} />
+            <Tooltip />
+            <Line type="monotone" dataKey="wpm" stroke="#8884d8" strokeWidth={2} />
+          </LineChart>
+        </ResponsiveContainer>
       </div>
 
       <div className="flex flex-row justify-center gap-4">
