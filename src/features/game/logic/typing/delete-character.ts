@@ -15,19 +15,11 @@ function decrementUserPosition(snippet: IParsedSnippet, position: number): numbe
   return position - 1;
 }
 
-export function deleteCharacter(
-  snippet: IParsedSnippet,
-  position: number,
-  updateParsedSnippet: (parsedSnippet: IParsedSnippet) => void,
-  updateUserPosition: (position: number) => void
-) {
-  if (position === 0) {
-    return;
-  }
+export function deleteCharacter(snippet: IParsedSnippet, position: number): [IParsedSnippet, number] {
+  if (position === 0) return [snippet, 0];
   const newPos = decrementUserPosition(snippet, position);
 
   resetCharactersInRange(snippet, newPos, position);
 
-  updateParsedSnippet(snippet);
-  updateUserPosition(newPos);
+  return [snippet, newPos];
 }

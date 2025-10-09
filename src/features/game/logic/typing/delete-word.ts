@@ -41,13 +41,8 @@ function getPreviousWordPosition(snippet: IParsedSnippet, position: number): num
   return position;
 }
 
-export function deleteWord(
-  snippet: IParsedSnippet,
-  position: number,
-  updateParsedSnippet: (parsedSnippet: IParsedSnippet) => void,
-  updateUserPosition: (position: number) => void
-) {
-  if (position === 0) return;
+export function deleteWord(snippet: IParsedSnippet, position: number): [IParsedSnippet, number] {
+  if (position === 0) return [snippet, 0];
 
   let previousWordPosition = getPreviousWordPosition(snippet, position);
 
@@ -67,6 +62,5 @@ export function deleteWord(
 
   resetCharactersInRange(snippet, previousWordPosition, position);
 
-  updateParsedSnippet(snippet);
-  updateUserPosition(previousWordPosition);
+  return [snippet, previousWordPosition];
 }
