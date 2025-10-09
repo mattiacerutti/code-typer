@@ -12,9 +12,7 @@ function EndgameView(props: IEndgameViewProps) {
   const {handleRetrySnippet, handleChangeSnippet} = props;
 
   const currentSnippet = useGameStore((state) => state.currentSnippet)!;
-  const validKeystrokes = useGameStore((state) => state.validKeystrokes);
-  const wrongKeystrokes = useGameStore((state) => state.wrongKeystrokes);
-  const positionSamples = useGameStore((state) => state.positionSamples);
+  const {validKeystrokes, wrongKeystrokes, positionSamples} = useMemo(() => useGameStore.getState().getSessionStats(), []);
 
   const normalizedPositionSamples = useMemo(() => normalizePositionSamples(positionSamples, currentSnippet.parsedSnippet), [positionSamples, currentSnippet]);
   const wpmSamples = useMemo(() => {

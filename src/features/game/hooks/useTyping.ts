@@ -4,7 +4,7 @@ import {deleteCharacter} from "@/features/game/logic/typing/delete-character";
 import {addCharacter} from "@/features/game/logic/typing/add-character";
 import {deleteWord} from "@/features/game/logic/typing/delete-word";
 import {deleteLine} from "@/features/game/logic/typing/delete-line";
-import {GameStatus} from "@/features/game/types/game-state";
+import {GameStatus} from "@/features/game/types/game-status";
 import type {IParsedSnippet} from "@/shared/types/snippet";
 
 interface IUseTypingProps {

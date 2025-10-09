@@ -1,5 +1,5 @@
 import {CharacterState, CharacterTypes, WhitespaceTypes} from "@/shared/types/character";
-import {IParsedSnippet} from "@/shared/types/snippet";
+import {IParsedSnippet, ISnippet} from "@/shared/types/snippet";
 
 export function isGameFinished(parsedSnippets: IParsedSnippet) {
   const allCorrect = parsedSnippets.every(
@@ -10,4 +10,14 @@ export function isGameFinished(parsedSnippets: IParsedSnippet) {
   );
 
   return allCorrect;
+}
+
+export function resetCharacters(snippet: ISnippet): ISnippet {
+  return {
+    text: snippet.text,
+    parsedSnippet: snippet.parsedSnippet.map((char) => ({
+      ...char,
+      state: CharacterState.Default,
+    })),
+  };
 }

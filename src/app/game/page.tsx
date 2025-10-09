@@ -4,7 +4,7 @@ import {useCallback, useEffect, useRef, useState} from "react";
 import {getRandomCodeSnippets} from "@/features/snippets/services/get-random-snippets.client";
 import {fetchLanguages} from "@/features/snippets/infrastructure/adapters/snippet-fetch.client";
 import useStopwatch from "@/features/game/hooks/useStopwatch";
-import {GameStatus} from "@/features/game/types/game-state";
+import {GameStatus} from "@/features/game/types/game-status";
 import {REFRESH_BUTTON_MIN_DELAY, DEFAULT_LANGUAGE} from "@/features/game/config/game";
 import {useGameStore} from "@/features/game/state/game-store";
 import GameView from "@/features/game/components/game-view";
@@ -13,7 +13,6 @@ import type {ILanguage} from "@/shared/types/language";
 
 function Home() {
   const status = useGameStore((state) => state.status);
-  const snippetQueue = useGameStore((state) => state.snippetQueue);
   const language = useGameStore((state) => state.language);
   const currentSnippet = useGameStore((state) => state.currentSnippet);
   const initialize = useGameStore((state) => state.initialize);
@@ -22,6 +21,7 @@ function Home() {
   const resetCurrentSnippet = useGameStore((state) => state.resetCurrentSnippet);
   const setStatus = useGameStore((state) => state.setStatus);
   const registerPositionSample = useGameStore((state) => state.registerPositionSample);
+  const getSnippetQueue = useGameStore((state) => state.getSnippetQueue);
 
   const [elapsedTime, setElapsedTime] = useState(0);
 
@@ -31,8 +31,9 @@ function Home() {
 
   const pushPositionSample = useCallback(
     (elapsedTime: number) => {
-      registerPositionSample(elapsedTime, useGameStore.getState().userPosition);
-      console.log("called with", elapsedTime, useGameStore.getState().userPosition);
+      const userPosition = useGameStore.getState().userPosition;
+      if (userPosition === null) return;
+      registerPositionSample(elapsedTime, userPosition);
     },
     [registerPositionSample]
   );
@@ -63,6 +64,8 @@ function Home() {
 
   const goToNextSnippetWithPrefetch = async () => {
     if (status !== GameStatus.PLAYING && status !== GameStatus.READY && status !== GameStatus.FINISHED) return;
+
+    const snippetQueue = getSnippetQueue();
 
     const startTime = Date.now();
     setIsNextButtonLocked(true);

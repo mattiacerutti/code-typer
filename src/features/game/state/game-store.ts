@@ -1,160 +1,150 @@
 import {create} from "zustand";
-import {CharacterState} from "@/shared/types/character";
 import type {IParsedSnippet, ISnippet} from "@/shared/types/snippet";
 import type {ILanguage} from "@/shared/types/language";
-import {GameStatus} from "@/features/game/types/game-state";
+import {GameStatus} from "@/features/game/types/game-status";
+import {resetCharacters} from "@/features/game/logic/game-logic";
+
+export type SessionStats = {
+  wrongKeystrokes: number;
+  validKeystrokes: number;
+  positionSamples: {time: number; position: number}[];
+};
+
+const createSessionStats = (): SessionStats => ({
+  wrongKeystrokes: 0,
+  validKeystrokes: 0,
+  positionSamples: [],
+});
 
 export interface IGameStoreState {
   status: GameStatus;
   language: ILanguage | null;
-  snippetQueue: ISnippet[];
   currentSnippet: ISnippet | null;
-  userPosition: number;
-  wrongKeystrokes: number;
-  validKeystrokes: number;
-  positionSamples: {time: number; position: number}[];
+  userPosition: number | null;
+
+  /* Methods */
   initialize: (language: ILanguage, snippets: ISnippet[]) => void;
+  updateCurrentSnippet: (newSnippet: IParsedSnippet) => void;
+  updateUserPosition: (position: number) => void;
   addSnippetsToQueue: (snippets: ISnippet[]) => void;
   goToNextSnippet: () => void;
   resetCurrentSnippet: () => void;
-  setParsedSnippet: (parsedSnippet: IParsedSnippet) => void;
-  setUserPosition: (position: number) => void;
-  setStatus: (status: GameStatus) => void;
+  setStatus: (status: GameStatus.LOADING | GameStatus.FINISHED) => void;
   incrementWrongKeystroke: () => void;
   incrementValidKeystroke: () => void;
   registerPositionSample: (time: number, position: number) => void;
+
+  /* Getters for non-stateful properties */
+  getSessionStats: () => SessionStats;
+  getSnippetQueue: () => ISnippet[];
 }
 
-function resetCharacters(snippet: ISnippet): ISnippet {
-  return {
-    text: snippet.text,
-    parsedSnippet: snippet.parsedSnippet.map((char) => ({
-      ...char,
-      state: CharacterState.Default,
-    })),
+export const useGameStore = create<IGameStoreState>((set, get) => {
+  let sessionStats = createSessionStats();
+  let snippetQueue: ISnippet[] = [];
+
+  const resetSessionStats = () => {
+    sessionStats = createSessionStats();
   };
-}
 
-export const useGameStore = create<IGameStoreState>((set, get) => ({
-  status: GameStatus.LOADING,
-  language: null,
-  snippetQueue: [],
-  currentSnippet: null,
-  userPosition: 0,
-  wrongKeystrokes: 0,
-  validKeystrokes: 0,
-  positionSamples: [],
-  initialize: (language, snippets) => {
-    if (snippets.length === 0) {
+  return {
+    status: GameStatus.LOADING,
+    language: null,
+    currentSnippet: null,
+    userPosition: null,
+    initialize: (language, snippets) => {
+      if (snippets.length === 0) throw new Error("Cannot initialize game with empty snippets");
+
+      resetSessionStats();
+
+      const [currentSnippet, ...rest] = snippets;
+
+      snippetQueue = [...rest];
+
       set({
-        status: GameStatus.LOADING,
+        status: GameStatus.READY,
         language,
-        snippetQueue: [],
-        currentSnippet: null,
+        currentSnippet,
         userPosition: 0,
-        wrongKeystrokes: 0,
-        validKeystrokes: 0,
-        positionSamples: [],
       });
-      return;
-    }
+    },
+    addSnippetsToQueue: (snippets) => {
+      const language = get().language;
+      if (!language) throw new Error("Cannot add snippets to queue when there is no selected language");
+      if (snippets.length === 0) return;
 
-    const [currentSnippet, ...snippetQueue] = snippets;
-    set({
-      status: GameStatus.READY,
-      language,
-      currentSnippet,
-      snippetQueue,
-      userPosition: 0,
-      wrongKeystrokes: 0,
-      validKeystrokes: 0,
-      positionSamples: [],
-    });
-  },
-  addSnippetsToQueue: (snippets) => {
-    set((state) => ({
-      snippetQueue: [...state.snippetQueue, ...snippets],
-    }));
-  },
-  goToNextSnippet: () => {
-    const {snippetQueue} = get();
-    if (snippetQueue.length === 0) {
-      return;
-    }
+      snippetQueue = [...snippetQueue, ...snippets];
+    },
+    goToNextSnippet: () => {
+      if (snippetQueue.length === 0) throw new Error("Cannot go to next snippet when the queue is empty");
+      const [nextSnippet, ...rest] = snippetQueue;
 
-    const [nextSnippet, ...rest] = snippetQueue;
-    set({
-      status: GameStatus.READY,
-      currentSnippet: nextSnippet,
-      snippetQueue: rest,
-      userPosition: 0,
-      wrongKeystrokes: 0,
-      validKeystrokes: 0,
-      positionSamples: [],
-    });
-  },
-  resetCurrentSnippet: () => {
-    const {currentSnippet} = get();
-    if (!currentSnippet) {
-      return;
-    }
+      snippetQueue = rest;
+      resetSessionStats();
 
-    set({
-      status: GameStatus.READY,
-      currentSnippet: resetCharacters(currentSnippet),
-      userPosition: 0,
-      wrongKeystrokes: 0,
-      validKeystrokes: 0,
-      positionSamples: [],
-    });
-  },
-  setParsedSnippet: (parsedSnippet) => {
-    const {currentSnippet, status, wrongKeystrokes, validKeystrokes, positionSamples} = get();
-    if (!currentSnippet) {
-      return;
-    }
+      set({
+        status: GameStatus.READY,
+        userPosition: 0,
+        currentSnippet: nextSnippet,
+      });
+    },
+    resetCurrentSnippet: () => {
+      const currentSnippet = get().currentSnippet;
+      if (!currentSnippet) return;
 
-    set({
-      status: GameStatus.PLAYING,
-      currentSnippet: {
-        text: currentSnippet.text,
-        parsedSnippet,
-      },
-      wrongKeystrokes: status === GameStatus.PLAYING ? wrongKeystrokes : 0,
-      validKeystrokes: status === GameStatus.PLAYING ? validKeystrokes : 0,
-      positionSamples: status === GameStatus.PLAYING ? [...positionSamples] : [],
-    });
-  },
-  setUserPosition: (position) => {
-    const {status, wrongKeystrokes, validKeystrokes, positionSamples} = get();
-    set({
-      status: GameStatus.PLAYING,
-      userPosition: position,
-      wrongKeystrokes: status === GameStatus.PLAYING ? wrongKeystrokes : 0,
-      validKeystrokes: status === GameStatus.PLAYING ? validKeystrokes : 0,
-      positionSamples: status === GameStatus.PLAYING ? [...positionSamples] : [],
-    });
-  },
-  setStatus: (status) => {
-    if (status === GameStatus.READY) {
-      set({status, userPosition: 0});
-      return;
-    }
+      resetSessionStats();
+      set({
+        status: GameStatus.READY,
+        userPosition: 0,
+        currentSnippet: resetCharacters(currentSnippet),
+      });
+    },
+    updateCurrentSnippet: (newSnippet) => {
+      const currentSnippet = get().currentSnippet;
+      if (!currentSnippet) throw new Error("Cannot set current snippet when there is no current snippet. This function should only be used to update the snippet during a game.");
 
-    set({status});
-  },
-  incrementWrongKeystroke: () => {
-    if (get().status !== GameStatus.PLAYING) return;
-    const store = get();
-    store.wrongKeystrokes += 1;
-  },
-  incrementValidKeystroke: () => {
-    if (get().status !== GameStatus.PLAYING) return;
-    const store = get();
-    store.validKeystrokes += 1;
-  },
-  registerPositionSample: (time: number, position: number) => {
-    const store = get();
-    store.positionSamples.push({time, position});
-  },
-}));
+      set({
+        status: GameStatus.PLAYING,
+        currentSnippet: {
+          text: currentSnippet.text,
+          parsedSnippet: newSnippet,
+        },
+      });
+    },
+    updateUserPosition: (position) => {
+      const userPosition = get().userPosition;
+      if (userPosition === null)
+        throw new Error("Cannot set user position when there is no current user position. This function should only be used to update the position during a game.");
+      set({
+        status: GameStatus.PLAYING,
+        userPosition: position,
+      });
+    },
+    setStatus: (status) => {
+      if (status === GameStatus.LOADING) {
+        set({
+          status,
+          userPosition: null,
+          currentSnippet: null,
+        });
+        return;
+      }
+
+      set({status});
+    },
+    incrementWrongKeystroke: () => {
+      if (get().status !== GameStatus.PLAYING) return;
+      sessionStats.wrongKeystrokes += 1;
+    },
+    incrementValidKeystroke: () => {
+      if (get().status !== GameStatus.PLAYING) return;
+      sessionStats.validKeystrokes += 1;
+    },
+    registerPositionSample: (time: number, position: number) => {
+      if (get().status !== GameStatus.PLAYING) return;
+      sessionStats.positionSamples.push({time, position});
+    },
+    getSessionStats: () => structuredClone(sessionStats),
+    getSnippetQueue: () => structuredClone(snippetQueue),
+  };
+});

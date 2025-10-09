@@ -2,7 +2,7 @@ import React, {memo, useEffect, useMemo} from "react";
 import useCodeHighlight from "@/features/game/hooks/useCodeHighlight";
 import {CharacterTypes, ICharacter, WhitespaceTypes} from "@/shared/types/character";
 import {isGameFinished} from "@/features/game/logic/game-logic";
-import {GameStatus} from "@/features/game/types/game-state";
+import {GameStatus} from "@/features/game/types/game-status";
 import Caret from "./caret";
 import Character from "./character";
 import {useGameStore} from "@/features/game/state/game-store";
@@ -17,7 +17,7 @@ function TypingArea(props: ITypingAreaProps) {
   const status = useGameStore((state) => state.status);
   const language = useGameStore((state) => state.language)!;
   const currentSnippet = useGameStore((state) => state.currentSnippet)!;
-  const userPosition = useGameStore((state) => state.userPosition);
+  const userPosition = useGameStore((state) => state.userPosition)!;
 
   // Handles code styling and syntax highlighting
   const {codeHighlight} = useCodeHighlight(currentSnippet.text, language.highlightAlias);

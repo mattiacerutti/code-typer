@@ -1,6 +1,6 @@
 import TypingArea from "@/features/game/components/typing-area";
 import useTyping from "@/features/game/hooks/useTyping";
-import {GameStatus} from "@/features/game/types/game-state";
+import {GameStatus} from "@/features/game/types/game-status";
 import type {ILanguage} from "@/shared/types/language";
 import {humanizeTime} from "@/features/game/utils/typing-metrics";
 import {useGameStore} from "../state/game-store";
@@ -23,9 +23,9 @@ function GameView(props: IGameViewProps) {
   const status = useGameStore((state) => state.status);
   const language = useGameStore((state) => state.language)!;
   const currentSnippet = useGameStore((state) => state.currentSnippet)!;
-  const userPosition = useGameStore((state) => state.userPosition);
-  const setParsedSnippet = useGameStore((state) => state.setParsedSnippet);
-  const setUserPosition = useGameStore((state) => state.setUserPosition);
+  const userPosition = useGameStore((state) => state.userPosition)!;
+  const updateCurrentSnippet = useGameStore((state) => state.updateCurrentSnippet);
+  const updateUserPosition = useGameStore((state) => state.updateUserPosition);
   const setStatus = useGameStore((state) => state.setStatus);
   const incrementWrongKeystroke = useGameStore((state) => state.incrementWrongKeystroke);
   const incrementValidKeystroke = useGameStore((state) => state.incrementValidKeystroke);
@@ -34,17 +34,16 @@ function GameView(props: IGameViewProps) {
     status,
     snippet: currentSnippet.parsedSnippet,
     userPosition,
-    onSnippetUpdate: setParsedSnippet,
-    onUserPositionChange: setUserPosition,
+    onSnippetUpdate: updateCurrentSnippet,
+    onUserPositionChange: updateUserPosition,
     onStartTyping: onGameStarted,
     onWrongKeystroke: incrementWrongKeystroke,
     onValidKeystroke: incrementValidKeystroke,
   });
 
   const handleSnippetFinished = useCallback(() => {
-    setStatus(GameStatus.FINISHED);
     onGameFinished();
-  }, [setStatus, onGameFinished]);
+  }, [onGameFinished]);
 
   return (
     <>
