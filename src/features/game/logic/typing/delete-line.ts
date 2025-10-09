@@ -1,13 +1,8 @@
 import {getLineStart, getPreviousLineEnd, isFirstCharacter, resetCharactersInRange} from "@/features/game/logic/typing/shared";
 import {IParsedSnippet} from "@/shared/types/snippet";
 
-export function deleteLine(
-  snippet: IParsedSnippet,
-  position: number,
-  updateParsedSnippet: (parsedSnippet: IParsedSnippet) => void,
-  updateUserPosition: (position: number) => void
-) {
-  if (position === 0) return;
+export function deleteLine(snippet: IParsedSnippet, position: number): [IParsedSnippet, number] {
+  if (position === 0) return [snippet, 0];
 
   let newPos = getLineStart(snippet, position);
 
@@ -27,6 +22,5 @@ export function deleteLine(
 
   resetCharactersInRange(snippet, newPos, position);
 
-  updateParsedSnippet(snippet);
-  updateUserPosition(newPos);
+  return [snippet, newPos];
 }

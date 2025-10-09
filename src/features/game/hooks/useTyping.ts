@@ -36,41 +36,44 @@ const useTyping = (props: IUseTypingProps) => {
 
   const handleKeyShortcut = useCallback(
     (event: KeyboardEvent) => {
-      if (event.ctrlKey || event.metaKey) {
-        if (event.key === "Backspace") {
-          deleteLine(snippet, userPosition, onSnippetUpdate, onUserPositionChange);
-        }
+      let updatedSnippet = snippet;
+      let newPosition = userPosition;
+
+      if ((event.ctrlKey || event.metaKey) && event.key === "Backspace") {
+        [updatedSnippet, newPosition] = deleteLine(snippet, userPosition);
       } else if (event.altKey && event.key === "Backspace") {
-        deleteWord(snippet, userPosition, onSnippetUpdate, onUserPositionChange);
+        [updatedSnippet, newPosition] = deleteWord(snippet, userPosition);
       }
+
+      if (updatedSnippet !== snippet) onSnippetUpdate(updatedSnippet);
+      if (newPosition !== userPosition) onUserPositionChange(newPosition);
     },
     [snippet, userPosition, onSnippetUpdate, onUserPositionChange]
   );
 
   const handleKeyPress = useCallback(
     (event: KeyboardEvent) => {
-      const isShortcut = hasModifierKey(event) && isAValidShortcutKey(event);
-      if (isShortcut) {
+      if (hasModifierKey(event) && isAValidShortcutKey(event)) {
         handleKeyShortcut(event);
         return;
       }
 
-      if (hasModifierKey(event) && !event.altKey) {
-        return;
+      // If its a modifier key different from alt (since it could produce valid characters) we ignore it
+      if (hasModifierKey(event) && !event.altKey) return;
+      if (!isAValidKey(event)) return;
+
+      let updatedSnippet = snippet;
+      let newPosition = userPosition;
+
+      if (event.key === "Backspace") {
+        [updatedSnippet, newPosition] = deleteCharacter(snippet, userPosition);
+      } else {
+        if (status === GameStatus.READY) onStartTyping();
+        [updatedSnippet, newPosition] = addCharacter(snippet, userPosition, event.key, registerKeyStroke);
       }
 
-      if (isAValidKey(event)) {
-        if (event.key === "Backspace") {
-          deleteCharacter(snippet, userPosition, onSnippetUpdate, onUserPositionChange);
-          return;
-        }
-
-        if (status === GameStatus.READY) {
-          onStartTyping();
-        }
-
-        addCharacter(snippet, userPosition, event.key, onSnippetUpdate, onUserPositionChange, registerKeyStroke);
-      }
+      if (updatedSnippet !== snippet) onSnippetUpdate(updatedSnippet);
+      if (newPosition !== userPosition) onUserPositionChange(newPosition);
     },
     [status, snippet, userPosition, onSnippetUpdate, onUserPositionChange, registerKeyStroke, handleKeyShortcut, onStartTyping]
   );

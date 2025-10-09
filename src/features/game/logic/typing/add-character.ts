@@ -2,14 +2,14 @@ import {getChar, getPreviousChar, hasOnlyWhitespacesBefore, setCharacterState} f
 import {CharacterState, CharacterTypes} from "@/shared/types/character";
 import {IParsedSnippet} from "@/shared/types/snippet";
 
-function incrementUserPosition(snippet: IParsedSnippet, position: number, updateUserPosition: (position: number) => void, isPressedKeyCorrect: boolean): number {
+function incrementUserPosition(snippet: IParsedSnippet, position: number, isPressedKeyCorrect: boolean): number {
   const newChar = getChar(snippet, position + 1);
 
   if (
     (newChar.type === CharacterTypes.Whitespace && hasOnlyWhitespacesBefore(snippet, position + 1)) ||
     (newChar.type === CharacterTypes.AutoClosing && !newChar.isOpening && (isPressedKeyCorrect || snippet[newChar.pairedChar].state === CharacterState.Right))
   ) {
-    return incrementUserPosition(snippet, position + 1, updateUserPosition, isPressedKeyCorrect);
+    return incrementUserPosition(snippet, position + 1, isPressedKeyCorrect);
   }
 
   return position + 1;
@@ -26,20 +26,14 @@ function getSignificantPreviousChar(snippet: IParsedSnippet, position: number): 
   return prevChar;
 }
 
-export function addCharacter(
-  snippet: IParsedSnippet,
-  position: number,
-  pressedKey: string,
-  updateParsedSnippet: (parsedSnippet: IParsedSnippet) => void,
-  updateUserPosition: (position: number) => void,
-  registerKeyStroke: (isCorrect: boolean) => void
-) {
+export function addCharacter(snippet: IParsedSnippet, position: number, pressedKey: string, registerKeyStroke: (isCorrect: boolean) => void): [IParsedSnippet, number] {
   const expectedChar = getChar(snippet, position);
+  if (expectedChar.value === "EOF") return [snippet, position];
 
-  if (expectedChar.value === "EOF") return;
   if (pressedKey === "Enter") {
     pressedKey = "\n";
   }
+
   let isPressedKeyCorrect = pressedKey === expectedChar.value;
 
   // If the previous character was incorrect, we also set this to incorrect no matter what.
@@ -48,7 +42,7 @@ export function addCharacter(
     isPressedKeyCorrect = false;
   }
 
-  const newPosition = incrementUserPosition(snippet, position, updateUserPosition, isPressedKeyCorrect);
+  const newPosition = incrementUserPosition(snippet, position, isPressedKeyCorrect);
 
   for (let i = position; i <= newPosition - 1; i++) {
     const char = snippet[i];
@@ -60,6 +54,5 @@ export function addCharacter(
 
   registerKeyStroke(isPressedKeyCorrect);
 
-  updateParsedSnippet(snippet);
-  updateUserPosition(newPosition);
+  return [snippet, newPosition];
 }
