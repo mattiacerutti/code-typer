@@ -1,7 +1,5 @@
+import {prisma} from "@/shared/db/prisma";
 import {ILanguage} from "@/shared/types/language";
-import {PrismaClient} from "@prisma/client";
-
-const prisma = new PrismaClient();
 
 export async function doesLanguageExist(languageId: string): Promise<boolean> {
   const language = await prisma.language.findUnique({

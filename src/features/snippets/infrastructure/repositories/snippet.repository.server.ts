@@ -1,5 +1,4 @@
-import {PrismaClient} from "@prisma/client";
-const prisma = new PrismaClient();
+import {prisma} from "@/shared/db/prisma";
 
 export async function fetchRandomFiles(languageId: string, quantity: number, alreadyFetched: string[]): Promise<string[]> {
   const alreadyFetchedList = alreadyFetched.length > 0 ? `AND "url" NOT IN (${alreadyFetched.map((_, i) => `$${i + 2}`).join(", ")})` : "";
