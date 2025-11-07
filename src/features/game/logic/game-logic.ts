@@ -14,7 +14,7 @@ export function isGameFinished(parsedSnippets: IParsedSnippet) {
 
 export function resetCharacters(snippet: ISnippet): ISnippet {
   return {
-    text: snippet.text,
+    rawSnippet: snippet.rawSnippet,
     parsedSnippet: snippet.parsedSnippet.map((char) => ({
       ...char,
       state: CharacterState.Default,

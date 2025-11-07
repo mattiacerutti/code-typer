@@ -4,7 +4,9 @@ import {GameStatus} from "@/features/game/types/game-status";
 import type {ILanguage} from "@/shared/types/language";
 import {humanizeTime} from "@/features/game/utils/typing-metrics";
 import {useGameStore} from "../state/game-store";
-import {useCallback} from "react";
+import {useCallback, useState} from "react";
+import SettingsModal from "@/features/settings/components/modal";
+import {IoSettingsSharp} from "react-icons/io5";
 
 interface IGameViewProps {
   onGameFinished: () => void;
@@ -41,47 +43,63 @@ function GameView(props: IGameViewProps) {
     onValidKeystroke: incrementValidKeystroke,
   });
 
+  const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
+
   const handleSnippetFinished = useCallback(() => {
     onGameFinished();
   }, [onGameFinished]);
 
   return (
     <>
-      <div className={`relative bottom-8 text-red-500 ${!isCapsLockOn && "opacity-0"} text-2xl font-bold`}>Caps Lock is on</div>
-      <div className="flex flex-col items-center justify-center gap-10">
-        <div className="rounded-md bg-slate-100 px-4 py-2 text-center font-medium text-slate-900">{humanizeTime(elapsedTime)}</div>
-        <TypingArea onGameFinished={handleSnippetFinished} />
-        <div className="flex flex-row content-between gap-1.5">
-          <button
-            className="rounded-md bg-slate-200 px-6 py-3 font-medium text-slate-900 hover:bg-slate-300 disabled:opacity-20"
-            onClick={resetSnippet}
-            disabled={isRefreshing || status !== GameStatus.PLAYING}
-          >
-            <svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-              <path
-                fill="currentColor"
-                d="M12 2a1 1 0 1 0 0 2a8 8 0 1 1-6.924 3.99l1.217 1.217A1 1 0 0 0 8 8.5v-4a1 1 0 0 0-1-1H3a1 1 0 0 0-.707 1.707l1.33 1.33A9.955 9.955 0 0 0 2 12c0 5.523 4.477 10 10 10s10-4.477 10-10S17.523 2 12 2"
-              />
-            </svg>
-          </button>
-          <button className="rounded-md bg-slate-200 px-6 py-3 font-medium text-slate-900 hover:bg-slate-300 disabled:opacity-20" onClick={changeSnippet} disabled={isRefreshing}>
-            {!isRefreshing ? "Change Snippet" : "Wait.."}
-          </button>
-          <select
-            disabled={isRefreshing}
-            value={language.id}
-            onChange={(event) => {
-              setStatus(GameStatus.LOADING);
-              changeLanguage(availableLanguages[event.target.value]);
-            }}
-            className="rounded-md bg-slate-200 px-6 py-3 font-medium text-slate-900 hover:bg-slate-300 disabled:opacity-20"
-          >
-            {Object.values(availableLanguages).map((availableLanguage) => (
-              <option key={availableLanguage.id} value={availableLanguage.id}>
-                {availableLanguage.name}
-              </option>
-            ))}
-          </select>
+      <SettingsModal isOpen={isSettingsModalOpen} closeModal={() => setIsSettingsModalOpen(false)} />
+      <div className="flex flex-col items-center justify-center">
+        <div className={`relative bottom-8 text-red-500 ${!isCapsLockOn && "opacity-0"} text-2xl font-bold`}>Caps Lock is on</div>
+        <div className="flex flex-col items-center justify-center gap-10">
+          <div className="flex w-full flex-row">
+            <div className="flex h-full flex-1 justify-center">
+              <div className="h-fit w-fit min-w-20 rounded-md bg-slate-100 px-4 py-2 text-center align-middle font-medium text-slate-900">{humanizeTime(elapsedTime)}</div>
+            </div>
+            <button
+              className="aspect-square h-auto w-fit rounded-md bg-slate-100 px-4 py-2 text-center font-medium text-slate-900 enabled:hover:bg-slate-200 disabled:cursor-not-allowed disabled:opacity-20"
+              onClick={() => setIsSettingsModalOpen(true)}
+              disabled={status !== GameStatus.READY}
+            >
+              <IoSettingsSharp />
+            </button>
+          </div>
+          <TypingArea onGameFinished={handleSnippetFinished} />
+          <div className="flex flex-row content-between gap-1.5">
+            <button
+              className="rounded-md bg-slate-200 px-6 py-3 font-medium text-slate-900 hover:bg-slate-300 disabled:opacity-20"
+              onClick={resetSnippet}
+              disabled={isRefreshing || status !== GameStatus.PLAYING}
+            >
+              <svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path
+                  fill="currentColor"
+                  d="M12 2a1 1 0 1 0 0 2a8 8 0 1 1-6.924 3.99l1.217 1.217A1 1 0 0 0 8 8.5v-4a1 1 0 0 0-1-1H3a1 1 0 0 0-.707 1.707l1.33 1.33A9.955 9.955 0 0 0 2 12c0 5.523 4.477 10 10 10s10-4.477 10-10S17.523 2 12 2"
+                />
+              </svg>
+            </button>
+            <button className="rounded-md bg-slate-200 px-6 py-3 font-medium text-slate-900 hover:bg-slate-300 disabled:opacity-20" onClick={changeSnippet} disabled={isRefreshing}>
+              {!isRefreshing ? "Change Snippet" : "Wait.."}
+            </button>
+            <select
+              disabled={isRefreshing}
+              value={language.id}
+              onChange={(event) => {
+                setStatus(GameStatus.LOADING);
+                changeLanguage(availableLanguages[event.target.value]);
+              }}
+              className="rounded-md bg-slate-200 px-6 py-3 font-medium text-slate-900 hover:bg-slate-300 disabled:opacity-20"
+            >
+              {Object.values(availableLanguages).map((availableLanguage) => (
+                <option key={availableLanguage.id} value={availableLanguage.id}>
+                  {availableLanguage.name}
+                </option>
+              ))}
+            </select>
+          </div>
         </div>
       </div>
     </>

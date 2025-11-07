@@ -20,7 +20,7 @@ function TypingArea(props: ITypingAreaProps) {
   const userPosition = useGameStore((state) => state.userPosition)!;
 
   // Handles code styling and syntax highlighting
-  const {codeHighlight} = useCodeHighlight(currentSnippet.text, language.highlightAlias);
+  const {codeHighlight} = useCodeHighlight(currentSnippet.rawSnippet.content, language.highlightAlias);
 
   // Collection of all character refs, used to know where every character is at and to update caret position
   const charRefs = useMemo(() => currentSnippet.parsedSnippet.map(() => React.createRef<HTMLSpanElement>()), [currentSnippet.parsedSnippet]);

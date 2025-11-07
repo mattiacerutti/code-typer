@@ -106,7 +106,7 @@ export const useGameStore = create<IGameStoreState>((set, get) => {
       set({
         status: GameStatus.PLAYING,
         currentSnippet: {
-          text: currentSnippet.text,
+          rawSnippet: currentSnippet.rawSnippet,
           parsedSnippet: newSnippet,
         },
       });

@@ -1,4 +1,3 @@
-import {SHOULD_PRESERVE_CLOSING_CHAR_WHEN_DELETING} from "@/features/game/config/game";
 import {CharacterState, CharacterTypes, ICharacter} from "@/shared/types/character";
 import {IParsedSnippet} from "@/shared/types/snippet";
 import {getPreviousChar, hasOnlyWhitespacesBefore, resetCharactersInRange} from "@/features/game/logic/typing/shared";
@@ -8,7 +7,7 @@ function decrementUserPosition(snippet: IParsedSnippet, position: number): numbe
   const prevChar = getPreviousChar(snippet, position) as ICharacter;
   if (
     (prevChar.type === CharacterTypes.Whitespace && hasOnlyWhitespacesBefore(snippet, position - 1)) ||
-    (prevChar.type === CharacterTypes.AutoClosing && !prevChar.isOpening && SHOULD_PRESERVE_CLOSING_CHAR_WHEN_DELETING && prevChar.state === CharacterState.Right)
+    (prevChar.type === CharacterTypes.AutoClosing && !prevChar.isOpening && prevChar.state === CharacterState.Right)
   ) {
     return decrementUserPosition(snippet, position - 1);
   }

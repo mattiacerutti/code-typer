@@ -1,5 +1,4 @@
 import {CharacterState, CharacterTypes, ICharacter, WhitespaceTypes} from "@/shared/types/character";
-import {SHOULD_PRESERVE_CLOSING_CHAR_WHEN_DELETING} from "@/features/game/config/game";
 import {IParsedSnippet} from "@/shared/types/snippet";
 
 export function getChar(snippet: IParsedSnippet, position: number): ICharacter {
@@ -83,7 +82,7 @@ export function getPreviousLineEnd(snippet: IParsedSnippet, position: number): n
 export function resetCharactersInRange(snippet: IParsedSnippet, start: number, end: number) {
   for (let i = start; i <= end; i++) {
     const char = snippet[i];
-    if (char.type === CharacterTypes.AutoClosing && !char.isOpening && SHOULD_PRESERVE_CLOSING_CHAR_WHEN_DELETING && char.state === CharacterState.Right) {
+    if (char.type === CharacterTypes.AutoClosing && !char.isOpening && char.state === CharacterState.Right) {
       continue;
     }
     setCharacterState(snippet, i, CharacterState.Default);

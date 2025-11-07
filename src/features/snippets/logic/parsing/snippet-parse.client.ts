@@ -51,16 +51,19 @@ function createAutoClosingMaps(snippet: ISnippet): {autoClosingMap: Record<numbe
   return {autoClosingMap, reverseAutoClosingMap};
 }
 
-export const parseSnippet = (snippet: ISnippet): IParsedSnippet | null => {
+export const parseSnippet = (snippet: ISnippet, autoClosingEnabled: boolean): IParsedSnippet | null => {
   const characters: string[] = snippet.content.split("");
 
   let autoClosingMap: Record<number, number> = {};
   let reverseAutoClosingMap: Record<number, number> = {};
-  try {
-    ({autoClosingMap, reverseAutoClosingMap} = createAutoClosingMaps(snippet));
-  } catch (error) {
-    console.warn("Error creating auto closing maps", error, "Snippet: ", snippet.content);
-    return null;
+
+  if (autoClosingEnabled) {
+    try {
+      ({autoClosingMap, reverseAutoClosingMap} = createAutoClosingMaps(snippet));
+    } catch (error) {
+      console.warn("Error creating auto closing maps", error, "Snippet: ", snippet.content);
+      return null;
+    }
   }
 
   const parsedText: IParsedSnippet = characters.map((char: string, index: number) => {
