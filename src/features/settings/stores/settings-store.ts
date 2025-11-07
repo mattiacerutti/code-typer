@@ -1,20 +1,21 @@
 import {ILanguage} from "@/shared/types/language";
 import {create} from "zustand";
 import {persist} from "zustand/middleware";
+import {AutoClosingMode} from "@/features/settings/types/autoclosing-mode";
 
 interface ISettingsStoreState {
-  autoClosingEnabled: boolean;
+  autoClosingMode: AutoClosingMode;
   selectedLanguage: ILanguage | null;
-  setAutoClosing: (enabled: boolean) => void;
+  setAutoClosing: (mode: AutoClosingMode) => void;
   setSelectedLanguage: (language: ILanguage) => void;
 }
 
 const useSettingsStore = create(
   persist<ISettingsStoreState>(
     (set) => ({
-      autoClosingEnabled: true,
+      autoClosingMode: AutoClosingMode.PARTIAL,
       selectedLanguage: null,
-      setAutoClosing: (enabled: boolean) => set({autoClosingEnabled: enabled}),
+      setAutoClosing: (mode: AutoClosingMode) => set({autoClosingMode: mode}),
       setSelectedLanguage: (language: ILanguage) => set({selectedLanguage: language}),
     }),
     {name: "settings-storage"}

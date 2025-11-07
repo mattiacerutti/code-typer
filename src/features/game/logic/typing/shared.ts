@@ -79,10 +79,10 @@ export function getPreviousLineEnd(snippet: IParsedSnippet, position: number): n
   return undefined;
 }
 
-export function resetCharactersInRange(snippet: IParsedSnippet, start: number, end: number) {
+export function resetCharactersInRange(snippet: IParsedSnippet, start: number, end: number, ignoreAutoClosingRight: boolean) {
   for (let i = start; i <= end; i++) {
     const char = snippet[i];
-    if (char.type === CharacterTypes.AutoClosing && !char.isOpening && char.state === CharacterState.Right) {
+    if (ignoreAutoClosingRight && char.type === CharacterTypes.AutoClosing && !char.isOpening && char.state === CharacterState.Right) {
       continue;
     }
     setCharacterState(snippet, i, CharacterState.Default);

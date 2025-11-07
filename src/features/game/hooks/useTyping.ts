@@ -6,11 +6,14 @@ import {deleteWord} from "@/features/game/logic/typing/delete-word";
 import {deleteLine} from "@/features/game/logic/typing/delete-line";
 import {GameStatus} from "@/features/game/types/game-status";
 import type {IParsedSnippet} from "@/shared/types/snippet";
+import {AutoClosingMode} from "@/features/settings/types/autoclosing-mode";
+import {skipCharacter} from "../logic/typing/skip-character";
 
 interface IUseTypingProps {
   status: GameStatus;
   snippet: IParsedSnippet;
   userPosition: number;
+  autoClosingMode: AutoClosingMode;
   onSnippetUpdate: (parsedSnippet: IParsedSnippet) => void;
   onUserPositionChange: (position: number) => void;
   onStartTyping: () => void;
@@ -19,7 +22,7 @@ interface IUseTypingProps {
 }
 
 const useTyping = (props: IUseTypingProps) => {
-  const {status, snippet, userPosition, onSnippetUpdate, onUserPositionChange, onStartTyping, onWrongKeystroke, onValidKeystroke} = props;
+  const {status, snippet, userPosition, autoClosingMode, onSnippetUpdate, onUserPositionChange, onStartTyping, onWrongKeystroke, onValidKeystroke} = props;
 
   const [isCapsLockOn, setIsCapsLockOn] = useState(false);
 
@@ -40,15 +43,15 @@ const useTyping = (props: IUseTypingProps) => {
       let newPosition = userPosition;
 
       if ((event.ctrlKey || event.metaKey) && event.key === "Backspace") {
-        [updatedSnippet, newPosition] = deleteLine(snippet, userPosition);
+        [updatedSnippet, newPosition] = deleteLine(snippet, userPosition, autoClosingMode);
       } else if (event.altKey && event.key === "Backspace") {
-        [updatedSnippet, newPosition] = deleteWord(snippet, userPosition);
+        [updatedSnippet, newPosition] = deleteWord(snippet, userPosition, autoClosingMode);
       }
 
       if (updatedSnippet !== snippet) onSnippetUpdate(updatedSnippet);
       if (newPosition !== userPosition) onUserPositionChange(newPosition);
     },
-    [snippet, userPosition, onSnippetUpdate, onUserPositionChange]
+    [snippet, userPosition, onSnippetUpdate, onUserPositionChange, autoClosingMode]
   );
 
   const handleKeyPress = useCallback(
@@ -66,16 +69,18 @@ const useTyping = (props: IUseTypingProps) => {
       let newPosition = userPosition;
 
       if (event.key === "Backspace") {
-        [updatedSnippet, newPosition] = deleteCharacter(snippet, userPosition);
+        [updatedSnippet, newPosition] = deleteCharacter(snippet, userPosition, autoClosingMode);
+      } else if (event.key === "ArrowRight" && autoClosingMode === AutoClosingMode.PARTIAL) {
+        [updatedSnippet, newPosition] = skipCharacter(snippet, userPosition);
       } else {
         if (status === GameStatus.READY) onStartTyping();
-        [updatedSnippet, newPosition] = addCharacter(snippet, userPosition, event.key, registerKeyStroke);
+        [updatedSnippet, newPosition] = addCharacter(snippet, userPosition, event.key, registerKeyStroke, autoClosingMode);
       }
 
       if (updatedSnippet !== snippet) onSnippetUpdate(updatedSnippet);
       if (newPosition !== userPosition) onUserPositionChange(newPosition);
     },
-    [status, snippet, userPosition, onSnippetUpdate, onUserPositionChange, registerKeyStroke, handleKeyShortcut, onStartTyping]
+    [status, snippet, userPosition, onSnippetUpdate, onUserPositionChange, registerKeyStroke, handleKeyShortcut, onStartTyping, autoClosingMode]
   );
 
   useEffect(() => {

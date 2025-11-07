@@ -7,6 +7,7 @@ import {useGameStore} from "../state/game-store";
 import {useCallback, useState} from "react";
 import SettingsModal from "@/features/settings/components/modal";
 import {IoSettingsSharp} from "react-icons/io5";
+import useSettingsStore from "@/features/settings/stores/settings-store";
 
 interface IGameViewProps {
   onGameFinished: () => void;
@@ -36,6 +37,7 @@ function GameView(props: IGameViewProps) {
     status,
     snippet: currentSnippet.parsedSnippet,
     userPosition,
+    autoClosingMode: useSettingsStore((state) => state.autoClosingMode),
     onSnippetUpdate: updateCurrentSnippet,
     onUserPositionChange: updateUserPosition,
     onStartTyping: onGameStarted,

@@ -2,6 +2,7 @@ import {CharacterTypes, ICharacter, WhitespaceTypes} from "@/shared/types/charac
 import {getLineStart, getPreviousChar, getPreviousLineEnd, isFirstCharacter, resetCharactersInRange} from "@/features/game/logic/typing/shared";
 import {AUTO_CLOSING_CHARS} from "@/features/game/config/game";
 import {IParsedSnippet} from "@/shared/types/snippet";
+import {AutoClosingMode} from "@/features/settings/types/autoclosing-mode";
 
 const isWordSeparator = (char: ICharacter) =>
   char.value === "." ||
@@ -41,7 +42,7 @@ function getPreviousWordPosition(snippet: IParsedSnippet, position: number): num
   return position;
 }
 
-export function deleteWord(snippet: IParsedSnippet, position: number): [IParsedSnippet, number] {
+export function deleteWord(snippet: IParsedSnippet, position: number, autoClosingMode: AutoClosingMode): [IParsedSnippet, number] {
   if (position === 0) return [snippet, 0];
 
   let previousWordPosition = getPreviousWordPosition(snippet, position);
@@ -60,7 +61,7 @@ export function deleteWord(snippet: IParsedSnippet, position: number): [IParsedS
     previousWordPosition = previousLineEnd;
   }
 
-  resetCharactersInRange(snippet, previousWordPosition, position);
+  resetCharactersInRange(snippet, previousWordPosition, position, autoClosingMode === AutoClosingMode.FULL);
 
   return [snippet, previousWordPosition];
 }

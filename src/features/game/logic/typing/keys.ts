@@ -3,7 +3,7 @@ export function hasModifierKey(event: KeyboardEvent) {
 }
 
 export function isAValidKey(event: KeyboardEvent) {
-  const validExtraKeys = ["Enter", "Backspace"];
+  const validExtraKeys = ["Enter", "Backspace", "ArrowRight"];
   return event.key.length === 1 || validExtraKeys.includes(event.key);
 }
 

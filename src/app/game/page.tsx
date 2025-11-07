@@ -12,6 +12,7 @@ import GameView from "@/features/game/components/game-view";
 import EndgameView from "@/features/game/components/endgame-view";
 import type {ILanguage} from "@/shared/types/language";
 import type {ISnippet} from "@/shared/types/snippet";
+import {AutoClosingMode} from "@/features/settings/types/autoclosing-mode";
 
 function Home() {
   const status = useGameStore((state) => state.status);
@@ -25,7 +26,7 @@ function Home() {
   const registerPositionSample = useGameStore((state) => state.registerPositionSample);
   const getSnippetQueue = useGameStore((state) => state.getSnippetQueue);
 
-  const autoClosingEnabled = useSettingsStore((state) => state.autoClosingEnabled);
+  const autoClosingMode = useSettingsStore((state) => state.autoClosingMode);
   const setSelectedLanguage = useSettingsStore((state) => state.setSelectedLanguage);
 
   const [elapsedTime, setElapsedTime] = useState(0);
@@ -54,8 +55,8 @@ function Home() {
     async (selectedLanguage: ILanguage) => {
       setSelectedLanguage(selectedLanguage);
       resetStopwatch();
-      const autoClosingEnabled = useSettingsStore.getState().autoClosingEnabled;
-      const snippets = await getRandomCodeSnippets(selectedLanguage.id, autoClosingEnabled);
+      const autoClosingMode = useSettingsStore.getState().autoClosingMode;
+      const snippets = await getRandomCodeSnippets(selectedLanguage.id, autoClosingMode !== AutoClosingMode.DISABLED);
 
       initialize(selectedLanguage, snippets);
     },
@@ -63,8 +64,8 @@ function Home() {
   );
 
   const backgroundGetSnippets = useCallback(async () => {
-    const autoClosingEnabled = useSettingsStore.getState().autoClosingEnabled;
-    const snippets = await getRandomCodeSnippets(language!.id, autoClosingEnabled);
+    const autoClosingMode = useSettingsStore.getState().autoClosingMode;
+    const snippets = await getRandomCodeSnippets(language!.id, autoClosingMode !== AutoClosingMode.DISABLED);
 
     addSnippetsToQueue(snippets);
   }, [language, addSnippetsToQueue]);
@@ -149,7 +150,7 @@ function Home() {
     resetStopwatch();
 
     const reparsedSnippets = snippetsToReparse
-      .map((snippet) => buildClientSnippet(snippet.rawSnippet, autoClosingEnabled))
+      .map((snippet) => buildClientSnippet(snippet.rawSnippet, autoClosingMode !== AutoClosingMode.DISABLED))
       .filter((snippet): snippet is ISnippet => snippet !== null);
 
     if (reparsedSnippets.length === 0) {
@@ -158,11 +159,11 @@ function Home() {
     }
 
     initialize(activeLanguage, reparsedSnippets);
-  }, [autoClosingEnabled, initialize, resetStopwatch, setSnippets, setStatus]);
+  }, [autoClosingMode, initialize, resetStopwatch, setSnippets, setStatus]);
 
   useEffect(() => {
     reparseExistingSnippets();
-  }, [autoClosingEnabled, reparseExistingSnippets]);
+  }, [autoClosingMode, reparseExistingSnippets]);
 
   if (status === GameStatus.FINISHED && currentSnippet) {
     return <EndgameView handleChangeSnippet={handleChangeSnippet} handleRetrySnippet={resetSnippet} />;
