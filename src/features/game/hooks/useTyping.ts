@@ -7,7 +7,6 @@ import {deleteLine} from "@/features/game/logic/typing/delete-line";
 import {GameStatus} from "@/features/game/types/game-status";
 import type {IParsedSnippet} from "@/shared/types/snippet";
 import {AutoClosingMode} from "@/features/settings/types/autoclosing-mode";
-import {skipCharacter} from "../logic/typing/skip-character";
 
 interface IUseTypingProps {
   status: GameStatus;
@@ -70,8 +69,6 @@ const useTyping = (props: IUseTypingProps) => {
 
       if (event.key === "Backspace") {
         [updatedSnippet, newPosition] = deleteCharacter(snippet, userPosition, autoClosingMode);
-      } else if (event.key === "ArrowRight" && autoClosingMode === AutoClosingMode.PARTIAL) {
-        [updatedSnippet, newPosition] = skipCharacter(snippet, userPosition);
       } else {
         if (status === GameStatus.READY) onStartTyping();
         [updatedSnippet, newPosition] = addCharacter(snippet, userPosition, event.key, registerKeyStroke, autoClosingMode);

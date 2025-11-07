@@ -46,6 +46,14 @@ export function addCharacter(
 
   let isPressedKeyCorrect = pressedKey === expectedChar.value;
 
+  // Lets the user skip over auto-closing characters with the arrow when Auto-Closing Mode is set to Partial.
+  if (pressedKey === "ArrowRight") {
+    if (autoClosingMode !== AutoClosingMode.PARTIAL || expectedChar.type !== CharacterTypes.AutoClosing || expectedChar.isOpening || expectedChar.state !== CharacterState.Right) {
+      return [snippet, position];
+    }
+    isPressedKeyCorrect = true;
+  }
+
   // If the previous character was incorrect, we also set this to incorrect no matter what.
   const prevChar = getSignificantPreviousChar(snippet, position, autoClosingMode);
   if (prevChar && prevChar.state === CharacterState.Wrong) {
