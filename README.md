@@ -30,4 +30,4 @@ Currently you can toggle between three different modes for the auto-closing.
 
 ## 📄 License
 
-MIT — feel free to fork, remix, or ship your own flavor.
+[MIT](https://github.com/mattiacerutti/code-typer/blob/main/LICENSE) — feel free to fork, remix, or ship your own flavor.
