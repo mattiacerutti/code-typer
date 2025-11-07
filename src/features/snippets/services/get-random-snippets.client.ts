@@ -9,12 +9,10 @@ export const buildClientSnippet = (rawSnippet: IServerSnippet, autoClosingEnable
     return null;
   }
 
-  return {text: rawSnippet.content, parsedSnippet, rawSnippet};
+  return {parsedSnippet, rawSnippet};
 };
 
 export const getRandomCodeSnippets = async (languageId: string, autoClosingEnabled: boolean): Promise<IClientSnippet[]> => {
   const rawSnippets = await fetchRandomSnippets(languageId);
-  return rawSnippets
-    .map((rawSnippet) => buildClientSnippet(rawSnippet, autoClosingEnabled))
-    .filter((snippet): snippet is IClientSnippet => snippet !== null);
+  return rawSnippets.map((rawSnippet) => buildClientSnippet(rawSnippet, autoClosingEnabled)).filter((snippet): snippet is IClientSnippet => snippet !== null);
 };
