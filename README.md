@@ -1,4 +1,9 @@
-# ⌨️ Code Typer
+<div align="center">
+<img width="256" alt="VSCord Logo" src="src/app/favicon.ico" />
+<!-- Icon -->
+</div>
+
+# Code Typer
 
 Type actual code, not lorem ipsum. Code Typer features **10k+ real snippets** across **8 languages** (JS, TS, C, C++, C#, Java, Python, Lua) and lets you practice **real-world code** with brackets, quotes, tabs, and all the little characters that usually ruin your flow.
 
@@ -30,4 +35,4 @@ Currently you can toggle between three different modes for the auto-closing.
 
 ## 📄 License
 
-[MIT](https://github.com/mattiacerutti/code-typer/blob/main/LICENSE) — feel free to fork, remix, or ship your own flavor.
+This project is licensed under the MIT License. See the [LICENSE](https://github.com/mattiacerutti/code-typer/blob/main/LICENSE) file for details.
