@@ -1,7 +1,24 @@
 import React from "react";
+import Link from "next/link";
+import {FaGithub} from "react-icons/fa";
 
 function GameLayout({children}: {children: React.ReactNode}) {
-  return <div className="flex h-screen w-screen flex-col items-center justify-center">{children}</div>;
+  return (
+    <div className="flex min-h-screen w-screen flex-col">
+      <main className="flex flex-1 flex-col items-center justify-center">{children}</main>
+      <footer className="flex items-center justify-center gap-2 py-4 text-sm text-slate-500">
+        <Link
+          href="https://github.com/mattiacerutti/code-typer"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex items-center gap-2 hover:text-slate-900"
+        >
+          <FaGithub className="text-lg" />
+          <span>GitHub</span>
+        </Link>
+      </footer>
+    </div>
+  );
 }
 
 export default GameLayout;
