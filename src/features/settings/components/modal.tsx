@@ -17,7 +17,7 @@ function SettingsModal(props: ISettingsModalProps) {
   if (!isOpen) return null;
 
   return (
-    <div className="absolute z-100 flex h-screen w-screen items-center justify-center bg-black/60" onClick={closeModal}>
+    <div className="absolute inset-0 z-1000 flex items-center justify-center bg-black/60" onClick={closeModal}>
       <div className="relative flex flex-col gap-4 rounded-md bg-white px-6 py-3 font-medium text-slate-900" onClick={(e) => e.stopPropagation()}>
         <div className="flex justify-between">
           <h2 className="text-2xl font-bold">Settings</h2>
