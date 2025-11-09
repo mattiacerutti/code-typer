@@ -49,7 +49,7 @@ function Home() {
   const [isNextButtonLocked, setIsNextButtonLocked] = useState(false);
 
   const backgroundFetchPromise = useRef<Promise<void> | null>(null);
-  const availableLanguages = useRef<{[key: string]: ILanguage} | null>(null);
+  const [availableLanguages, setAvailableLanguages] = useState<{[key: string]: ILanguage} | null>(null);
 
   const setSnippets = useCallback(
     async (selectedLanguage: ILanguage) => {
@@ -64,13 +64,14 @@ function Home() {
   );
 
   const backgroundGetSnippets = useCallback(async () => {
+    if (!language) return;
     const autoClosingMode = useSettingsStore.getState().autoClosingMode;
     const snippets = await getRandomCodeSnippets(language!.id, autoClosingMode !== AutoClosingMode.DISABLED);
 
     addSnippetsToQueue(snippets);
   }, [language, addSnippetsToQueue]);
 
-  const goToNextSnippetWithPrefetch = async () => {
+  const goToNextSnippetWithPrefetch = useCallback(async () => {
     if (status !== GameStatus.PLAYING && status !== GameStatus.READY && status !== GameStatus.FINISHED) return;
 
     const snippetQueue = getSnippetQueue();
@@ -101,7 +102,7 @@ function Home() {
     setTimeout(() => {
       setIsNextButtonLocked(false);
     }, remainingTime);
-  };
+  }, [status, language, getSnippetQueue, setStatus, setSnippets, backgroundGetSnippets, goToNextSnippet]);
 
   const resetSnippet = () => {
     resetStopwatch();
@@ -127,7 +128,7 @@ function Home() {
   useEffect(() => {
     const initializeGame = async () => {
       const languages = await fetchLanguages();
-      availableLanguages.current = languages;
+      setAvailableLanguages(languages);
 
       const selectedLanguage = useSettingsStore.getState().selectedLanguage;
 
@@ -169,7 +170,7 @@ function Home() {
     return <EndgameView handleChangeSnippet={handleChangeSnippet} handleRetrySnippet={resetSnippet} />;
   }
 
-  if (status === GameStatus.LOADING || !availableLanguages.current || !currentSnippet || !language) {
+  if (status === GameStatus.LOADING || !availableLanguages || !currentSnippet || !language) {
     return <div>Loading...</div>;
   }
 
@@ -181,7 +182,7 @@ function Home() {
       resetSnippet={resetSnippet}
       changeLanguage={setSnippets}
       isRefreshing={isNextButtonLocked}
-      availableLanguages={availableLanguages.current}
+      availableLanguages={availableLanguages}
       elapsedTime={elapsedTime}
     />
   );

@@ -7,27 +7,24 @@ interface ICaretProps {
 
 function Caret(props: ICaretProps) {
   const {charRefs, userPosition} = props;
-  const [caretPosition, setCaretPosition] = useState({top: 0, left: 0});
-  const [blinking, setBlinking] = useState(true);
+  const [blinking, setBlinking] = useState(false);
 
   useEffect(() => {
     const blinkingTimeout = setTimeout(() => {
       setBlinking(true);
     }, 500);
 
-    setBlinking(false);
+    return () => {
+      setBlinking(false);
+      clearTimeout(blinkingTimeout);
+    };
+  }, [userPosition]);
 
-    return () => clearTimeout(blinkingTimeout);
-  }, [caretPosition]);
-
-  useEffect(() => {
-    const charElement = charRefs[userPosition].current;
-    if (charElement) {
-      const {offsetTop, offsetLeft} = charElement;
-      setCaretPosition({top: offsetTop, left: offsetLeft});
-    }
-  }, [userPosition, charRefs]);
-
+  const ref = charRefs[userPosition]?.current;
+  const caretPosition = {
+    top: ref?.offsetTop ?? 0,
+    left: ref?.offsetLeft ?? 0,
+  };
   return (
     <div
       className={`blinking-cursor ${blinking && "blinking-caret"}`}
