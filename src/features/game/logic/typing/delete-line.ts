@@ -21,7 +21,7 @@ export function deleteLine(snippet: IParsedSnippet, position: number, autoClosin
     newPos = previousLineEnd;
   }
 
-  resetCharactersInRange(snippet, newPos, position, autoClosingMode === AutoClosingMode.FULL);
+  const updatedSnippet = resetCharactersInRange(snippet, newPos, position, autoClosingMode === AutoClosingMode.FULL);
 
-  return [snippet, newPos];
+  return [updatedSnippet, newPos];
 }

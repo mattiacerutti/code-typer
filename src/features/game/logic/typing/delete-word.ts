@@ -61,7 +61,7 @@ export function deleteWord(snippet: IParsedSnippet, position: number, autoClosin
     previousWordPosition = previousLineEnd;
   }
 
-  resetCharactersInRange(snippet, previousWordPosition, position, autoClosingMode === AutoClosingMode.FULL);
+  const updatedSnippet = resetCharactersInRange(snippet, previousWordPosition, position, autoClosingMode === AutoClosingMode.FULL);
 
-  return [snippet, previousWordPosition];
+  return [updatedSnippet, previousWordPosition];
 }
