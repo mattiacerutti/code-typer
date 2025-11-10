@@ -1,24 +1,23 @@
-import {ICharacter, CharacterState, WhitespaceTypes} from "@/shared/types/character";
-import {getCharacterText, getCharacterClasses} from "@/features/game/utils/character";
+import {CharacterState, WhitespaceTypes} from "@/shared/types/character";
+import React from "react";
 
 interface ICharacterProps {
-  char: ICharacter;
-  charHighlighting: string | null;
+  value: string;
+  state: CharacterState;
+  elementText: string;
+  elementClasses: string;
   isSelected: boolean;
   isInvisible: boolean;
 }
 
 function Character(props: ICharacterProps & {ref: React.RefObject<HTMLSpanElement | null>}) {
-  const {char, charHighlighting, ref, isSelected, isInvisible} = props;
+  const {value, state, elementText, elementClasses, isSelected, isInvisible, ref} = props;
 
-  const elementClasses = getCharacterClasses(char, charHighlighting);
-  const elementText = getCharacterText(char);
-
-  const hasOpacity = !isInvisible && !(char.value === WhitespaceTypes.NewLine && !isSelected && char.state !== CharacterState.Wrong);
+  const hasOpacity = !isInvisible && !(value === WhitespaceTypes.NewLine && !isSelected && state !== CharacterState.Wrong);
 
   const spanStyle = {
-    fontSize: char.value === WhitespaceTypes.NewLine ? "1rem" : "",
-    fontWeight: char.value === WhitespaceTypes.NewLine ? "bold" : "",
+    fontSize: value === WhitespaceTypes.NewLine ? "1rem" : undefined,
+    fontWeight: value === WhitespaceTypes.NewLine ? "bold" : undefined,
     opacity: hasOpacity ? 1 : 0,
   };
 
@@ -29,4 +28,4 @@ function Character(props: ICharacterProps & {ref: React.RefObject<HTMLSpanElemen
   );
 }
 
-export default Character;
+export default React.memo(Character);

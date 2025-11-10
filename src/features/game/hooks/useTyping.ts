@@ -1,4 +1,4 @@
-import {useCallback, useEffect, useState} from "react";
+import {useEffect, useState} from "react";
 import {hasModifierKey, isAValidKey, isAValidShortcutKey} from "@/features/game/logic/typing/keys";
 import {deleteCharacter} from "@/features/game/logic/typing/delete-character";
 import {addCharacter} from "@/features/game/logic/typing/add-character";
@@ -25,60 +25,51 @@ const useTyping = (props: IUseTypingProps) => {
 
   const [isCapsLockOn, setIsCapsLockOn] = useState(false);
 
-  const registerKeyStroke = useCallback(
-    (isCorrect: boolean) => {
-      if (!isCorrect) {
-        onWrongKeystroke();
-        return;
-      }
-      onValidKeystroke();
-    },
-    [onWrongKeystroke, onValidKeystroke]
-  );
+  const registerKeyStroke = (isCorrect: boolean) => {
+    if (!isCorrect) {
+      onWrongKeystroke();
+      return;
+    }
+    onValidKeystroke();
+  };
 
-  const handleKeyShortcut = useCallback(
-    (event: KeyboardEvent) => {
-      let updatedSnippet = snippet;
-      let newPosition = userPosition;
+  const handleKeyShortcut = (event: KeyboardEvent) => {
+    let updatedSnippet = snippet;
+    let newPosition = userPosition;
 
-      if ((event.ctrlKey || event.metaKey) && event.key === "Backspace") {
-        [updatedSnippet, newPosition] = deleteLine(snippet, userPosition, autoClosingMode);
-      } else if (event.altKey && event.key === "Backspace") {
-        [updatedSnippet, newPosition] = deleteWord(snippet, userPosition, autoClosingMode);
-      }
+    if ((event.ctrlKey || event.metaKey) && event.key === "Backspace") {
+      [updatedSnippet, newPosition] = deleteLine(snippet, userPosition, autoClosingMode);
+    } else if (event.altKey && event.key === "Backspace") {
+      [updatedSnippet, newPosition] = deleteWord(snippet, userPosition, autoClosingMode);
+    }
 
-      if (updatedSnippet !== snippet) onSnippetUpdate(updatedSnippet);
-      if (newPosition !== userPosition) onUserPositionChange(newPosition);
-    },
-    [snippet, userPosition, onSnippetUpdate, onUserPositionChange, autoClosingMode]
-  );
+    if (updatedSnippet !== snippet) onSnippetUpdate(updatedSnippet);
+    if (newPosition !== userPosition) onUserPositionChange(newPosition);
+  };
 
-  const handleKeyPress = useCallback(
-    (event: KeyboardEvent) => {
-      if (hasModifierKey(event) && isAValidShortcutKey(event)) {
-        handleKeyShortcut(event);
-        return;
-      }
+  const handleKeyPress = (event: KeyboardEvent) => {
+    if (hasModifierKey(event) && isAValidShortcutKey(event)) {
+      handleKeyShortcut(event);
+      return;
+    }
 
-      // If its a modifier key different from alt (since it could produce valid characters) we ignore it
-      if (hasModifierKey(event) && !event.altKey) return;
-      if (!isAValidKey(event)) return;
+    // If its a modifier key different from alt (since it could produce valid characters) we ignore it
+    if (hasModifierKey(event) && !event.altKey) return;
+    if (!isAValidKey(event)) return;
 
-      let updatedSnippet = snippet;
-      let newPosition = userPosition;
+    let updatedSnippet = snippet;
+    let newPosition = userPosition;
 
-      if (event.key === "Backspace") {
-        [updatedSnippet, newPosition] = deleteCharacter(snippet, userPosition, autoClosingMode);
-      } else {
-        if (status === GameStatus.READY) onStartTyping();
-        [updatedSnippet, newPosition] = addCharacter(snippet, userPosition, event.key, registerKeyStroke, autoClosingMode);
-      }
+    if (event.key === "Backspace") {
+      [updatedSnippet, newPosition] = deleteCharacter(snippet, userPosition, autoClosingMode);
+    } else {
+      if (status === GameStatus.READY) onStartTyping();
+      [updatedSnippet, newPosition] = addCharacter(snippet, userPosition, event.key, registerKeyStroke, autoClosingMode);
+    }
 
-      if (updatedSnippet !== snippet) onSnippetUpdate(updatedSnippet);
-      if (newPosition !== userPosition) onUserPositionChange(newPosition);
-    },
-    [status, snippet, userPosition, onSnippetUpdate, onUserPositionChange, registerKeyStroke, handleKeyShortcut, onStartTyping, autoClosingMode]
-  );
+    if (updatedSnippet !== snippet) onSnippetUpdate(updatedSnippet);
+    if (newPosition !== userPosition) onUserPositionChange(newPosition);
+  };
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {

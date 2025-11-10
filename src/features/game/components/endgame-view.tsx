@@ -1,6 +1,5 @@
 import {calculateAccuracy, calculateWPM, humanizeTime, normalizePositionSamples} from "@/features/game/utils/typing-metrics";
 import {useGameStore} from "@/features/game/state/game-store";
-import {useMemo} from "react";
 import {LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer} from "recharts";
 
 interface IEndgameViewProps {
@@ -12,15 +11,13 @@ function EndgameView(props: IEndgameViewProps) {
   const {handleRetrySnippet, handleChangeSnippet} = props;
 
   const currentSnippet = useGameStore((state) => state.currentSnippet)!;
-  const {validKeystrokes, wrongKeystrokes, positionSamples} = useMemo(() => useGameStore.getState().getSessionStats(), []);
+  const {validKeystrokes, wrongKeystrokes, positionSamples} = useGameStore.getState().getSessionStats();
 
-  const normalizedPositionSamples = useMemo(() => normalizePositionSamples(positionSamples, currentSnippet.parsedSnippet), [positionSamples, currentSnippet]);
-  const wpmSamples = useMemo(() => {
-    return normalizedPositionSamples.map((sample) => ({
-      time: humanizeTime(sample.time),
-      wpm: calculateWPM(sample.time, sample.position),
-    }));
-  }, [normalizedPositionSamples]);
+  const normalizedPositionSamples = normalizePositionSamples(positionSamples, currentSnippet.parsedSnippet);
+  const wpmSamples = normalizedPositionSamples.map((sample) => ({
+    time: humanizeTime(sample.time),
+    wpm: calculateWPM(sample.time, sample.position),
+  }));
 
   const lastSample = wpmSamples.at(-1)!;
 

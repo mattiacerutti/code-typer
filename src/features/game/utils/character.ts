@@ -16,7 +16,7 @@ export function getCharacterText(char: ICharacter): string {
   }
 }
 
-export function getCharacterClasses(char: ICharacter, charHighlighting: string | null): string {
+export function getCharacterClasses(char: ICharacter, charHighlighting?: string): string {
   if (char.state === CharacterState.Wrong) {
     return "character-wrong";
   }

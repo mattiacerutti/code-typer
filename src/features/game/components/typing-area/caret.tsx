@@ -1,32 +1,29 @@
-import {useState, useEffect} from "react";
+import {useState, useEffect, useLayoutEffect} from "react";
 
 interface ICaretProps {
   charRefs: React.RefObject<HTMLSpanElement | null>[];
   userPosition: number;
 }
 
-function Caret(props: ICaretProps) {
-  const {charRefs, userPosition} = props;
+function Caret({charRefs, userPosition}: ICaretProps) {
+  const [blinking, setBlinking] = useState(false);
   const [caretPosition, setCaretPosition] = useState({top: 0, left: 0});
-  const [blinking, setBlinking] = useState(true);
 
   useEffect(() => {
-    const blinkingTimeout = setTimeout(() => {
-      setBlinking(true);
-    }, 500);
+    const blinkingTimeout = setTimeout(() => setBlinking(true), 500);
+    return () => {
+      setBlinking(false);
+      clearTimeout(blinkingTimeout);
+    };
+  }, [userPosition]);
 
-    setBlinking(false);
-
-    return () => clearTimeout(blinkingTimeout);
-  }, [caretPosition]);
-
-  useEffect(() => {
-    const charElement = charRefs[userPosition].current;
-    if (charElement) {
-      const {offsetTop, offsetLeft} = charElement;
+  useLayoutEffect(() => {
+    const ref = charRefs[userPosition];
+    if (ref?.current) {
+      const {offsetTop, offsetLeft} = ref.current;
       setCaretPosition({top: offsetTop, left: offsetLeft});
     }
-  }, [userPosition, charRefs]);
+  }, [charRefs, userPosition]);
 
   return (
     <div
@@ -41,7 +38,8 @@ function Caret(props: ICaretProps) {
         borderRadius: "10px",
         transition: "all 0.15s ease",
       }}
-    ></div>
+    />
   );
 }
+
 export default Caret;

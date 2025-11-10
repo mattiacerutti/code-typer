@@ -2,6 +2,7 @@ import {getChar, getPreviousChar, hasOnlyWhitespacesBefore, setCharacterState} f
 import {AutoClosingMode} from "@/features/settings/types/autoclosing-mode";
 import {CharacterState, CharacterTypes} from "@/shared/types/character";
 import {IParsedSnippet} from "@/shared/types/snippet";
+import {produce} from "immer";
 
 function incrementUserPosition(snippet: IParsedSnippet, position: number, isPressedKeyCorrect: boolean, autoClosingMode: AutoClosingMode): number {
   const newChar = getChar(snippet, position + 1);
@@ -62,20 +63,22 @@ export function addCharacter(
 
   const newPosition = incrementUserPosition(snippet, position, isPressedKeyCorrect, autoClosingMode);
 
-  for (let i = position; i <= newPosition - 1; i++) {
-    const char = snippet[i];
-    if (
-      autoClosingMode === AutoClosingMode.FULL &&
-      char.type === CharacterTypes.AutoClosing &&
-      !char.isOpening &&
-      (isPressedKeyCorrect || snippet[char.pairedChar].state === CharacterState.Right)
-    ) {
-      continue;
+  const updatedSnippet = produce(snippet, (draft) => {
+    for (let i = position; i <= newPosition - 1; i++) {
+      const char = draft[i];
+      if (
+        autoClosingMode === AutoClosingMode.FULL &&
+        char.type === CharacterTypes.AutoClosing &&
+        !char.isOpening &&
+        (isPressedKeyCorrect || draft[char.pairedChar].state === CharacterState.Right)
+      ) {
+        continue;
+      }
+      setCharacterState(draft, i, isPressedKeyCorrect ? CharacterState.Right : CharacterState.Wrong);
     }
-    setCharacterState(snippet, i, isPressedKeyCorrect ? CharacterState.Right : CharacterState.Wrong);
-  }
+  });
 
   registerKeyStroke(isPressedKeyCorrect);
 
-  return [snippet, newPosition];
+  return [updatedSnippet, newPosition];
 }

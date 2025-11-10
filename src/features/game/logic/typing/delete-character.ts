@@ -19,7 +19,7 @@ export function deleteCharacter(snippet: IParsedSnippet, position: number, autoC
   if (position === 0) return [snippet, 0];
   const newPos = decrementUserPosition(snippet, position, autoClosingMode);
 
-  resetCharactersInRange(snippet, newPos, position - 1, autoClosingMode === AutoClosingMode.FULL);
+  const updatedSnippet = resetCharactersInRange(snippet, newPos, position - 1, autoClosingMode === AutoClosingMode.FULL);
 
-  return [snippet, newPos];
+  return [updatedSnippet, newPos];
 }
