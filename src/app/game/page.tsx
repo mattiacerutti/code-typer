@@ -1,6 +1,6 @@
 "use client";
 
-import {useCallback, useEffect, useRef, useState} from "react";
+import {useEffect, useRef, useState} from "react";
 import {buildClientSnippet, getRandomCodeSnippets} from "@/features/snippets/services/get-random-snippets.client";
 import {fetchLanguages} from "@/features/snippets/infrastructure/adapters/snippet-fetch.client";
 import useStopwatch from "@/features/game/hooks/useStopwatch";
@@ -31,18 +31,15 @@ function Home() {
 
   const [elapsedTime, setElapsedTime] = useState(0);
 
-  const onTick = useCallback((elapsedTime: number) => {
+  const onTick = (elapsedTime: number) => {
     setElapsedTime(elapsedTime);
-  }, []);
+  };
 
-  const pushPositionSample = useCallback(
-    (elapsedTime: number) => {
-      const userPosition = useGameStore.getState().userPosition;
-      if (userPosition === null) return;
-      registerPositionSample(elapsedTime, userPosition);
-    },
-    [registerPositionSample]
-  );
+  const pushPositionSample = (elapsedTime: number) => {
+    const userPosition = useGameStore.getState().userPosition;
+    if (userPosition === null) return;
+    registerPositionSample(elapsedTime, userPosition);
+  };
 
   const {startStopwatch, stopStopwatch, resetStopwatch, getTime} = useStopwatch({onTick, onInterval: pushPositionSample});
 
@@ -51,27 +48,23 @@ function Home() {
   const backgroundFetchPromise = useRef<Promise<void> | null>(null);
   const [availableLanguages, setAvailableLanguages] = useState<{[key: string]: ILanguage} | null>(null);
 
-  const setSnippets = useCallback(
-    async (selectedLanguage: ILanguage) => {
-      setSelectedLanguage(selectedLanguage);
-      resetStopwatch();
-      const autoClosingMode = useSettingsStore.getState().autoClosingMode;
-      const snippets = await getRandomCodeSnippets(selectedLanguage.id, autoClosingMode !== AutoClosingMode.DISABLED);
+  const setSnippets = async (selectedLanguage: ILanguage) => {
+    setSelectedLanguage(selectedLanguage);
+    resetStopwatch();
+    const autoClosingMode = useSettingsStore.getState().autoClosingMode;
+    const snippets = await getRandomCodeSnippets(selectedLanguage.id, autoClosingMode !== AutoClosingMode.DISABLED);
+    initialize(selectedLanguage, snippets);
+  };
 
-      initialize(selectedLanguage, snippets);
-    },
-    [initialize, resetStopwatch, setSelectedLanguage]
-  );
-
-  const backgroundGetSnippets = useCallback(async () => {
+  const backgroundGetSnippets = async () => {
     if (!language) return;
     const autoClosingMode = useSettingsStore.getState().autoClosingMode;
     const snippets = await getRandomCodeSnippets(language!.id, autoClosingMode !== AutoClosingMode.DISABLED);
 
     addSnippetsToQueue(snippets);
-  }, [language, addSnippetsToQueue]);
+  };
 
-  const goToNextSnippetWithPrefetch = useCallback(async () => {
+  const goToNextSnippetWithPrefetch = async () => {
     if (status !== GameStatus.PLAYING && status !== GameStatus.READY && status !== GameStatus.FINISHED) return;
 
     const snippetQueue = getSnippetQueue();
@@ -102,7 +95,7 @@ function Home() {
     setTimeout(() => {
       setIsNextButtonLocked(false);
     }, remainingTime);
-  }, [status, language, getSnippetQueue, setStatus, setSnippets, backgroundGetSnippets, goToNextSnippet]);
+  };
 
   const resetSnippet = () => {
     resetStopwatch();
@@ -113,11 +106,11 @@ function Home() {
     startStopwatch();
   };
 
-  const handleEndGame = useCallback(() => {
+  const handleEndGame = () => {
     stopStopwatch();
     pushPositionSample(getTime());
     setStatus(GameStatus.FINISHED);
-  }, [stopStopwatch, getTime, pushPositionSample, setStatus]);
+  };
 
   const handleChangeSnippet = async () => {
     setStatus(GameStatus.LOADING);
@@ -139,7 +132,7 @@ function Home() {
     initializeGame();
   }, [setSnippets]);
 
-  const reparseExistingSnippets = useCallback(async () => {
+  const reparseExistingSnippets = async () => {
     const gameState = useGameStore.getState();
     const activeLanguage = gameState.language;
     const activeSnippet = gameState.currentSnippet;
@@ -160,7 +153,7 @@ function Home() {
     }
 
     initialize(activeLanguage, reparsedSnippets);
-  }, [autoClosingMode, initialize, resetStopwatch, setSnippets, setStatus]);
+  };
 
   useEffect(() => {
     reparseExistingSnippets();

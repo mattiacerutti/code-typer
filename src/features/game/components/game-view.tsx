@@ -4,7 +4,7 @@ import {GameStatus} from "@/features/game/types/game-status";
 import type {ILanguage} from "@/shared/types/language";
 import {humanizeTime} from "@/features/game/utils/typing-metrics";
 import {useGameStore} from "../state/game-store";
-import {useCallback, useState} from "react";
+import {useState} from "react";
 import SettingsModal from "@/features/settings/components/modal";
 import {IoSettingsSharp} from "react-icons/io5";
 import useSettingsStore from "@/features/settings/stores/settings-store";
@@ -47,9 +47,9 @@ function GameView(props: IGameViewProps) {
 
   const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
 
-  const handleSnippetFinished = useCallback(() => {
+  const handleSnippetFinished = () => {
     onGameFinished();
-  }, [onGameFinished]);
+  };
 
   return (
     <>
