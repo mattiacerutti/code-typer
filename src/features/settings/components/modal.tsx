@@ -17,32 +17,33 @@ function SettingsModal(props: ISettingsModalProps) {
   if (!isOpen) return null;
 
   return (
-    <div className="absolute inset-0 z-1000 flex items-center justify-center bg-black/60" onClick={closeModal}>
-      <div className="relative flex flex-col gap-4 rounded-md bg-white px-6 py-3 font-medium text-slate-900" onClick={(e) => e.stopPropagation()}>
-        <div className="flex justify-between">
-          <h2 className="text-2xl font-bold">Settings</h2>
-          <button className="top-3 right-3 hover:text-slate-600" onClick={closeModal}>
-            <IoClose size={24} />
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-4" onClick={closeModal}>
+      <div className="relative w-full max-w-sm rounded-2xl border border-black/10 bg-white px-6 py-6 text-zinc-900 shadow-xl" onClick={(e) => e.stopPropagation()}>
+        <div className="flex items-start justify-between">
+          <div>
+            <p className="text-xs uppercase tracking-[0.3em] text-zinc-500">Settings</p>
+            <h2 className="mt-1 text-xl font-semibold text-black">Adjust your run</h2>
+          </div>
+          <button className="rounded-full p-1 text-zinc-500 hover:text-black" onClick={closeModal}>
+            <IoClose size={18} />
           </button>
         </div>
-        <div className="flex flex-col gap-2">
-          <label className="flex items-center gap-4">
-            Auto-Closing Mode
-            <select
-              value={autoClosingMode}
-              onChange={(event) => {
-                setAutoClosing(event.target.value as AutoClosingMode);
-              }}
-              className="rounded-md bg-slate-200 px-6 py-3 font-medium text-slate-900"
-            >
-              {Object.values(AutoClosingMode).map((mode) => (
-                <option key={mode} value={mode}>
-                  {mode}
-                </option>
-              ))}
-            </select>
-          </label>
-        </div>
+        <label className="mt-6 flex flex-col gap-2 text-sm text-zinc-600">
+          Auto-closing mode
+          <select
+            value={autoClosingMode}
+            onChange={(event) => {
+              setAutoClosing(event.target.value as AutoClosingMode);
+            }}
+            className="rounded-xl border border-black/10 bg-white px-4 py-3 text-sm font-semibold text-black"
+          >
+            {Object.values(AutoClosingMode).map((mode) => (
+              <option key={mode} value={mode}>
+                {mode}
+              </option>
+            ))}
+          </select>
+        </label>
       </div>
     </div>
   );
