@@ -7,9 +7,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body
-        className={"min-h-[100vh] m-0 bg-white col-[#0f172a]"}
-      >{children}</body>
+      <body>{children}</body>
     </html>
   );
 }

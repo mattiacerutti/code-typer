@@ -7,16 +7,6 @@ interface IEndgameViewProps {
   handleChangeSnippet: () => void;
 }
 
-function StatCard({label, value, helper}: {label: string; value: string | number; helper?: string}) {
-  return (
-    <div className="rounded-2xl border border-black/10 bg-white p-4 shadow-sm">
-      <p className="text-xs uppercase tracking-[0.3em] text-zinc-500">{label}</p>
-      <p className="mt-2 text-3xl font-semibold text-black">{value}</p>
-      {helper ? <p className="mt-1 text-xs text-zinc-500">{helper}</p> : null}
-    </div>
-  );
-}
-
 function EndgameView(props: IEndgameViewProps) {
   const {handleRetrySnippet, handleChangeSnippet} = props;
 
@@ -32,35 +22,29 @@ function EndgameView(props: IEndgameViewProps) {
   const lastSample = wpmSamples.at(-1)!;
 
   return (
-    <div className="flex flex-col gap-6 rounded-3xl border border-black/10 bg-white p-6 text-black shadow-sm sm:p-10">
-      <div>
-        <p className="text-xs uppercase tracking-[0.45em] text-zinc-500">Run complete</p>
-        <h2 className="mt-2 text-3xl font-semibold">Session report</h2>
-        <p className="text-sm text-zinc-500">Review the curve, then continue practicing.</p>
+    <div className="flex flex-col gap-8">
+      <div className="flex flex-row gap-4">
+        <div className="rounded-lg bg-slate-500 px-8 py-4 text-white shadow-lg">WPM {lastSample.wpm}</div>
+        <div className="rounded-lg bg-slate-500 px-8 py-4 text-white shadow-lg">Accuracy: {calculateAccuracy(validKeystrokes, wrongKeystrokes)}%</div>
+        <div className="rounded-lg bg-slate-500 px-8 py-4 text-white shadow-lg">{lastSample.time}</div>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-3">
-        <StatCard label="Final WPM" value={lastSample.wpm} helper="Based on last caret sample" />
-        <StatCard label="Accuracy" value={`${calculateAccuracy(validKeystrokes, wrongKeystrokes)}%`} helper={`${validKeystrokes} correct · ${wrongKeystrokes} misses`} />
-        <StatCard label="Time" value={lastSample.time} helper="Elapsed typing time" />
-      </div>
-
-      <div className="rounded-2xl border border-black/10 bg-white p-4 [&_*:focus]:outline-none">
-        <ResponsiveContainer width="100%" height={320}>
-          <LineChart data={wpmSamples} margin={{top: 10, right: 10, left: -15, bottom: 0}}>
-            <XAxis dataKey="time" stroke="#a1a1aa" tick={{fontSize: 12}} dy={10} />
-            <YAxis width={35} stroke="#a1a1aa" tick={{fontSize: 12}} dx={-5} />
-            <Tooltip contentStyle={{backgroundColor: "#ffffff", border: "1px solid #e4e4e7", borderRadius: 12, color: "#0f172a"}} />
-            <Line type="monotone" dataKey="wpm" stroke="#0f172a" strokeWidth={3} dot={false} />
+      <div className="flex justify-center [&_*:focus]:outline-none">
+        <ResponsiveContainer width="100%" height={300}>
+          <LineChart data={wpmSamples}>
+            <XAxis dataKey="time" />
+            <YAxis width={30} />
+            <Tooltip />
+            <Line type="monotone" dataKey="wpm" stroke="#8884d8" strokeWidth={2} />
           </LineChart>
         </ResponsiveContainer>
       </div>
 
-      <div className="flex flex-col gap-3 sm:flex-row">
-        <button className="flex-1 rounded-2xl border border-black/10 bg-black px-6 py-3 text-sm font-semibold text-white" onClick={handleRetrySnippet}>
+      <div className="flex flex-row justify-center gap-4">
+        <button className="flex-1 rounded-md bg-slate-200 px-6 py-3 font-medium text-slate-900 hover:bg-slate-300 disabled:opacity-20" onClick={handleRetrySnippet}>
           Retry snippet
         </button>
-        <button className="flex-1 rounded-2xl border border-black/10 bg-white px-6 py-3 text-sm font-semibold text-black" onClick={handleChangeSnippet}>
+        <button className="flex-1 rounded-md bg-slate-200 px-6 py-3 font-medium text-slate-900 hover:bg-slate-300 disabled:opacity-20" onClick={handleChangeSnippet}>
           Change snippet
         </button>
       </div>

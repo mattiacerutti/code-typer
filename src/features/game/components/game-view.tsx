@@ -4,11 +4,10 @@ import {GameStatus} from "@/features/game/types/game-status";
 import type {ILanguage} from "@/shared/types/language";
 import {humanizeTime} from "@/features/game/utils/typing-metrics";
 import {useGameStore} from "../state/game-store";
-import {useMemo, useState} from "react";
+import {useState} from "react";
 import SettingsModal from "@/features/settings/components/modal";
-import {IoClose, IoSettingsSharp} from "react-icons/io5";
+import {IoSettingsSharp} from "react-icons/io5";
 import useSettingsStore from "@/features/settings/stores/settings-store";
-import LanguageMenu from "@/features/game/components/language-menu";
 
 interface IGameViewProps {
   onGameFinished: () => void;
@@ -19,31 +18,6 @@ interface IGameViewProps {
   availableLanguages: {[key: string]: ILanguage};
   isRefreshing: boolean;
   elapsedTime: number;
-}
-
-interface IModalProps {
-  title: string;
-  subtitle?: string;
-  isOpen: boolean;
-  onClose: () => void;
-  children: React.ReactNode;
-}
-
-function OverlayModal({title, subtitle, isOpen, onClose, children}: IModalProps) {
-  if (!isOpen) return null;
-
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-4" onClick={onClose}>
-      <div className="relative w-full max-w-2xl rounded-2xl border border-black/10 bg-white p-6 text-zinc-900 shadow-xl" onClick={(event) => event.stopPropagation()}>
-        <button className="absolute top-4 right-4 text-zinc-500 hover:text-black" aria-label="Close" onClick={onClose}>
-          <IoClose size={20} />
-        </button>
-        <h2 className="text-2xl font-semibold text-black">{title}</h2>
-        {subtitle ? <p className="mt-1 text-sm text-zinc-500">{subtitle}</p> : null}
-        <div className="mt-4 space-y-3 text-sm text-zinc-700">{children}</div>
-      </div>
-    </div>
-  );
 }
 
 function GameView(props: IGameViewProps) {
@@ -72,9 +46,6 @@ function GameView(props: IGameViewProps) {
   });
 
   const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
-  const [isTutorialOpen, setIsTutorialOpen] = useState(false);
-  const [isDocsOpen, setIsDocsOpen] = useState(false);
-  const languageOptions = useMemo(() => Object.values(availableLanguages).sort((a, b) => a.name.localeCompare(b.name)), [availableLanguages]);
 
   const handleSnippetFinished = () => {
     onGameFinished();
@@ -83,110 +54,53 @@ function GameView(props: IGameViewProps) {
   return (
     <>
       <SettingsModal isOpen={isSettingsModalOpen} closeModal={() => setIsSettingsModalOpen(false)} />
-      <OverlayModal isOpen={isTutorialOpen} onClose={() => setIsTutorialOpen(false)} title="Quick tutorial" subtitle="Keep accuracy high before chasing speed.">
-        <ol className="list-decimal space-y-2 pl-4">
-          <li>Pick a language, then wait for the snippet queue to load.</li>
-          <li>Begin typing to start the timer. The caret follows your position.</li>
-          <li>Reset if you want a clean take without changing the snippet.</li>
-          <li>Use Change Snippet whenever you want a new challenge.</li>
-        </ol>
-      </OverlayModal>
-      <OverlayModal isOpen={isDocsOpen} onClose={() => setIsDocsOpen(false)} title="Game docs" subtitle="Reference for gameplay and settings">
-        <div>
-          <h3 className="text-sm font-semibold text-black">How to play</h3>
-          <p>Typing starts the session timer. Every character must match the snippet exactly, including whitespace and symbols.</p>
-          <p>Accuracy updates live. Incorrect keystrokes highlight in red until corrected.</p>
-        </div>
-
-        <div>
-          <h3 className="text-sm font-semibold text-black">Buttons</h3>
-          <ul className="list-disc space-y-1 pl-4">
-            <li>
-              <strong>Reset</strong>: clears all progress for the current snippet.
-            </li>
-            <li>
-              <strong>Change snippet</strong>: loads the next snippet in sequence.
-            </li>
-            <li>
-              <strong>Language selector</strong>: reloads snippets for the selected language or stack.
-            </li>
-          </ul>
-        </div>
-
-        <div>
-          <h3 className="text-sm font-semibold text-black">Settings</h3>
-          <p>Auto-closing mode controls how brackets and quotes behave during typing. Choose before starting a session.</p>
-          <ul className="list-disc space-y-1 pl-4">
-            <li>
-              <strong>Full</strong>: All brackets, parentheses, and quotation marks are auto-closed and skipped automatically when you reach them.
-            </li>
-            <li>
-              <strong>Partial</strong>: Auto-closes all pairs, but you must type the closing character or press the right arrow to move past it.
-            </li>
-            <li>
-              <strong>Disabled</strong>: No auto-closing; every bracket and quote must be typed manually.
-            </li>
-          </ul>
-        </div>
-      </OverlayModal>
-
-      <div className="rounded-3xl border border-black/10 bg-white p-6 shadow-sm">
-        <header className="flex flex-col gap-4 border-b border-black/5 pb-4 md:flex-row md:items-center md:justify-between">
-          <div>
-            <p className="text-xs tracking-[0.4em] text-zinc-500 uppercase">Code typer</p>
-            <h1 className="text-2xl font-semibold text-black">Practice board</h1>
-          </div>
-          <div className="flex flex-wrap gap-2">
-            <button className="rounded-full border border-black/10 px-4 py-2 text-sm font-semibold text-black" onClick={() => setIsTutorialOpen(true)}>
-              Tutorial
-            </button>
-            <button className="rounded-full border border-black/10 px-4 py-2 text-sm font-semibold text-black" onClick={() => setIsDocsOpen(true)}>
-              Docs
-            </button>
+      <div className="flex flex-col items-center justify-center">
+        <div className={`relative bottom-8 text-red-500 ${!isCapsLockOn && "opacity-0"} text-2xl font-bold`}>Caps Lock is on</div>
+        <div className="flex flex-col items-center justify-center gap-10">
+          <div className="flex w-full flex-row">
+            <div className="flex h-full flex-1 justify-center">
+              <div className="h-fit w-fit min-w-20 rounded-md bg-slate-100 px-4 py-2 text-center align-middle font-medium text-slate-900">{humanizeTime(elapsedTime)}</div>
+            </div>
             <button
-              className="flex items-center gap-2 rounded-full border border-black/10 px-4 py-2 text-sm font-semibold text-black disabled:opacity-40"
+              className="aspect-square h-auto w-fit rounded-md bg-slate-100 px-4 py-2 text-center font-medium text-slate-900 enabled:hover:bg-slate-200 disabled:cursor-not-allowed disabled:opacity-20"
               onClick={() => setIsSettingsModalOpen(true)}
               disabled={status !== GameStatus.READY}
             >
               <IoSettingsSharp />
-              Settings
             </button>
           </div>
-        </header>
-
-        <div className="mt-4 flex flex-col gap-4">
-          <div className="flex flex-wrap items-center justify-between gap-3 text-sm text-zinc-600">
-            <div className="flex items-center gap-2 text-lg font-semibold text-black">{humanizeTime(elapsedTime)}</div>
-            <div className={`text-sm font-medium text-red-600 ${!isCapsLockOn ? "invisible" : ""}`}>Caps Lock is on</div>
-          </div>
           <TypingArea onGameFinished={handleSnippetFinished} />
-          <div className="flex flex-col gap-3 sm:flex-row">
+          <div className="flex flex-row content-between gap-1.5">
             <button
-              className="flex-1 rounded-xl border border-black/10 bg-black px-4 py-3 text-sm font-semibold text-white disabled:bg-zinc-500"
+              className="rounded-md bg-slate-200 px-6 py-3 font-medium text-slate-900 hover:bg-slate-300 disabled:opacity-20"
               onClick={resetSnippet}
               disabled={isRefreshing || status !== GameStatus.PLAYING}
             >
-              Reset
+              <svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path
+                  fill="currentColor"
+                  d="M12 2a1 1 0 1 0 0 2a8 8 0 1 1-6.924 3.99l1.217 1.217A1 1 0 0 0 8 8.5v-4a1 1 0 0 0-1-1H3a1 1 0 0 0-.707 1.707l1.33 1.33A9.955 9.955 0 0 0 2 12c0 5.523 4.477 10 10 10s10-4.477 10-10S17.523 2 12 2"
+                />
+              </svg>
             </button>
-            <button
-              className="flex-1 rounded-xl border border-black/10 bg-white px-4 py-3 text-sm font-semibold text-black disabled:opacity-40"
-              onClick={changeSnippet}
+            <button className="rounded-md bg-slate-200 px-6 py-3 font-medium text-slate-900 hover:bg-slate-300 disabled:opacity-20" onClick={changeSnippet} disabled={isRefreshing}>
+              {!isRefreshing ? "Change Snippet" : "Wait.."}
+            </button>
+            <select
               disabled={isRefreshing}
+              value={language.id}
+              onChange={(event) => {
+                setStatus(GameStatus.LOADING);
+                changeLanguage(availableLanguages[event.target.value]);
+              }}
+              className="rounded-md bg-slate-200 px-6 py-3 font-medium text-slate-900 hover:bg-slate-300 disabled:opacity-20"
             >
-              {!isRefreshing ? "Change snippet" : "Wait"}
-            </button>
-            <div className="flex-1">
-              <LanguageMenu
-                languages={languageOptions}
-                selectedLanguageId={language.id}
-                disabled={isRefreshing}
-                onSelect={(nextLanguage) => {
-                  if (nextLanguage.id === language.id) return;
-                  setStatus(GameStatus.LOADING);
-                  changeLanguage(nextLanguage);
-                }}
-              />
-            </div>
+              {Object.values(availableLanguages).map((availableLanguage) => (
+                <option key={availableLanguage.id} value={availableLanguage.id}>
+                  {availableLanguage.name}
+                </option>
+              ))}
+            </select>
           </div>
         </div>
       </div>
