@@ -1,4 +1,4 @@
-import {useEffect} from "react";
+import {createRef, useEffect} from "react";
 import useCodeHighlight from "@/features/game/hooks/useCodeHighlight";
 import {CharacterTypes, ICharacter, WhitespaceTypes} from "@/shared/types/character";
 import {isGameFinished} from "@/features/game/logic/game-logic";
@@ -7,7 +7,6 @@ import Caret from "./caret";
 import Character from "./character";
 import {useGameStore} from "@/features/game/state/game-store";
 import {getCharacterClasses, getCharacterText} from "@/features/game/utils/character";
-import {useCharacterRefs} from "@/features/game/hooks/useCharacterRefs";
 
 interface ITypingAreaProps {
   onGameFinished: () => void;
@@ -25,7 +24,7 @@ function TypingArea(props: ITypingAreaProps) {
   const {codeHighlight} = useCodeHighlight(currentSnippet.rawSnippet.content, language.highlightAlias);
 
   // Collection of all character refs, used to know where every character is at and to update caret position
-  const charRefs = useCharacterRefs(currentSnippet.parsedSnippet);
+  const charRefs = Array.from({length: currentSnippet.parsedSnippet.length}, () => createRef<HTMLSpanElement>());
 
   const groupedCharacters = (() => {
     const groups: {char: ICharacter; index: number}[][] = [];
@@ -77,14 +76,14 @@ function TypingArea(props: ITypingAreaProps) {
                     elementText={getCharacterText(char)}
                     isSelected={index === userPosition}
                     isInvisible={isInvisible}
-                    ref={charRefs.current[index]}
+                    ref={charRefs[index]}
                   />
                 );
               })}
             </div>
           ))}
         </div>
-        <Caret charRefs={charRefs.current} userPosition={userPosition} />
+        <Caret charRefs={charRefs} userPosition={userPosition} />
       </div>
     </div>
   );

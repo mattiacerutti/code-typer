@@ -1,30 +1,30 @@
-import {useState, useEffect} from "react";
+import {useState, useEffect, useLayoutEffect} from "react";
 
 interface ICaretProps {
   charRefs: React.RefObject<HTMLSpanElement | null>[];
   userPosition: number;
 }
 
-function Caret(props: ICaretProps) {
-  const {charRefs, userPosition} = props;
+function Caret({charRefs, userPosition}: ICaretProps) {
   const [blinking, setBlinking] = useState(false);
+  const [caretPosition, setCaretPosition] = useState({top: 0, left: 0});
 
   useEffect(() => {
-    const blinkingTimeout = setTimeout(() => {
-      setBlinking(true);
-    }, 500);
-
+    const blinkingTimeout = setTimeout(() => setBlinking(true), 500);
     return () => {
       setBlinking(false);
       clearTimeout(blinkingTimeout);
     };
   }, [userPosition]);
 
-  const ref = charRefs[userPosition]?.current;
-  const caretPosition = {
-    top: ref?.offsetTop ?? 0,
-    left: ref?.offsetLeft ?? 0,
-  };
+  useLayoutEffect(() => {
+    const ref = charRefs[userPosition];
+    if (ref?.current) {
+      const {offsetTop, offsetLeft} = ref.current;
+      setCaretPosition({top: offsetTop, left: offsetLeft});
+    }
+  }, [charRefs, userPosition]);
+
   return (
     <div
       className={`blinking-cursor ${blinking && "blinking-caret"}`}
@@ -38,7 +38,8 @@ function Caret(props: ICaretProps) {
         borderRadius: "10px",
         transition: "all 0.15s ease",
       }}
-    ></div>
+    />
   );
 }
+
 export default Caret;
