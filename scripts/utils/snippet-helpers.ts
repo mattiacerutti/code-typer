@@ -1,5 +1,6 @@
-import {ILanguage} from "@/shared/types/language";
 import {PrismaClient} from "@prisma/client";
+import {SUPPORTED_LANGUAGES} from "../../prisma/seed/languages";
+import {ILanguage} from "@/shared/types/language";
 
 const GITHUB_API_URL = "https://api.github.com";
 const RAW_GITHUB_BASE_URL = "https://raw.githubusercontent.com";
@@ -55,7 +56,7 @@ function getSnippetRawLink(data: SnippetData): string {
   return `${RAW_GITHUB_BASE_URL}/${repository}/${sha}/${path}`;
 }
 
-async function fetchLanguageSnippets(language: ILanguage, page: number): Promise<string[]> {
+export async function fetchLanguageSnippets(language: ILanguage, page: number): Promise<string[]> {
   const token = getToken();
   const extensionsFilter = language.extensions.map((ext) => `extension:${ext}`).join(" ");
   const params = new URLSearchParams({
@@ -127,4 +128,13 @@ export async function seedSnippets(prisma: PrismaClient, languages: ILanguage[],
   }
 }
 
-export {fetchLanguageSnippets};
+export async function seedLanguageSnippets(prismaClient: PrismaClient, languageId: string, pagesPerLanguage?: number): Promise<void> {
+  const language = SUPPORTED_LANGUAGES.find((lang) => lang.id === languageId);
+
+  if (!language) {
+    throw new Error(`Unsupported language "${languageId}". Supported ids: ${SUPPORTED_LANGUAGES.map((lang) => lang.id).join(", ")}`);
+  }
+
+  await seedSnippets(prismaClient, [language], {pagesPerLanguage});
+  console.log(`Snippets seeded for ${language.name}.`);
+}
