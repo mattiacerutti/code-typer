@@ -18,10 +18,11 @@ interface IUseTypingProps {
   onStartTyping: () => void;
   onWrongKeystroke: () => void;
   onValidKeystroke: () => void;
+  hiddenInputRef: React.RefObject<HTMLInputElement | null>;
 }
 
 const useTyping = (props: IUseTypingProps) => {
-  const {status, snippet, userPosition, autoClosingMode, onSnippetUpdate, onUserPositionChange, onStartTyping, onWrongKeystroke, onValidKeystroke} = props;
+  const {status, snippet, userPosition, autoClosingMode, onSnippetUpdate, onUserPositionChange, onStartTyping, onWrongKeystroke, onValidKeystroke, hiddenInputRef} = props;
 
   const [isCapsLockOn, setIsCapsLockOn] = useState(false);
 
@@ -48,6 +49,8 @@ const useTyping = (props: IUseTypingProps) => {
   };
 
   const handleKeyPress = (event: KeyboardEvent) => {
+    if (event.key === "Dead") return;
+
     if (hasModifierKey(event) && isAValidShortcutKey(event)) {
       handleKeyShortcut(event);
       return;
@@ -72,26 +75,38 @@ const useTyping = (props: IUseTypingProps) => {
   };
 
   useEffect(() => {
+    const hiddenInput = hiddenInputRef.current;
+    if (!hiddenInput) return;
+
+    const handleReFocus = () => {
+      if (hiddenInput !== document.activeElement) {
+        hiddenInput.focus();
+        return;
+      }
+    };
+
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.getModifierState("CapsLock")) {
         setIsCapsLockOn(true);
       }
       handleKeyPress(event);
     };
-    window.addEventListener("keydown", handleKeyDown);
+    hiddenInput.addEventListener("keydown", handleKeyDown);
+    window.addEventListener("keydown", handleReFocus);
 
     const handleKeyUp = (event: KeyboardEvent) => {
       if (event.key === "CapsLock") {
         setIsCapsLockOn(false);
       }
     };
-    window.addEventListener("keyup", handleKeyUp);
+    hiddenInput.addEventListener("keyup", handleKeyUp);
 
     return () => {
-      window.removeEventListener("keydown", handleKeyDown);
-      window.removeEventListener("keyup", handleKeyUp);
+      hiddenInput.removeEventListener("keydown", handleKeyDown);
+      hiddenInput.removeEventListener("keyup", handleKeyUp);
+      window.removeEventListener("keydown", handleReFocus);
     };
-  }, [handleKeyPress]);
+  }, [handleKeyPress, hiddenInputRef]);
 
   return {
     isCapsLockOn,

@@ -31,6 +31,8 @@ function Home() {
 
   const [elapsedTime, setElapsedTime] = useState(0);
 
+  const hiddenInputRef = useRef<HTMLInputElement | null>(null);
+
   const onTick = (elapsedTime: number) => {
     setElapsedTime(elapsedTime);
   };
@@ -97,7 +99,7 @@ function Home() {
     }, remainingTime);
   };
 
-  const resetSnippet = () => {
+  const handleResetSnippet = () => {
     resetStopwatch();
     resetCurrentSnippet();
   };
@@ -116,6 +118,10 @@ function Home() {
     setStatus(GameStatus.LOADING);
     await goToNextSnippetWithPrefetch();
     resetStopwatch();
+  };
+
+  const handleChangeLanguage = async (selectedLanguage: ILanguage) => {
+    await setSnippets(selectedLanguage);
   };
 
   useEffect(() => {
@@ -160,7 +166,7 @@ function Home() {
   }, [autoClosingMode, reparseExistingSnippets]);
 
   if (status === GameStatus.FINISHED && currentSnippet) {
-    return <EndgameView handleChangeSnippet={handleChangeSnippet} handleRetrySnippet={resetSnippet} />;
+    return <EndgameView handleChangeSnippet={handleChangeSnippet} handleRetrySnippet={handleResetSnippet} />;
   }
 
   if (status === GameStatus.LOADING || !availableLanguages || !currentSnippet || !language) {
@@ -168,16 +174,20 @@ function Home() {
   }
 
   return (
-    <GameView
-      onGameFinished={handleEndGame}
-      onGameStarted={handleStartGame}
-      changeSnippet={handleChangeSnippet}
-      resetSnippet={resetSnippet}
-      changeLanguage={setSnippets}
-      isRefreshing={isNextButtonLocked}
-      availableLanguages={availableLanguages}
-      elapsedTime={elapsedTime}
-    />
+    <div className="relative h-fit w-fit">
+      <GameView
+        onGameFinished={handleEndGame}
+        onGameStarted={handleStartGame}
+        changeSnippet={handleChangeSnippet}
+        resetSnippet={handleResetSnippet}
+        changeLanguage={handleChangeLanguage}
+        isRefreshing={isNextButtonLocked}
+        availableLanguages={availableLanguages}
+        elapsedTime={elapsedTime}
+        hiddenInputRef={hiddenInputRef}
+      />
+      <input type="text" className="pointer-events-none absolute top-0 h-full w-full cursor-default rounded-2xl opacity-0" autoFocus ref={hiddenInputRef} value="" readOnly />
+    </div>
   );
 }
 

@@ -4,7 +4,7 @@ import {GameStatus} from "@/features/game/types/game-status";
 import type {ILanguage} from "@/shared/types/language";
 import {humanizeTime} from "@/features/game/utils/typing-metrics";
 import {useGameStore} from "../state/game-store";
-import {useState} from "react";
+import {useEffect, useRef, useState} from "react";
 import SettingsModal from "@/features/settings/components/modal";
 import {IoSettingsSharp} from "react-icons/io5";
 import useSettingsStore from "@/features/settings/stores/settings-store";
@@ -18,10 +18,11 @@ interface IGameViewProps {
   availableLanguages: {[key: string]: ILanguage};
   isRefreshing: boolean;
   elapsedTime: number;
+  hiddenInputRef: React.RefObject<HTMLInputElement | null>;
 }
 
 function GameView(props: IGameViewProps) {
-  const {onGameFinished, onGameStarted, changeSnippet, resetSnippet, changeLanguage, availableLanguages, isRefreshing, elapsedTime} = props;
+  const {onGameFinished, onGameStarted, changeSnippet, resetSnippet, changeLanguage, availableLanguages, isRefreshing, elapsedTime, hiddenInputRef} = props;
 
   const status = useGameStore((state) => state.status);
   const language = useGameStore((state) => state.language)!;
@@ -33,6 +34,8 @@ function GameView(props: IGameViewProps) {
   const incrementWrongKeystroke = useGameStore((state) => state.incrementWrongKeystroke);
   const incrementValidKeystroke = useGameStore((state) => state.incrementValidKeystroke);
 
+  const [isFocus, setIsFocus] = useState(false);
+
   const {isCapsLockOn} = useTyping({
     status,
     snippet: currentSnippet.parsedSnippet,
@@ -43,13 +46,33 @@ function GameView(props: IGameViewProps) {
     onStartTyping: onGameStarted,
     onWrongKeystroke: incrementWrongKeystroke,
     onValidKeystroke: incrementValidKeystroke,
+    hiddenInputRef,
   });
 
   const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
+  hiddenInputRef.current?.focus();
 
   const handleSnippetFinished = () => {
     onGameFinished();
   };
+
+  useEffect(() => {
+    const input = hiddenInputRef.current;
+    if (!input) return;
+
+    setIsFocus(document.activeElement === input);
+
+    const handleFocus = () => setIsFocus(true);
+    const handleBlur = () => setIsFocus(false);
+
+    input.addEventListener("focus", handleFocus);
+    input.addEventListener("blur", handleBlur);
+
+    return () => {
+      input.removeEventListener("focus", handleFocus);
+      input.removeEventListener("blur", handleBlur);
+    };
+  }, [hiddenInputRef]);
 
   return (
     <>
@@ -69,7 +92,9 @@ function GameView(props: IGameViewProps) {
               <IoSettingsSharp />
             </button>
           </div>
-          <TypingArea onGameFinished={handleSnippetFinished} />
+          <div className={`h-fit w-fit cursor-default rounded-2xl ${!isFocus && "blur-[4px]"}`}>
+            <TypingArea onGameFinished={handleSnippetFinished} />
+          </div>
           <div className="flex flex-row content-between gap-1.5">
             <button
               className="rounded-md bg-slate-200 px-6 py-3 font-medium text-slate-900 hover:bg-slate-300 disabled:opacity-20"
