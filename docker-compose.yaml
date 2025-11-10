@@ -20,7 +20,6 @@ services:
     build: .
     restart: unless-stopped
     working_dir: /app
-    command: bash -lc "npx prisma migrate deploy && npm run start"
     env_file:
       - .env
     environment:
