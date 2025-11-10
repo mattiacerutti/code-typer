@@ -3,7 +3,7 @@ services:
     image: postgres:18
     restart: unless-stopped
     ports:
-      - ${POSTGRES_PORT}:5432
+      - "${POSTGRES_PORT:-5432}:5432"
     environment:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
@@ -15,5 +15,22 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+
+  frontend:
+    build: .
+    restart: unless-stopped
+    working_dir: /app
+    command: bash -lc "npx prisma migrate deploy && npm run start"
+    env_file:
+      - .env
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@db:5432/${POSTGRES_DB:-code-typer}
+      NEXT_TELEMETRY_DISABLED: "1"
+    ports:
+      - "${FRONTEND_PORT:-3000}:3000"
+    depends_on:
+      db:
+        condition: service_healthy
+
 volumes:
   db_data:
