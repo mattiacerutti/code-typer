@@ -38,11 +38,10 @@ jobs:
 
   build-and-push:
     needs: test
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04-arm
     steps:
       - uses: actions/checkout@v4
 
-      - uses: docker/setup-qemu-action@v3
       - uses: docker/setup-buildx-action@v3
 
       - name: Log in to GHCR
@@ -59,45 +58,16 @@ jobs:
           file: Dockerfile
           push: true
           provenance: false
-          platforms: linux/amd64,linux/arm64
+          platforms: linux/arm64
           cache-from: type=gha
           cache-to: type=gha,mode=max
           tags: |
             ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
             ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
 
-  migrate-and-seed:
-    needs: build-and-push
-    runs-on: ubuntu-latest
-    env:
-      DATABASE_URL: ${{ secrets.DATABASE_URL }}
-      GITHUB_API_TOKEN: ${{ secrets.API_GITHUB_TOKEN }}
-      NEXT_TELEMETRY_DISABLED: "1"
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          cache: npm
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Run Prisma migrate
-        run: npx prisma migrate deploy
-
-      - name: Seed database
-        run: npx prisma db seed
-
-      - name: Seed missing snippets
-        run: npx ts-node --compiler-options {\"module\":\"CommonJS\"} scripts/seed-missing-snippets.ts
-
   deploy:
     needs:
       - build-and-push
-      - migrate-and-seed
     runs-on: ubuntu-latest
     steps:
       - name: Trigger Coolify deploy
