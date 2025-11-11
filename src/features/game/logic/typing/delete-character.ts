@@ -1,6 +1,6 @@
-import {CharacterState, CharacterTypes, ICharacter, WhitespaceTypes} from "@/shared/types/character";
+import {CharacterState, CharacterTypes, WhitespaceTypes} from "@/shared/types/character";
 import {IParsedSnippet} from "@/shared/types/snippet";
-import {getChar, getPreviousChar, hasOnlyWhitespacesBefore, resetCharactersInRange} from "@/features/game/logic/typing/shared";
+import {getChar, hasOnlyWhitespacesBefore, resetCharactersInRange} from "@/features/game/logic/typing/shared";
 import {AutoClosingMode} from "@/features/settings/types/autoclosing-mode";
 
 function decrementUserPosition(snippet: IParsedSnippet, position: number, autoClosingMode: AutoClosingMode): number {
