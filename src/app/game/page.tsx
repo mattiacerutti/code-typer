@@ -118,6 +118,7 @@ function Home() {
     setStatus(GameStatus.LOADING);
     await goToNextSnippetWithPrefetch();
     resetStopwatch();
+    hiddenInputRef.current?.focus();
   };
 
   const handleChangeLanguage = async (selectedLanguage: ILanguage) => {
