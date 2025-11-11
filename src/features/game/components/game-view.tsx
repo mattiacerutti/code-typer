@@ -78,6 +78,14 @@ function GameView(props: IGameViewProps) {
               autoFocus
               ref={hiddenInputRef}
               className="peer absolute top-0 h-full w-full cursor-default rounded-2xl text-transparent caret-transparent backdrop-blur-xs transition-opacity duration-200 outline-none selection:bg-transparent focus:opacity-0 [@starting-style]:opacity-0"
+              autoComplete="off"
+              autoCapitalize="off"
+              autoCorrect="off"
+              data-gramm="false"
+              data-gramm_editor="false"
+              data-enable-grammarly="false"
+              list="autocompleteOff"
+              spellCheck="false"
             />
             <div className="pointer-events-none absolute inset-0 flex items-center justify-center text-lg transition-opacity duration-200 peer-focus:opacity-0 [@starting-style]:opacity-0">
               Click here or press any key to focus
