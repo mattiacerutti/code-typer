@@ -1,6 +1,6 @@
 import {getChar, getPreviousChar, hasOnlyWhitespacesBefore, setCharacterState} from "@/features/game/logic/typing/shared";
 import {AutoClosingMode} from "@/features/settings/types/autoclosing-mode";
-import {CharacterState, CharacterTypes} from "@/shared/types/character";
+import {CharacterState, CharacterTypes, WhitespaceTypes} from "@/shared/types/character";
 import {IParsedSnippet} from "@/shared/types/snippet";
 import {produce} from "immer";
 
@@ -8,7 +8,9 @@ function incrementUserPosition(snippet: IParsedSnippet, position: number, isPres
   const newChar = getChar(snippet, position + 1);
 
   if (
-    (newChar.type === CharacterTypes.Whitespace && hasOnlyWhitespacesBefore(snippet, position + 1)) ||
+    (newChar.type === CharacterTypes.Whitespace &&
+      hasOnlyWhitespacesBefore(snippet, position + 1) &&
+      (autoClosingMode === AutoClosingMode.FULL || newChar.value !== WhitespaceTypes.NewLine)) ||
     (autoClosingMode === AutoClosingMode.FULL &&
       newChar.type === CharacterTypes.AutoClosing &&
       !newChar.isOpening &&

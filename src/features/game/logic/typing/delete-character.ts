@@ -1,13 +1,15 @@
-import {CharacterState, CharacterTypes, ICharacter} from "@/shared/types/character";
+import {CharacterState, CharacterTypes, ICharacter, WhitespaceTypes} from "@/shared/types/character";
 import {IParsedSnippet} from "@/shared/types/snippet";
-import {getPreviousChar, hasOnlyWhitespacesBefore, resetCharactersInRange} from "@/features/game/logic/typing/shared";
+import {getChar, getPreviousChar, hasOnlyWhitespacesBefore, resetCharactersInRange} from "@/features/game/logic/typing/shared";
 import {AutoClosingMode} from "@/features/settings/types/autoclosing-mode";
 
 function decrementUserPosition(snippet: IParsedSnippet, position: number, autoClosingMode: AutoClosingMode): number {
   if (position === 0) return 0;
-  const prevChar = getPreviousChar(snippet, position) as ICharacter;
+  const prevChar = getChar(snippet, position - 1);
   if (
-    (prevChar.type === CharacterTypes.Whitespace && hasOnlyWhitespacesBefore(snippet, position - 1)) ||
+    (prevChar.type === CharacterTypes.Whitespace &&
+      hasOnlyWhitespacesBefore(snippet, position - 1) &&
+      (autoClosingMode === AutoClosingMode.FULL || prevChar.value !== WhitespaceTypes.NewLine)) ||
     (autoClosingMode === AutoClosingMode.FULL && prevChar.type === CharacterTypes.AutoClosing && !prevChar.isOpening && prevChar.state === CharacterState.Right)
   ) {
     return decrementUserPosition(snippet, position - 1, autoClosingMode);
