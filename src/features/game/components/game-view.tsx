@@ -4,7 +4,7 @@ import {GameStatus} from "@/features/game/types/game-status";
 import type {ILanguage} from "@/shared/types/language";
 import {humanizeTime} from "@/features/game/utils/typing-metrics";
 import {useGameStore} from "../state/game-store";
-import {useEffect, useRef, useState} from "react";
+import {useState} from "react";
 import SettingsModal from "@/features/settings/components/modal";
 import {IoSettingsSharp} from "react-icons/io5";
 import useSettingsStore from "@/features/settings/stores/settings-store";
@@ -34,8 +34,6 @@ function GameView(props: IGameViewProps) {
   const incrementWrongKeystroke = useGameStore((state) => state.incrementWrongKeystroke);
   const incrementValidKeystroke = useGameStore((state) => state.incrementValidKeystroke);
 
-  const [isFocus, setIsFocus] = useState(false);
-
   const {isCapsLockOn} = useTyping({
     status,
     snippet: currentSnippet.parsedSnippet,
@@ -50,29 +48,10 @@ function GameView(props: IGameViewProps) {
   });
 
   const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
-  hiddenInputRef.current?.focus();
 
   const handleSnippetFinished = () => {
     onGameFinished();
   };
-
-  useEffect(() => {
-    const input = hiddenInputRef.current;
-    if (!input) return;
-
-    setIsFocus(document.activeElement === input);
-
-    const handleFocus = () => setIsFocus(true);
-    const handleBlur = () => setIsFocus(false);
-
-    input.addEventListener("focus", handleFocus);
-    input.addEventListener("blur", handleBlur);
-
-    return () => {
-      input.removeEventListener("focus", handleFocus);
-      input.removeEventListener("blur", handleBlur);
-    };
-  }, [hiddenInputRef]);
 
   return (
     <>
@@ -92,12 +71,23 @@ function GameView(props: IGameViewProps) {
               <IoSettingsSharp />
             </button>
           </div>
-          <div className={`h-fit w-fit cursor-default rounded-2xl ${!isFocus && "blur-[4px]"}`}>
+          <div className="relative h-fit w-fit">
             <TypingArea onGameFinished={handleSnippetFinished} />
+            <input
+              type="text"
+              autoFocus
+              ref={hiddenInputRef}
+              className="peer absolute top-0 h-full w-full cursor-default rounded-2xl text-transparent caret-transparent backdrop-blur-xs transition-opacity duration-200 outline-none selection:bg-transparent focus:opacity-0 [@starting-style]:opacity-0"
+            />
+            <div className="pointer-events-none absolute inset-0 flex items-center justify-center text-lg transition-opacity duration-200 peer-focus:opacity-0 [@starting-style]:opacity-0">
+              Click here or press any key to focus
+            </div>
           </div>
+
           <div className="flex flex-row content-between gap-1.5">
             <button
               className="rounded-md bg-slate-200 px-6 py-3 font-medium text-slate-900 hover:bg-slate-300 disabled:opacity-20"
+              onMouseDown={(e) => e.preventDefault()}
               onClick={resetSnippet}
               disabled={isRefreshing || status !== GameStatus.PLAYING}
             >
@@ -108,7 +98,12 @@ function GameView(props: IGameViewProps) {
                 />
               </svg>
             </button>
-            <button className="rounded-md bg-slate-200 px-6 py-3 font-medium text-slate-900 hover:bg-slate-300 disabled:opacity-20" onClick={changeSnippet} disabled={isRefreshing}>
+            <button
+              className="rounded-md bg-slate-200 px-6 py-3 font-medium text-slate-900 hover:bg-slate-300 disabled:opacity-20"
+              onMouseDown={(e) => e.preventDefault()}
+              onClick={changeSnippet}
+              disabled={isRefreshing}
+            >
               {!isRefreshing ? "Change Snippet" : "Wait.."}
             </button>
             <select
