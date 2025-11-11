@@ -22,6 +22,7 @@ const nextConfig: NextConfig = {
     "tree-sitter-python",
     "tree-sitter-lua",
     "tree-sitter-compat",
+    "@davisvaughan/tree-sitter-r",
   ],
 };
 
