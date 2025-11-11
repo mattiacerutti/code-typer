@@ -84,13 +84,7 @@ export function applyIndentationToEmptyLines(lines: string[]): string[] {
       const previousLineInitialWhitespaces = countInitialWhitespaces(lines[index - 1]);
       const nextLineInitialWhitespaces = countInitialWhitespaces(lines[index + 1]);
 
-      // If increasing indentation, we apply the bigger one
-      if (previousLineInitialWhitespaces < nextLineInitialWhitespaces) {
-        return "\t".repeat(nextLineInitialWhitespaces);
-      }
-
-      // If decreasing indentation or same, we apply the smaller one
-      return "\t".repeat(Math.min(previousLineInitialWhitespaces, nextLineInitialWhitespaces));
+      return "\t".repeat(Math.max(previousLineInitialWhitespaces, nextLineInitialWhitespaces));
     })
     .filter((line) => line !== null);
 }
