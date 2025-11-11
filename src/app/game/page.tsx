@@ -174,20 +174,17 @@ function Home() {
   }
 
   return (
-    <div className="relative h-fit w-fit">
-      <GameView
-        onGameFinished={handleEndGame}
-        onGameStarted={handleStartGame}
-        changeSnippet={handleChangeSnippet}
-        resetSnippet={handleResetSnippet}
-        changeLanguage={handleChangeLanguage}
-        isRefreshing={isNextButtonLocked}
-        availableLanguages={availableLanguages}
-        elapsedTime={elapsedTime}
-        hiddenInputRef={hiddenInputRef}
-      />
-      <input type="text" className="pointer-events-none absolute top-0 h-full w-full cursor-default rounded-2xl opacity-0" autoFocus ref={hiddenInputRef} value="" readOnly />
-    </div>
+    <GameView
+      onGameFinished={handleEndGame}
+      onGameStarted={handleStartGame}
+      changeSnippet={handleChangeSnippet}
+      resetSnippet={handleResetSnippet}
+      changeLanguage={handleChangeLanguage}
+      isRefreshing={isNextButtonLocked}
+      availableLanguages={availableLanguages}
+      elapsedTime={elapsedTime}
+      hiddenInputRef={hiddenInputRef}
+    />
   );
 }
 
