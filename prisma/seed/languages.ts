@@ -50,6 +50,12 @@ export const SUPPORTED_LANGUAGES: ILanguage[] = [
     extensions: ["lua"],
     highlightAlias: "lua",
   },
+  {
+    id: "r",
+    name: "R",
+    extensions: ["r", "R"],
+    highlightAlias: "r",
+  },
 ];
 
 export async function seedLanguages(prisma: PrismaClient) {

@@ -13,6 +13,7 @@ import Java from "tree-sitter-java";
 import Python from "tree-sitter-python";
 // @ts-expect-error tree-sitter packages have no types
 import Lua from "tree-sitter-lua";
+import R from "@davisvaughan/tree-sitter-r";
 import {convertLanguage} from "tree-sitter-compat";
 
 export function getTSParser(languageId: string): Parser {
@@ -43,6 +44,8 @@ function getLanguage(languageId: string) {
       return Python;
     case "lua":
       return Lua;
+    case "r":
+      return R;
     default:
       throw new Error(`Language ${languageId} not supported.`);
   }
