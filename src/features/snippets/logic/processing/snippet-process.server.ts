@@ -1,4 +1,4 @@
-import {adjustIndentationOffset, detectIndentationStyle} from "./indentation.server";
+import {adjustIndentationOffset, applyIndentationToEmptyLines, detectIndentationStyle} from "./indentation.server";
 import {extractAutoCompleteDisabledRanges, extractSnippets} from "@/features/snippets/logic/parsing/snippet-parser.server";
 import {countInitialWhitespaces} from "./text.server";
 import {filterLineLength, filterLinesNumber, filterSnippetLength, filterSnippetSpecialCharacters, filterTabsInBetween} from "./snippet-filters.server";
@@ -56,8 +56,11 @@ function formatCode(snippet: string): string | null {
     return "\t".repeat(initialWhitespaces) + trimmedLine;
   });
 
-  // Adjust indentation offset
+  // Adjust indentation offset on every line
   codeLines = adjustIndentationOffset(codeLines);
+
+  // Applies indentation to empty lines (the minimum indentation of the surrounding lines)
+  codeLines = applyIndentationToEmptyLines(codeLines);
 
   return codeLines.join("\n");
 }

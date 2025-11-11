@@ -69,3 +69,28 @@ export function getInitialIndentation(nodeStartIndex: number, sourceCode: string
 
   return buf;
 }
+
+export function applyIndentationToEmptyLines(lines: string[]): string[] {
+  return lines
+    .map((line, index) => {
+      if (line !== "") {
+        return line;
+      }
+
+      if (index === 0 || index === lines.length - 1) {
+        return null;
+      }
+
+      const previousLineInitialWhitespaces = countInitialWhitespaces(lines[index - 1]);
+      const nextLineInitialWhitespaces = countInitialWhitespaces(lines[index + 1]);
+
+      // If increasing indentation, we apply the bigger one
+      if (previousLineInitialWhitespaces < nextLineInitialWhitespaces) {
+        return "\t".repeat(nextLineInitialWhitespaces);
+      }
+
+      // If decreasing indentation or same, we apply the smaller one
+      return "\t".repeat(Math.min(previousLineInitialWhitespaces, nextLineInitialWhitespaces));
+    })
+    .filter((line) => line !== null);
+}
