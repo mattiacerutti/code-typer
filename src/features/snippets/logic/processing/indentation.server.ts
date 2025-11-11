@@ -69,3 +69,22 @@ export function getInitialIndentation(nodeStartIndex: number, sourceCode: string
 
   return buf;
 }
+
+export function applyIndentationToEmptyLines(lines: string[]): string[] {
+  return lines
+    .map((line, index) => {
+      if (line !== "") {
+        return line;
+      }
+
+      if (index === 0 || index === lines.length - 1) {
+        return null;
+      }
+
+      const previousLineInitialWhitespaces = countInitialWhitespaces(lines[index - 1]);
+      const nextLineInitialWhitespaces = countInitialWhitespaces(lines[index + 1]);
+
+      return "\t".repeat(Math.max(previousLineInitialWhitespaces, nextLineInitialWhitespaces));
+    })
+    .filter((line) => line !== null);
+}

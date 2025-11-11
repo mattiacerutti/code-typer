@@ -10,7 +10,8 @@ export function deleteLine(snippet: IParsedSnippet, position: number, autoClosin
   if (isFirstCharacter(snippet, position)) {
     let previousLineEnd = getPreviousLineEnd(snippet, position);
 
-    while (previousLineEnd && getLineStart(snippet, previousLineEnd) === previousLineEnd) {
+    // If the last char and first char of the previous line are the same, we are in an empty line
+    while (previousLineEnd && getLineStart(snippet, previousLineEnd) === previousLineEnd && autoClosingMode === AutoClosingMode.FULL) {
       previousLineEnd = getPreviousLineEnd(snippet, previousLineEnd);
     }
 
