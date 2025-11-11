@@ -71,7 +71,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       DATABASE_URL: ${{ secrets.DATABASE_URL }}
-      GITHUB_API_TOKEN: ${{ secrets.GITHUB_API_TOKEN }}
+      GITHUB_API_TOKEN: ${{ secrets.API_GITHUB_TOKEN }}
       NEXT_TELEMETRY_DISABLED: "1"
     steps:
       - uses: actions/checkout@v4
