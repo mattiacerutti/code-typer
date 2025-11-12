@@ -1,3 +1,4 @@
+import Script from "next/script";
 import "./globals.css";
 
 export default function RootLayout({
@@ -7,6 +8,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <head>{process.env.NODE_ENV === "production" && <Script defer src="https://cloud.umami.is/script.js" data-website-id="5776b2c7-d9cd-424b-a233-b9ed0287d324" />}</head>
       <body>{children}</body>
     </html>
   );
