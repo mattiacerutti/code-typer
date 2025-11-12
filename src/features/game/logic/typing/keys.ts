@@ -7,7 +7,7 @@ export function isAValidKey(event: KeyboardEvent) {
   return event.key.length === 1 || validExtraKeys.includes(event.key);
 }
 
-export function isAValidShortcutKey(event: KeyboardEvent) {
-  const validShortcutKeys = ["Backspace"];
-  return validShortcutKeys.includes(event.key);
+export function isAValidShortcutKey(event: InputEvent) {
+  const validShortcutKeys = ["deleteSoftLineBackward", "deleteWordBackward"];
+  return validShortcutKeys.includes(event.inputType);
 }
