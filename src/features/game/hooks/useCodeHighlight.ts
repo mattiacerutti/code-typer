@@ -1,8 +1,11 @@
 import {useState, useEffect} from "react";
 import hljs from "highlight.js";
+import {useTheme} from "next-themes";
 
 const useCodeHighlight = (snippet: string, languageHighlightAlias: string) => {
   const [codeHighlight, setCodeHighlight] = useState<string[] | null>(null);
+
+  const {resolvedTheme} = useTheme();
 
   useEffect(() => {
     const wrapCharactersInSpans = (code: string) => {
@@ -77,9 +80,23 @@ const useCodeHighlight = (snippet: string, languageHighlightAlias: string) => {
   }, [snippet, languageHighlightAlias]);
 
   useEffect(() => {
-    //@ts-expect-error custom theme for code highlighting
-    import("highlight.js/styles/github.css");
-  }, []);
+    const existingLink = document.getElementById("hljs-theme") as HTMLLinkElement | null;
+
+    const href =
+      resolvedTheme === "dark"
+        ? "https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.css"
+        : "https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.css";
+
+    if (existingLink) {
+      existingLink.href = href;
+    } else {
+      const link = document.createElement("link");
+      link.id = "hljs-theme";
+      link.rel = "stylesheet";
+      link.href = href;
+      document.head.appendChild(link);
+    }
+  }, [resolvedTheme]);
 
   return {codeHighlight};
 };
