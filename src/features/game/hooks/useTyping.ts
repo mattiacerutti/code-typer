@@ -33,44 +33,44 @@ const useTyping = (props: IUseTypingProps) => {
     }
     onValidKeystroke();
   };
+  const handleKeyDown = (event: KeyboardEvent) => {
+    if (event.key === "Dead") return;
 
-  const handleKeyShortcut = (event: KeyboardEvent) => {
-    let updatedSnippet = snippet;
-    let newPosition = userPosition;
-
-    if ((event.ctrlKey || event.metaKey) && event.key === "Backspace") {
-      [updatedSnippet, newPosition] = deleteLine(snippet, userPosition, autoClosingMode);
-    } else if (event.altKey && event.key === "Backspace") {
-      [updatedSnippet, newPosition] = deleteWord(snippet, userPosition, autoClosingMode);
+    if (event.getModifierState("CapsLock")) {
+      setIsCapsLockOn(true);
     }
 
-    if (updatedSnippet !== snippet) onSnippetUpdate(updatedSnippet);
+    // If its a modifier key different from alt (since it could produce valid characters) or its a backspace modifier we ignore it
+    if (hasModifierKey(event) && (!event.altKey || event.key === "Backspace")) return;
+    if (!isAValidKey(event)) return;
+
+    let newPosition = userPosition;
+    let newSnippet = snippet;
+
+    if (event.key === "Backspace") {
+      [newSnippet, newPosition] = deleteCharacter(snippet, userPosition, autoClosingMode);
+    } else {
+      if (status === GameStatus.READY) onStartTyping();
+      [newSnippet, newPosition] = addCharacter(snippet, userPosition, event.key, registerKeyStroke, autoClosingMode);
+    }
+
+    if (newSnippet !== snippet) onSnippetUpdate(newSnippet);
     if (newPosition !== userPosition) onUserPositionChange(newPosition);
   };
 
-  const handleKeyPress = (event: KeyboardEvent) => {
-    if (event.key === "Dead") return;
+  const handleInput = (event: InputEvent) => {
+    if (!isAValidShortcutKey(event)) return;
 
-    if (hasModifierKey(event) && isAValidShortcutKey(event)) {
-      handleKeyShortcut(event);
-      return;
-    }
-
-    // If its a modifier key different from alt (since it could produce valid characters) we ignore it
-    if (hasModifierKey(event) && !event.altKey) return;
-    if (!isAValidKey(event)) return;
-
-    let updatedSnippet = snippet;
+    let newSnippet = snippet;
     let newPosition = userPosition;
 
-    if (event.key === "Backspace") {
-      [updatedSnippet, newPosition] = deleteCharacter(snippet, userPosition, autoClosingMode);
-    } else {
-      if (status === GameStatus.READY) onStartTyping();
-      [updatedSnippet, newPosition] = addCharacter(snippet, userPosition, event.key, registerKeyStroke, autoClosingMode);
+    if (event.inputType === "deleteWordBackward") {
+      [newSnippet, newPosition] = deleteWord(snippet, userPosition, autoClosingMode);
+    } else if (event.inputType === "deleteSoftLineBackward") {
+      [newSnippet, newPosition] = deleteLine(snippet, userPosition, autoClosingMode);
     }
 
-    if (updatedSnippet !== snippet) onSnippetUpdate(updatedSnippet);
+    if (newSnippet !== snippet) onSnippetUpdate(newSnippet);
     if (newPosition !== userPosition) onUserPositionChange(newPosition);
   };
 
@@ -85,28 +85,24 @@ const useTyping = (props: IUseTypingProps) => {
       }
     };
 
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.getModifierState("CapsLock")) {
-        setIsCapsLockOn(true);
-      }
-      handleKeyPress(event);
-    };
-    hiddenInput.addEventListener("keydown", handleKeyDown);
-    window.addEventListener("keydown", handleReFocus);
-
     const handleKeyUp = (event: KeyboardEvent) => {
       if (event.key === "CapsLock") {
         setIsCapsLockOn(false);
       }
     };
+
+    hiddenInput.addEventListener("keydown", handleKeyDown);
     hiddenInput.addEventListener("keyup", handleKeyUp);
+    hiddenInput.addEventListener("input", handleInput as EventListener);
+    window.addEventListener("keydown", handleReFocus);
 
     return () => {
       hiddenInput.removeEventListener("keydown", handleKeyDown);
       hiddenInput.removeEventListener("keyup", handleKeyUp);
+      hiddenInput.removeEventListener("input", handleInput as EventListener);
       window.removeEventListener("keydown", handleReFocus);
     };
-  }, [handleKeyPress, hiddenInputRef]);
+  }, [handleKeyDown, handleInput, hiddenInputRef]);
 
   return {
     isCapsLockOn,
