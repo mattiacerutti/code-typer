@@ -29,16 +29,16 @@ function ThemeToggle() {
       onClick={handleToggle}
       onMouseDown={(e) => e.preventDefault()}
     >
-      <span className="relative block h-5 w-5 shrink-0">
+      <span className="relative block h-4.5 w-4.5 shrink-0">
         <FiSun
           className={
-            "pointer-events-none absolute inset-0 h-5 w-5 origin-center transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] " +
+            "pointer-events-none absolute inset-0 h-full w-full origin-center transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] " +
             (isDark ? "scale-90 rotate-[-60deg] opacity-0" : "scale-100 rotate-0 opacity-100")
           }
         />
         <FiMoon
           className={
-            "pointer-events-none absolute inset-0 h-5 w-5 origin-center transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] " +
+            "pointer-events-none absolute inset-0 h-full w-full origin-center transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] " +
             (isDark ? "scale-100 rotate-0 opacity-100" : "scale-90 rotate-60 opacity-0")
           }
         />
