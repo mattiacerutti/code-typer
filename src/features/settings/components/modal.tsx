@@ -33,7 +33,7 @@ function SettingsModal(props: ISettingsModalProps) {
               onChange={(event) => {
                 setAutoClosing(event.target.value as AutoClosingMode);
               }}
-              className="rounded-md bg-(--color-surface) px-6 py-3 font-medium text-(--color-foreground)"
+              className="rounded-md bg-(--color-accent) px-6 py-3 font-medium text-(--color-foreground) hover:bg-(--color-accent-hover)"
             >
               {Object.values(AutoClosingMode).map((mode) => (
                 <option key={mode} value={mode}>
