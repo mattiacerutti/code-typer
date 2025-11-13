@@ -13,6 +13,7 @@ import EndgameView from "@/features/game/components/endgame-view";
 import type {ILanguage} from "@/shared/types/language";
 import type {ISnippet} from "@/shared/types/snippet";
 import {AutoClosingMode} from "@/features/settings/types/autoclosing-mode";
+import {track} from "@/features/game/logic/track";
 
 function Home() {
   const status = useGameStore((state) => state.status);
@@ -102,16 +103,19 @@ function Home() {
   const handleResetSnippet = () => {
     resetStopwatch();
     resetCurrentSnippet();
+    track("SNIPPET_RETRY");
   };
 
   const handleStartGame = () => {
     startStopwatch();
+    track("GAME_START");
   };
 
   const handleEndGame = () => {
     stopStopwatch();
     pushPositionSample(getTime());
     setStatus(GameStatus.FINISHED);
+    track("GAME_END");
   };
 
   const handleChangeSnippet = async () => {
@@ -119,10 +123,12 @@ function Home() {
     await goToNextSnippetWithPrefetch();
     resetStopwatch();
     hiddenInputRef.current?.focus();
+    track("SNIPPET_CHANGE");
   };
 
   const handleChangeLanguage = async (selectedLanguage: ILanguage) => {
     await setSnippets(selectedLanguage);
+    track("LANGUAGE_CHANGE", {language: selectedLanguage.name});
   };
 
   useEffect(() => {
