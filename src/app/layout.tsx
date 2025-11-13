@@ -1,7 +1,6 @@
 import Script from "next/script";
 import "./globals.css";
 import ThemeProvider from "@/shared/components/theme-provider";
-import HighlightTheme from "@/features/game/components/highlight-theme";
 
 export default function RootLayout({
   children,
@@ -10,10 +9,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <head>
-        {process.env.NODE_ENV === "production" && <Script defer src="https://cloud.umami.is/script.js" data-website-id="5776b2c7-d9cd-424b-a233-b9ed0287d324" />}
-        <HighlightTheme />
-      </head>
+      <head>{process.env.NODE_ENV === "production" && <Script defer src="https://cloud.umami.is/script.js" data-website-id="5776b2c7-d9cd-424b-a233-b9ed0287d324" />}</head>
       <body>
         <ThemeProvider>{children}</ThemeProvider>
       </body>

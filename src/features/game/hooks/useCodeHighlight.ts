@@ -1,7 +1,10 @@
-import {useMemo} from "react";
+import {useEffect, useMemo} from "react";
 import hljs from "highlight.js";
+import {useTheme} from "next-themes";
 
 const useCodeHighlight = (snippet: string, languageHighlightAlias: string) => {
+  const {resolvedTheme} = useTheme();
+
   const codeHighlight = useMemo(() => {
     const wrapCharactersInSpans = (code: string) =>
       code
@@ -64,6 +67,24 @@ const useCodeHighlight = (snippet: string, languageHighlightAlias: string) => {
     // Extract the code styling
     return extractCodeStyling(tempElement);
   }, [snippet, languageHighlightAlias]);
+
+  useEffect(() => {
+    let link = document.getElementById("hljs-theme") as HTMLLinkElement | null;
+
+    if (!link) {
+      link = document.createElement("link");
+      link.id = "hljs-theme";
+      link.rel = "stylesheet";
+      document.head.appendChild(link);
+    }
+
+    const href =
+      resolvedTheme === "dark"
+        ? "https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.css"
+        : "https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.css";
+
+    link.href = href;
+  }, [resolvedTheme]);
 
   return {codeHighlight};
 };
