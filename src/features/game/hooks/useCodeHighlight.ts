@@ -80,8 +80,8 @@ const useCodeHighlight = (snippet: string, languageHighlightAlias: string) => {
 
     const href =
       resolvedTheme === "dark"
-        ? "https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.css"
-        : "https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.css";
+        ? "https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/github-dark.css"
+        : "https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/github.css";
 
     link.href = href;
   }, [resolvedTheme]);
