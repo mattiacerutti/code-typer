@@ -27,13 +27,12 @@ function Caret({charRefs, userPosition}: ICaretProps) {
 
   return (
     <div
-      className={`blinking-cursor ${blinking && "blinking-caret"}`}
+      className={`blinking-cursor ${blinking && "blinking-caret"} bg-(--color-foreground)`}
       style={{
         position: "absolute",
         top: `${caretPosition.top + 4}px`,
         left: `${caretPosition.left - 2}px`,
         height: "30px",
-        backgroundColor: "black",
         width: "3px",
         borderRadius: "10px",
         transition: "all 0.15s ease",

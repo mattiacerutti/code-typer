@@ -54,9 +54,9 @@ function TypingArea(props: ITypingAreaProps) {
   }, [status, userPosition, currentSnippet.parsedSnippet, onGameFinished]);
 
   return (
-    <div className="flex flex-col items-center justify-center rounded-2xl bg-slate-100 p-10 shadow-lg">
+    <div className="flex flex-col items-center justify-center rounded-2xl bg-(--color-surface) p-10 shadow-lg">
       <div className="relative flex items-center justify-center">
-        <div className="flex flex-col gap-1.5 text-3xl text-slate-700 select-none">
+        <div className="flex flex-col gap-1.5 text-3xl select-none">
           {groupedCharacters.map((group, groupIndex) => (
             <div key={groupIndex} className="flex flex-row whitespace-pre">
               {group.map((item) => {

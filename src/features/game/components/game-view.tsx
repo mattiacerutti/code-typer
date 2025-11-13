@@ -57,14 +57,16 @@ function GameView(props: IGameViewProps) {
     <>
       <SettingsModal isOpen={isSettingsModalOpen} closeModal={() => setIsSettingsModalOpen(false)} />
       <div className="flex flex-col items-center justify-center">
-        <div className={`relative bottom-8 text-red-500 ${!isCapsLockOn && "opacity-0"} text-2xl font-bold`}>Caps Lock is on</div>
+        <div className={`relative bottom-8 text-(--color-danger) ${!isCapsLockOn && "opacity-0"} text-2xl font-bold`}>Caps Lock is on</div>
         <div className="flex flex-col items-center justify-center gap-10">
           <div className="flex w-full flex-row">
             <div className="flex h-full flex-1 justify-center">
-              <div className="h-fit w-fit min-w-20 rounded-md bg-slate-100 px-4 py-2 text-center align-middle font-medium text-slate-900">{humanizeTime(elapsedTime)}</div>
+              <div className="h-fit w-fit min-w-20 rounded-md bg-(--color-surface) px-4 py-2 text-center align-middle font-medium text-(--color-foreground)">
+                {humanizeTime(elapsedTime)}
+              </div>
             </div>
             <button
-              className="aspect-square h-auto w-fit rounded-md bg-slate-100 px-4 py-2 text-center font-medium text-slate-900 enabled:hover:bg-slate-200 disabled:cursor-not-allowed disabled:opacity-20"
+              className="aspect-square h-auto w-fit rounded-md bg-(--color-accent) px-4 py-2 text-center font-medium text-(--color-accent-contrast) shadow-sm enabled:hover:bg-(--color-accent-hover) disabled:cursor-not-allowed disabled:opacity-20"
               onClick={() => setIsSettingsModalOpen(true)}
               disabled={status !== GameStatus.READY}
             >
@@ -96,7 +98,7 @@ function GameView(props: IGameViewProps) {
 
           <div className="flex flex-row content-between gap-1.5">
             <button
-              className="rounded-md bg-slate-200 px-6 py-3 font-medium text-slate-900 hover:bg-slate-300 disabled:opacity-20"
+              className="rounded-md bg-(--color-accent) px-6 py-3 font-medium text-(--color-accent-contrast) shadow-sm hover:bg-(--color-accent-hover) disabled:opacity-20"
               onMouseDown={(e) => e.preventDefault()}
               onClick={resetSnippet}
               disabled={isRefreshing || status !== GameStatus.PLAYING}
@@ -109,7 +111,7 @@ function GameView(props: IGameViewProps) {
               </svg>
             </button>
             <button
-              className="rounded-md bg-slate-200 px-6 py-3 font-medium text-slate-900 hover:bg-slate-300 disabled:opacity-20"
+              className="rounded-md bg-(--color-accent) px-6 py-3 text-(--color-accent-contrast) shadow-sm hover:bg-(--color-accent-hover) disabled:opacity-20"
               onMouseDown={(e) => e.preventDefault()}
               onClick={changeSnippet}
               disabled={isRefreshing}
@@ -123,7 +125,7 @@ function GameView(props: IGameViewProps) {
                 setStatus(GameStatus.LOADING);
                 changeLanguage(availableLanguages[event.target.value]);
               }}
-              className="rounded-md bg-slate-200 px-6 py-3 font-medium text-slate-900 hover:bg-slate-300 disabled:opacity-20"
+              className="rounded-md bg-(--color-accent) px-6 py-3 font-medium text-(--color-accent-contrast) shadow-sm hover:bg-(--color-accent-hover) disabled:opacity-20"
             >
               {Object.values(availableLanguages).map((availableLanguage) => (
                 <option key={availableLanguage.id} value={availableLanguage.id}>

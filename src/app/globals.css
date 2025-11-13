@@ -1,13 +1,37 @@
 @import "tailwindcss";
 
-root {
+:root {
+  color: var(--color-foreground);
+  background-color: var(--color-background);
+  --color-background: #ffffff;
+  --color-foreground: #0f172a;
+  --color-muted: #94a3b8;
+  --color-surface: #f1f5f9;
+  --color-surface-hover: #e2e8f0;
+  --color-accent: #e2e8f0;
+  --color-accent-contrast: #0f172a;
+  --color-accent-hover: #d5dbe2;
+  --color-danger: #dc2626;
+  --color-chart: #6366f1;
+}
+:root[data-theme="dark"],
+[data-theme="dark"] {
+  --color-background: #0e0e11;
+  --color-foreground: rgb(209 213 219);
+  --color-muted: hsla(0, 0%, 72%, 0.8);
+  --color-surface: #18181b;
+  --color-surface-hover: #1e293b;
+  --color-accent: oklch(30.519% 0.00003 271.152);
+  --color-accent-contrast: #f8fafc;
+  --color-accent-hover: oklch(28.908% 0.00003 271.152);
+  --color-danger: #f87171;
+  --color-chart: #c084fc;
+}
+
+body {
   font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
-  font-weight: 400;
-
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
+  font-weight: 500;
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -18,12 +42,12 @@ root {
 }
 
 .character-default {
-  color: #94a3b8;
+  color: var(--color-muted);
   background-color: inherit;
 }
 
 .character-wrong {
-  background-color: #dc2626 !important;
+  background-color: var(--color-danger) !important;
 }
 
 @keyframes caret-blink {
