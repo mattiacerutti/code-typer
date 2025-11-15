@@ -10,6 +10,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint .",
+    "prettier": "prettier --check src",
     "postinstall": "prisma generate"
   },
   "prisma": {

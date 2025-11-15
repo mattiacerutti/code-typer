@@ -1,4 +1,4 @@
-name: cd
+name: CD
 
 on:
   push:
@@ -30,6 +30,9 @@ jobs:
 
       - name: Lint
         run: npm run lint
+
+      - name: Prettier
+        run: npm run prettier
 
       - name: Build
         env:
