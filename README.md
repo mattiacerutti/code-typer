@@ -25,15 +25,12 @@ Currently you can toggle between three different modes for the auto-closing.
 | **Partial** | All brackets, parenthesis, quotation marks that are automatically closed when you type them, but you actually need to type the closing character (or press the right arrow!) to move past it.
 | **Disabled** | Nothing auto-completes, every bracket is on you. |
 
-## Tech Stack 🛠️
 
-- Next.js 16
-- Tailwind
-- Zustand
-- Prisma + PostgreSQL
-- Tree-sitter grammars (JS/TS/C/C++/C#/Java/Python/Lua)
-- highlight.js
-- Recharts
+## Contributing 🤝
+- Contributions are **very welcome!**
+- **Found a bug?** Please [open an issue](https://github.com/mattiacerutti/code-typer/issues) with as much details as possible.
+- **Want to request a feature?** Please [open an issue](https://github.com/mattiacerutti/code-typer/issues) so we can discuss it openly.
+- **Ready to open a PR?** Please read [CONTRIBUTING.md](./CONTRIBUTING.md).
 
 ## License 📄
 
