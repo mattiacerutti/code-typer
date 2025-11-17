@@ -1,7 +1,7 @@
 import dotenv from "dotenv";
 import {PrismaClient} from "@prisma/client";
 import {getFlagValue, parseNumberFlag} from "./utils/cli";
-import {seedLanguageSnippets as seedLanguageSnippetsHelper} from "./utils/snippet-helpers";
+import {getFilesForLanguage} from "../lib/snippet-helpers";
 
 dotenv.config();
 
@@ -38,5 +38,3 @@ if (require.main === module) {
     }
   })();
 }
-
-export {fetchLanguageSnippets, seedLanguageSnippets, seedSnippets} from "./utils/snippet-helpers";

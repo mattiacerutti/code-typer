@@ -18,25 +18,31 @@ model Language {
 
 model File {
   id           String        @id @default(uuid())
-  url          String
+  repository   String
+  path         String
   languageId   String
   language     Language      @relation(fields: [languageId], references: [id])
   fileVersions FileVersion[]
+
+  @@unique([repository, path])
 }
 
 model FileVersion {
   id        String    @id @default(uuid())
-  commitSha String
+  sha       String
+  commit    String
   createdAt DateTime  @default(now())
   parsedAt  DateTime?
   fileId    String
   file      File      @relation(fields: [fileId], references: [id])
   snippets  Snippet[]
+
+  @@unique([fileId, sha])
 }
 
 model Snippet {
   id            String      @id @default(uuid())
-  hash          String      @unique
+  sha           String      @unique
   content       String
   languageId    String
   fileVersionId String
