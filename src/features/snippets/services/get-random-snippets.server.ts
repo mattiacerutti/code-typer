@@ -1,39 +1,29 @@
 import {MIN_SNIPPETS_PER_LANGUAGE, MAX_SNIPPETS_FETCH_ATTEMPTS, RANDOM_FILES_FETCHED} from "@/features/snippets/config/snippets.server";
-import {fetchRandomFiles as getRandomFiles, setSnippetAsNonValid} from "@/features/snippets/infrastructure/repositories/snippet.repository.server";
-import {getFilesFromUrls} from "@/features/snippets/infrastructure/adapters/snippet-fetch.server";
-import {processSnippets as processFile} from "@/features/snippets/logic/processing/snippet-process.server";
-import type {SnippetSourceFile} from "@/features/snippets/types/snippet-source";
 import {ISnippet} from "@/shared/types/snippet.server";
-import {isDev} from "@/core/config/env";
+import {filterSnippets} from "@/features/snippets/logic/processing/filter";
+import {findRandomSnippets} from "@/features/snippets/infrastructure/repositories/snippet.repository.server";
+import {extractAutoCompleteDisabledRanges} from "@/features/snippets/logic/parsing/snippet-parser.server";
 
 export async function getRandomSnippets(languageId: string): Promise<ISnippet[]> {
   const snippets: ISnippet[] = [];
-  const fetchedFilesUrls: string[] = [];
 
   let attempts = 0;
   while (snippets.length < MIN_SNIPPETS_PER_LANGUAGE && attempts < MAX_SNIPPETS_FETCH_ATTEMPTS) {
-    const fileUrls = await getRandomFiles(languageId, RANDOM_FILES_FETCHED, fetchedFilesUrls).catch((error) => {
-      console.error("Error fetching random files:", error);
-      return [];
+    const randomSnippets = await findRandomSnippets(languageId, RANDOM_FILES_FETCHED);
+
+    const filteredSnippets = randomSnippets.filter((s) => filterSnippets(s.content));
+
+    const finalSnippets = filteredSnippets.map((snippet) => {
+      const disabledRanges = extractAutoCompleteDisabledRanges(snippet.content, languageId);
+
+      return {
+        content: snippet.content,
+        disabledRanges,
+      };
     });
 
-    fetchedFilesUrls.push(...fileUrls);
+    snippets.push(...finalSnippets);
 
-    const fetchedFiles: SnippetSourceFile[] = await getFilesFromUrls(fileUrls);
-
-    const extractedSnippets = fetchedFiles
-      .map((file) => {
-        const snippetsFromFile = processFile(file.content, languageId);
-
-        if (snippetsFromFile.length === 0 && !isDev) {
-          setSnippetAsNonValid(file.url);
-        }
-
-        return snippetsFromFile;
-      })
-      .flat();
-
-    snippets.push(...extractedSnippets);
     attempts++;
   }
 

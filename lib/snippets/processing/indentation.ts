@@ -1,4 +1,4 @@
-import {countInitialWhitespaces, removeInitialCharacters} from "./text.server";
+import {countInitialWhitespaces, removeInitialCharacters} from "./utils";
 
 type IIndentationStyle = {type: "none" | "mixed" | "tab"} | {type: "space"; value: number[]};
 export function detectIndentationStyle(snippet: string): IIndentationStyle {

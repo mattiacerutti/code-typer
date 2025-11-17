@@ -14,48 +14,48 @@ export const SUPPORTED_LANGUAGES: ILanguage[] = [
     extensions: ["ts", "tsx"],
     highlightAlias: "typescript",
   },
-  {
-    id: "c",
-    name: "C",
-    extensions: ["c"],
-    highlightAlias: "cpp",
-  },
-  {
-    id: "cpp",
-    name: "C++",
-    extensions: ["cpp"],
-    highlightAlias: "cpp",
-  },
-  {
-    id: "cs",
-    name: "C#",
-    extensions: ["cs"],
-    highlightAlias: "csharp",
-  },
-  {
-    id: "java",
-    name: "Java",
-    extensions: ["java"],
-    highlightAlias: "java",
-  },
-  {
-    id: "py",
-    name: "Python",
-    extensions: ["py"],
-    highlightAlias: "python",
-  },
-  {
-    id: "lua",
-    name: "Lua",
-    extensions: ["lua"],
-    highlightAlias: "lua",
-  },
-  {
-    id: "r",
-    name: "R",
-    extensions: ["r", "R"],
-    highlightAlias: "r",
-  },
+  // {
+  //   id: "c",
+  //   name: "C",
+  //   extensions: ["c"],
+  //   highlightAlias: "cpp",
+  // },
+  // {
+  //   id: "cpp",
+  //   name: "C++",
+  //   extensions: ["cpp"],
+  //   highlightAlias: "cpp",
+  // },
+  // {
+  //   id: "cs",
+  //   name: "C#",
+  //   extensions: ["cs"],
+  //   highlightAlias: "csharp",
+  // },
+  // {
+  //   id: "java",
+  //   name: "Java",
+  //   extensions: ["java"],
+  //   highlightAlias: "java",
+  // },
+  // {
+  //   id: "py",
+  //   name: "Python",
+  //   extensions: ["py"],
+  //   highlightAlias: "python",
+  // },
+  // {
+  //   id: "lua",
+  //   name: "Lua",
+  //   extensions: ["lua"],
+  //   highlightAlias: "lua",
+  // },
+  // {
+  //   id: "r",
+  //   name: "R",
+  //   extensions: ["r", "R"],
+  //   highlightAlias: "r",
+  // },
 ];
 
 export async function seedLanguages(prisma: PrismaClient) {

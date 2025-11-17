@@ -2,6 +2,7 @@ import dotenv from "dotenv";
 import {PrismaClient} from "@prisma/client";
 import {seedLanguages} from "./seed/languages";
 import {seedFiles} from "./seed/files";
+import {seedSnippets} from "./seed/snippets";
 
 dotenv.config();
 
@@ -10,6 +11,7 @@ const prisma = new PrismaClient();
 async function main() {
   await seedLanguages(prisma);
   await seedFiles(prisma);
+  await seedSnippets(prisma);
 }
 
 main()
