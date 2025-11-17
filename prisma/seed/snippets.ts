@@ -1,8 +1,8 @@
 import {getSnippetsFromFile} from "@lib/snippets";
 import {Prisma, PrismaClient} from "@prisma/client";
-const RAW_GITHUB_BASE_URL = "https://raw.githubusercontent.com";
 import pLimit from "p-limit";
 
+const RAW_GITHUB_BASE_URL = "https://raw.githubusercontent.com";
 const limit = pLimit(100);
 
 export async function seedSnippets(prisma: PrismaClient) {
