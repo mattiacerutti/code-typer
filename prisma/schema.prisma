@@ -8,19 +8,40 @@ datasource db {
 }
 
 model Language {
-  id             String    @id @unique
+  id             String    @id
   name           String    @unique
-  lastUpdatedAt  DateTime  @default(now())
   extensions     String[]
   highlightAlias String
   snippets       Snippet[]
+  trackedFiles   File[]
+}
+
+model File {
+  id           String        @id @default(uuid())
+  url          String
+  languageId   String
+  language     Language      @relation(fields: [languageId], references: [id])
+  fileVersions FileVersion[]
+}
+
+model FileVersion {
+  id        String    @id @default(uuid())
+  commitSha String
+  createdAt DateTime  @default(now())
+  parsedAt  DateTime?
+  fileId    String
+  file      File      @relation(fields: [fileId], references: [id])
+  snippets  Snippet[]
 }
 
 model Snippet {
-  url        String   @id @unique
-  languageId String
-  isValid    Boolean  @default(true)
-  language   Language @relation(fields: [languageId], references: [id])
+  id            String      @id @default(uuid())
+  hash          String      @unique
+  content       String
+  languageId    String
+  fileVersionId String
+  language      Language    @relation(fields: [languageId], references: [id])
+  fileVersion   FileVersion @relation(fields: [fileVersionId], references: [id])
 
   @@index([languageId])
 }
