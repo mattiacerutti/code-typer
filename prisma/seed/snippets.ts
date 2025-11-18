@@ -3,7 +3,7 @@ import {Prisma, PrismaClient} from "@prisma/client";
 import pLimit from "p-limit";
 
 const RAW_GITHUB_BASE_URL = "https://raw.githubusercontent.com";
-const limit = pLimit(100);
+const limit = pLimit(60);
 
 export async function seedSnippets(prisma: PrismaClient) {
   console.log("Seeding snippets for unparsed files..");
