@@ -25,12 +25,13 @@ export async function seedSnippets(prisma: PrismaClient) {
   });
 
   if (unparsedFiles.length === 0) {
-    throw new Error("All files are parsed. No snippets to seed.");
+    console.log("All files are parsed. No snippets to seed.");
+    return;
   }
 
   await Promise.all(
     unparsedFiles.map(async (file) => {
-      const {repository, path} = file.file;
+      const {repository, path, languageId} = file.file;
       const url = `${RAW_GITHUB_BASE_URL}/${repository}/${file.commit}/${path}`;
 
       const fileContent = await limit(async () => {
@@ -56,11 +57,10 @@ export async function seedSnippets(prisma: PrismaClient) {
 
       if (!fileContent) return;
 
-      const snippets = getSnippetsFromFile(fileContent, file.file.languageId);
+      const snippets = getSnippetsFromFile(fileContent, languageId);
 
       await Promise.all(
         snippets.map(async (snippet) => {
-          console.log(`Inserting snippet with SHA ${snippet.sha} from file version ${file.id}`);
           try {
             await prisma.snippet.create({
               data: {
