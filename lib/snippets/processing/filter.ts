@@ -23,8 +23,8 @@ function filterSnippetSpecialCharacters(snippet: string): boolean {
 }
 
 function filterTabsInBetween(snippet: string): boolean {
-  const regex = /(^|[^\\])(\\t)|(\t)/;
-  return regex.test(snippet.trim());
+  const regex = /^.+\\t.+$/;
+  return !regex.test(snippet);
 }
 
 export function isValidNode(node: IParser.SyntaxNode) {
