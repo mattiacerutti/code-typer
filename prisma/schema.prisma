@@ -20,7 +20,7 @@ model File {
   repository   String
   path         String
   languageId   String
-  language     Language      @relation(fields: [languageId], references: [id])
+  language     Language      @relation(fields: [languageId], references: [id], onDelete: Cascade)
   fileVersions FileVersion[]
 
   @@unique([repository, path])
@@ -34,7 +34,7 @@ model FileVersion {
   createdAt DateTime  @default(now())
   parsedAt  DateTime?
   fileId    String
-  file      File      @relation(fields: [fileId], references: [id])
+  file      File      @relation(fields: [fileId], references: [id], onDelete: Cascade)
   snippets  Snippet[]
 
   @@unique([fileId, sha])
@@ -46,5 +46,5 @@ model Snippet {
   content       String
   rawContent    String
   fileVersionId String
-  fileVersion   FileVersion @relation(fields: [fileVersionId], references: [id])
+  fileVersion   FileVersion @relation(fields: [fileVersionId], references: [id], onDelete: Cascade)
 }
