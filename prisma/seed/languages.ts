@@ -77,4 +77,5 @@ export async function seedLanguages(prisma: PrismaClient) {
 
     console.log(`Language seeded: ${languageRecord.name}`);
   }
+  console.log("Languages seeded successfully.");
 }

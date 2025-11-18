@@ -3,8 +3,8 @@ export const MIN_LINES = 3;
 
 export const MAX_LINE_LENGTH = 72;
 
-export const MAX_SNIPPET_LENGTH = 300;
-export const MIN_SNIPPET_LENGTH = 100;
+export const MAX_SNIPPET_LENGTH = 350;
+export const MIN_SNIPPET_LENGTH = 75;
 
 export const VALID_NODES = [
   "function_declaration",
@@ -25,7 +25,3 @@ export const VALID_NODES = [
   "for_statement",
   "if_statement",
 ];
-
-export const MIN_SNIPPETS_NUMBER = 10;
-export const SNIPPETS_RETRIEVED_PER_QUERY = 30;
-export const MAX_GET_SNIPPETS_ATTEMPTS = 10;
