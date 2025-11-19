@@ -1,8 +1,7 @@
 "use client";
 
 import {useEffect, useRef, useState} from "react";
-import {buildClientSnippet, getRandomCodeSnippets} from "@/features/snippets/services/get-random-snippets.client";
-import {fetchLanguages} from "@/features/snippets/infrastructure/adapters/snippet-fetch.client";
+import {buildClientSnippet, buildClientSnippets} from "@/features/snippets/services/get-random-snippets.client";
 import useStopwatch from "@/features/game/hooks/useStopwatch";
 import {GameStatus} from "@/features/game/types/game-status";
 import {REFRESH_BUTTON_MIN_DELAY} from "@/features/game/config/game";
@@ -14,6 +13,7 @@ import type {ILanguage} from "@/shared/types/language";
 import type {ISnippet} from "@/shared/types/snippet";
 import {AutoClosingMode} from "@/features/settings/types/autoclosing-mode";
 import {track} from "@/features/game/logic/track";
+import {api} from "@/trpc/react";
 
 function Home() {
   const status = useGameStore((state) => state.status);
@@ -49,21 +49,33 @@ function Home() {
   const [isNextButtonLocked, setIsNextButtonLocked] = useState(false);
 
   const backgroundFetchPromise = useRef<Promise<void> | null>(null);
-  const [availableLanguages, setAvailableLanguages] = useState<{[key: string]: ILanguage} | null>(null);
+  const {
+    data: availableLanguages,
+    isLoading: isLoadingLanguages,
+    isError: languagesError,
+  } = api.snippet.languages.useQuery(undefined, {
+    staleTime: Infinity,
+    gcTime: Infinity,
+  });
+
+  const {mutateAsync: requestRandomSnippets} = api.snippet.random.useMutation();
+
+  const fetchClientSnippets = async (languageId: string) => {
+    const autoClosingEnabled = useSettingsStore.getState().autoClosingMode !== AutoClosingMode.DISABLED;
+    const rawSnippets = await requestRandomSnippets({languageId});
+    return buildClientSnippets(rawSnippets, autoClosingEnabled);
+  };
 
   const setSnippets = async (selectedLanguage: ILanguage) => {
     setSelectedLanguage(selectedLanguage);
     resetStopwatch();
-    const autoClosingMode = useSettingsStore.getState().autoClosingMode;
-    const snippets = await getRandomCodeSnippets(selectedLanguage.id, autoClosingMode !== AutoClosingMode.DISABLED);
+    const snippets = await fetchClientSnippets(selectedLanguage.id);
     initialize(selectedLanguage, snippets);
   };
 
   const backgroundGetSnippets = async () => {
     if (!language) return;
-    const autoClosingMode = useSettingsStore.getState().autoClosingMode;
-    const snippets = await getRandomCodeSnippets(language!.id, autoClosingMode !== AutoClosingMode.DISABLED);
-
+    const snippets = await fetchClientSnippets(language.id);
     addSnippetsToQueue(snippets);
   };
 
@@ -132,18 +144,17 @@ function Home() {
   };
 
   useEffect(() => {
-    const initializeGame = async () => {
-      const languages = await fetchLanguages();
-      setAvailableLanguages(languages);
+    if (!availableLanguages) return;
 
-      const selectedLanguage = useSettingsStore.getState().selectedLanguage;
+    const selectedLanguage = useSettingsStore.getState().selectedLanguage;
+    const langId = selectedLanguage?.id ?? Object.keys(availableLanguages)[0];
 
-      const langId = selectedLanguage?.id ?? Object.keys(languages)[0];
+    if (!langId) return;
 
-      await setSnippets(languages[langId]);
-    };
-    initializeGame();
-  }, [setSnippets]);
+    const languageToUse = availableLanguages[langId];
+
+    setSnippets(languageToUse);
+  }, [availableLanguages, setSnippets]);
 
   const reparseExistingSnippets = async () => {
     const gameState = useGameStore.getState();
@@ -170,13 +181,17 @@ function Home() {
 
   useEffect(() => {
     reparseExistingSnippets();
-  }, [autoClosingMode, reparseExistingSnippets]);
+  }, [reparseExistingSnippets]);
 
   if (status === GameStatus.FINISHED && currentSnippet) {
     return <EndgameView handleChangeSnippet={handleChangeSnippet} handleRetrySnippet={handleResetSnippet} />;
   }
 
-  if (status === GameStatus.LOADING || !availableLanguages || !currentSnippet || !language) {
+  if (languagesError) {
+    return <div>Failed to load languages.</div>;
+  }
+
+  if (status === GameStatus.LOADING || isLoadingLanguages || !availableLanguages || !currentSnippet || !language) {
     return <div>Loading...</div>;
   }
 

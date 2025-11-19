@@ -1,6 +1,5 @@
 import type {ISnippet as IClientSnippet} from "@/shared/types/snippet";
 import type {ISnippet as IServerSnippet} from "@/shared/types/snippet.server";
-import {fetchRandomSnippets} from "@/features/snippets/infrastructure/adapters/snippet-fetch.client";
 import {parseSnippet} from "@/features/snippets/logic/parsing/snippet-parse.client";
 
 export const buildClientSnippet = (rawSnippet: IServerSnippet, autoClosingEnabled: boolean): IClientSnippet | null => {
@@ -12,7 +11,6 @@ export const buildClientSnippet = (rawSnippet: IServerSnippet, autoClosingEnable
   return {parsedSnippet, rawSnippet};
 };
 
-export const getRandomCodeSnippets = async (languageId: string, autoClosingEnabled: boolean): Promise<IClientSnippet[]> => {
-  const rawSnippets = await fetchRandomSnippets(languageId);
+export const buildClientSnippets = (rawSnippets: IServerSnippet[], autoClosingEnabled: boolean): IClientSnippet[] => {
   return rawSnippets.map((rawSnippet) => buildClientSnippet(rawSnippet, autoClosingEnabled)).filter((snippet): snippet is IClientSnippet => snippet !== null);
 };
