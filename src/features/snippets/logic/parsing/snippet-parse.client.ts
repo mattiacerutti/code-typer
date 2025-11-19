@@ -1,7 +1,7 @@
-import {CharacterState, CharacterTypes, WhitespaceTypes} from "@/shared/types/character";
-import {IParsedSnippet} from "@/shared/types/snippet";
+import {CharacterState, CharacterTypes, WhitespaceTypes} from "@/features/shared/types/character";
+import {IParsedSnippet} from "@/features/shared/types/snippet";
 import {AUTO_CLOSING_CHARS} from "@/features/game/config/game";
-import {ISnippet} from "@/shared/types/snippet.server";
+import {ISnippet} from "@/features/shared/types/snippet.server";
 
 function createAutoClosingMaps(snippet: ISnippet): {autoClosingMap: Record<number, number>; reverseAutoClosingMap: Record<number, number>} {
   const pendingPairs: Record<string, number[]> = {};

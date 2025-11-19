@@ -1,5 +1,5 @@
-import {CharacterTypes, WhitespaceTypes} from "@/shared/types/character";
-import {IParsedSnippet} from "@/shared/types/snippet";
+import {CharacterTypes, WhitespaceTypes} from "@/features/shared/types/character";
+import {IParsedSnippet} from "@/features/shared/types/snippet";
 
 export function calculateWPM(milliseconds: number, totalCharacters: number) {
   const minutes = milliseconds / 1000 / 60;

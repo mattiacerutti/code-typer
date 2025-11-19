@@ -1,7 +1,7 @@
 import Script from "next/script";
 import "./globals.css";
-import ThemeProvider from "@/shared/components/theme-provider";
-import {TRPCReactProvider} from "@/trpc/react";
+import ThemeProvider from "@/providers/theme-provider";
+import {TRPCReactProvider} from "@/providers/trpc-provider";
 
 export default function RootLayout({
   children,

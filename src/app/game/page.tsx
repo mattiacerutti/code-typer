@@ -9,11 +9,11 @@ import {useGameStore} from "@/features/game/state/game-store";
 import useSettingsStore from "@/features/settings/stores/settings-store";
 import GameView from "@/features/game/components/game-view";
 import EndgameView from "@/features/game/components/endgame-view";
-import type {ILanguage} from "@/shared/types/language";
-import type {ISnippet} from "@/shared/types/snippet";
+import type {ILanguage} from "@/features/shared/types/language";
+import type {ISnippet} from "@/features/shared/types/snippet";
 import {AutoClosingMode} from "@/features/settings/types/autoclosing-mode";
 import {track} from "@/features/game/logic/track";
-import {api} from "@/trpc/react";
+import {api} from "@/providers/trpc-provider";
 
 function Home() {
   const status = useGameStore((state) => state.status);

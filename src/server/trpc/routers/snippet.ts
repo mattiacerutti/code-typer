@@ -1,14 +1,14 @@
 import {TRPCError} from "@trpc/server";
 import {z} from "zod";
-import {createTRPCRouter, rateLimitedProcedure} from "@/server/trpc/trpc";
+import {createTRPCRouter, publicProcedure} from "@/server/trpc/trpc";
 import {getRandomSnippets} from "@/features/snippets/services/get-random-snippets.server";
 import {doesLanguageExist, getLanguages} from "@/features/snippets/infrastructure/repositories/language.repository.server";
 
 export const snippetRouter = createTRPCRouter({
-  languages: rateLimitedProcedure.query(async () => {
+  languages: publicProcedure.query(async () => {
     return getLanguages();
   }),
-  random: rateLimitedProcedure
+  random: publicProcedure
     .input(
       z.object({
         languageId: z.string().min(1),

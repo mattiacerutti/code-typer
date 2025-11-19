@@ -1,6 +1,6 @@
 import {create} from "zustand";
-import type {IParsedSnippet, ISnippet} from "@/shared/types/snippet";
-import type {ILanguage} from "@/shared/types/language";
+import type {IParsedSnippet, ISnippet} from "@/features/shared/types/snippet";
+import type {ILanguage} from "@/features/shared/types/language";
 import {GameStatus} from "@/features/game/types/game-status";
 import {resetCharacters} from "@/features/game/logic/game-logic";
 

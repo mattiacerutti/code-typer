@@ -1,7 +1,7 @@
 import {getChar, getPreviousChar, hasOnlyWhitespacesBefore, setCharacterState} from "@/features/game/logic/typing/shared";
 import {AutoClosingMode} from "@/features/settings/types/autoclosing-mode";
-import {CharacterState, CharacterTypes, WhitespaceTypes} from "@/shared/types/character";
-import {IParsedSnippet} from "@/shared/types/snippet";
+import {CharacterState, CharacterTypes, WhitespaceTypes} from "@/features/shared/types/character";
+import {IParsedSnippet} from "@/features/shared/types/snippet";
 import {produce} from "immer";
 
 function incrementUserPosition(snippet: IParsedSnippet, position: number, isPressedKeyCorrect: boolean, autoClosingMode: AutoClosingMode): number {

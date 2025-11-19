@@ -1,7 +1,7 @@
-import {CharacterTypes, ICharacter, WhitespaceTypes} from "@/shared/types/character";
+import {CharacterTypes, ICharacter, WhitespaceTypes} from "@/features/shared/types/character";
 import {getLineStart, getPreviousChar, getPreviousLineEnd, isFirstCharacter, resetCharactersInRange} from "@/features/game/logic/typing/shared";
 import {AUTO_CLOSING_CHARS} from "@/features/game/config/game";
-import {IParsedSnippet} from "@/shared/types/snippet";
+import {IParsedSnippet} from "@/features/shared/types/snippet";
 import {AutoClosingMode} from "@/features/settings/types/autoclosing-mode";
 
 const isWordSeparator = (char: ICharacter) =>

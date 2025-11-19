@@ -1,6 +1,6 @@
 import {produce} from "immer";
-import {CharacterState, CharacterTypes, ICharacter, WhitespaceTypes} from "@/shared/types/character";
-import {IParsedSnippet} from "@/shared/types/snippet";
+import {CharacterState, CharacterTypes, ICharacter, WhitespaceTypes} from "@/features/shared/types/character";
+import {IParsedSnippet} from "@/features/shared/types/snippet";
 
 export function getChar(snippet: IParsedSnippet, position: number): ICharacter {
   return snippet[position];

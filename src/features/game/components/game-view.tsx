@@ -1,7 +1,7 @@
 import TypingArea from "@/features/game/components/typing-area";
 import useTyping from "@/features/game/hooks/useTyping";
 import {GameStatus} from "@/features/game/types/game-status";
-import type {ILanguage} from "@/shared/types/language";
+import type {ILanguage} from "@/features/shared/types/language";
 import {humanizeTime} from "@/features/game/utils/typing-metrics";
 import {useGameStore} from "../state/game-store";
 import {useState} from "react";
