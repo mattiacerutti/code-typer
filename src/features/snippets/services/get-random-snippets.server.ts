@@ -1,11 +1,11 @@
-import {ISnippet} from "@/features/shared/types/snippet.server";
+import {IRawSnippet} from "@/features/shared/types/snippet";
 import {filterSnippets} from "@/features/snippets/logic/filter";
 import {findRandomSnippets} from "@/features/snippets/infrastructure/repositories/snippet.repository.server";
 import {extractAutoCompleteDisabledRanges} from "@/features/snippets/logic/parsing/snippet-parser.server";
 import {MAX_GET_SNIPPETS_ATTEMPTS, MIN_SNIPPETS_NUMBER, SNIPPETS_RETRIEVED_PER_QUERY} from "@/features/snippets/config/snippets.server";
 
-export async function getRandomSnippets(languageId: string): Promise<ISnippet[]> {
-  const snippets: ISnippet[] = [];
+export async function getRandomSnippets(languageId: string): Promise<IRawSnippet[]> {
+  const snippets: IRawSnippet[] = [];
 
   let attempts = 0;
   while (snippets.length < MIN_SNIPPETS_NUMBER && attempts < MAX_GET_SNIPPETS_ATTEMPTS) {

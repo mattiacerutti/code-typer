@@ -1,9 +1,13 @@
 import {ICharacter} from "@/features/shared/types/character";
-import type {ISnippet as IServerSnippet} from "@/features/shared/types/snippet.server";
 
 export type IParsedSnippet = ICharacter[];
 
-export interface ISnippet {
+export interface IRawSnippet {
+  content: string;
+  disabledRanges: {startIndex: number; endIndex: number}[];
+}
+
+export interface IClientSnippet {
   parsedSnippet: IParsedSnippet;
-  rawSnippet: IServerSnippet;
+  rawSnippet: IRawSnippet;
 }

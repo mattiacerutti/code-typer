@@ -1,5 +1,5 @@
 import {CharacterState, CharacterTypes, WhitespaceTypes} from "@/features/shared/types/character";
-import {IParsedSnippet, ISnippet} from "@/features/shared/types/snippet";
+import {IParsedSnippet, IClientSnippet} from "@/features/shared/types/snippet";
 
 export function isGameFinished(parsedSnippets: IParsedSnippet) {
   const allCorrect = parsedSnippets.every(
@@ -12,7 +12,7 @@ export function isGameFinished(parsedSnippets: IParsedSnippet) {
   return allCorrect;
 }
 
-export function resetCharacters(snippet: ISnippet): ISnippet {
+export function resetCharacters(snippet: IClientSnippet): IClientSnippet {
   return {
     rawSnippet: snippet.rawSnippet,
     parsedSnippet: snippet.parsedSnippet.map((char) => ({

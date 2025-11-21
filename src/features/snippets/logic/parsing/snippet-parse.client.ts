@@ -1,9 +1,9 @@
 import {CharacterState, CharacterTypes, WhitespaceTypes} from "@/features/shared/types/character";
 import {IParsedSnippet} from "@/features/shared/types/snippet";
 import {AUTO_CLOSING_CHARS} from "@/features/game/config/game";
-import {ISnippet} from "@/features/shared/types/snippet.server";
+import {IRawSnippet} from "@/features/shared/types/snippet";
 
-function createAutoClosingMaps(snippet: ISnippet): {autoClosingMap: Record<number, number>; reverseAutoClosingMap: Record<number, number>} {
+function createAutoClosingMaps(snippet: IRawSnippet): {autoClosingMap: Record<number, number>; reverseAutoClosingMap: Record<number, number>} {
   const pendingPairs: Record<string, number[]> = {};
 
   const autoClosingMap: Record<number, number> = {};
@@ -51,7 +51,7 @@ function createAutoClosingMaps(snippet: ISnippet): {autoClosingMap: Record<numbe
   return {autoClosingMap, reverseAutoClosingMap};
 }
 
-export const parseSnippet = (snippet: ISnippet, autoClosingEnabled: boolean): IParsedSnippet | null => {
+export const parseSnippet = (snippet: IRawSnippet, autoClosingEnabled: boolean): IParsedSnippet | null => {
   const characters: string[] = snippet.content.split("");
 
   let autoClosingMap: Record<number, number> = {};

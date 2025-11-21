@@ -9,8 +9,7 @@ import EndgameView from "@/features/game/components/endgame-view";
 import {track} from "@/features/game/logic/track";
 import {useGameSnippets} from "@/features/game/hooks/useGameSnippets";
 import {GameStatus} from "@/features/game/types/game-status";
-import {buildClientSnippet} from "@/features/snippets/services/get-random-snippets.client";
-import type {ISnippet as IClientSnippet} from "@/features/shared/types/snippet";
+import {buildClientSnippets} from "@/features/snippets/services/build-client-snippets.client";
 import type {ILanguage} from "@/features/shared/types/language";
 import {AutoClosingMode} from "@/features/settings/types/autoclosing-mode";
 
@@ -102,9 +101,10 @@ function Home() {
     resetStopwatch();
 
     const snippetsToReparse = [activeSnippet, ...gameState.getSnippetQueue()];
-    const reparsedSnippets = snippetsToReparse
-      .map((snippet) => buildClientSnippet(snippet.rawSnippet, autoClosingMode !== AutoClosingMode.DISABLED))
-      .filter((snippet): snippet is IClientSnippet => snippet !== null);
+    const reparsedSnippets = buildClientSnippets(
+      snippetsToReparse.map((snippet) => snippet.rawSnippet),
+      autoClosingMode !== AutoClosingMode.DISABLED
+    );
 
     initialize(activeLanguage, reparsedSnippets);
   }, [autoClosingMode, initialize, resetStopwatch, setStatus]);

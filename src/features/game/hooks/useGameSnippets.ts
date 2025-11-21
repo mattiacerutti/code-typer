@@ -3,11 +3,11 @@ import {api} from "@/components/providers/trpc-provider";
 import {useGameStore} from "@/features/game/state/game-store";
 import {GameStatus} from "@/features/game/types/game-status";
 import {REFRESH_BUTTON_MIN_DELAY} from "@/features/game/config/game";
-import type {ILanguage} from "@/features/shared/types/language";
-import type {ISnippet as IClientSnippet} from "@/features/shared/types/snippet";
+import {ILanguage} from "@/features/shared/types/language";
+import {IClientSnippet} from "@/features/shared/types/snippet";
 import useSettingsStore from "@/features/settings/stores/settings-store";
 import {AutoClosingMode} from "@/features/settings/types/autoclosing-mode";
-import {buildClientSnippets} from "@/features/snippets/services/get-random-snippets.client";
+import {buildClientSnippets} from "@/features/snippets/services/build-client-snippets.client";
 
 export function useGameSnippets() {
   const language = useGameStore((state) => state.language);

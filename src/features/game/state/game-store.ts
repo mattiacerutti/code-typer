@@ -1,5 +1,5 @@
 import {create} from "zustand";
-import type {IParsedSnippet, ISnippet} from "@/features/shared/types/snippet";
+import type {IParsedSnippet, IClientSnippet} from "@/features/shared/types/snippet";
 import type {ILanguage} from "@/features/shared/types/language";
 import {GameStatus} from "@/features/game/types/game-status";
 import {resetCharacters} from "@/features/game/logic/game-logic";
@@ -19,14 +19,14 @@ const createSessionStats = (): SessionStats => ({
 export interface IGameStoreState {
   status: GameStatus;
   language: ILanguage | null;
-  currentSnippet: ISnippet | null;
+  currentSnippet: IClientSnippet | null;
   userPosition: number | null;
 
   /* Methods */
-  initialize: (language: ILanguage, snippets: ISnippet[]) => void;
+  initialize: (language: ILanguage, snippets: IClientSnippet[]) => void;
   updateCurrentSnippet: (newSnippet: IParsedSnippet) => void;
   updateUserPosition: (position: number) => void;
-  addSnippetsToQueue: (snippets: ISnippet[]) => void;
+  addSnippetsToQueue: (snippets: IClientSnippet[]) => void;
   goToNextSnippet: () => void;
   resetCurrentSnippet: () => void;
   setStatus: (status: GameStatus.LOADING | GameStatus.FINISHED) => void;
@@ -36,12 +36,12 @@ export interface IGameStoreState {
 
   /* Getters for non-stateful properties */
   getSessionStats: () => SessionStats;
-  getSnippetQueue: () => ISnippet[];
+  getSnippetQueue: () => IClientSnippet[];
 }
 
 export const useGameStore = create<IGameStoreState>((set, get) => {
   let sessionStats = createSessionStats();
-  let snippetQueue: ISnippet[] = [];
+  let snippetQueue: IClientSnippet[] = [];
 
   const resetSessionStats = () => {
     sessionStats = createSessionStats();
