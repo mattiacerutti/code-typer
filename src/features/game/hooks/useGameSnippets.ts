@@ -1,5 +1,5 @@
 import {useRef, useState} from "react";
-import {api} from "@/providers/trpc-provider";
+import {api} from "@/components/providers/trpc-provider";
 import {useGameStore} from "@/features/game/state/game-store";
 import {GameStatus} from "@/features/game/types/game-status";
 import {REFRESH_BUTTON_MIN_DELAY} from "@/features/game/config/game";
@@ -24,11 +24,11 @@ export function useGameSnippets() {
   const backgroundFetchPromise = useRef<Promise<void> | null>(null);
 
   const {data: availableLanguages, isLoading: isLoadingLanguages, isError: languagesError} = api.snippet.languages.useQuery();
-  const {mutateAsync: requestRandomSnippets} = api.snippet.random.useMutation();
+  const fetchRandomSnippets = api.snippet.random.useMutation();
 
   const fetchSnippetsForLanguage = async (language: ILanguage): Promise<IClientSnippet[]> => {
     const autoClosingEnabled = autoClosingMode !== AutoClosingMode.DISABLED;
-    const rawSnippets = await requestRandomSnippets({languageId: language.id});
+    const rawSnippets = await fetchRandomSnippets.mutateAsync({languageId: language.id});
     return buildClientSnippets(rawSnippets, autoClosingEnabled);
   };
 
