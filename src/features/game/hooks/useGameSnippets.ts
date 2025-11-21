@@ -23,8 +23,10 @@ export function useGameSnippets() {
   const [isNextButtonLocked, setIsNextButtonLocked] = useState(false);
   const backgroundFetchPromise = useRef<Promise<void> | null>(null);
 
-  const {data: availableLanguages, isLoading: isLoadingLanguages, isError: languagesError} = api.snippet.languages.useQuery();
-  const fetchRandomSnippets = api.snippet.random.useMutation();
+  const {data: availableLanguages, isError: languagesError} = api.snippet.languages.useQuery();
+  const {error: randomError, ...fetchRandomSnippets} = api.snippet.random.useMutation();
+
+  const error = languagesError || randomError;
 
   const fetchSnippetsForLanguage = async (language: ILanguage): Promise<IClientSnippet[]> => {
     const autoClosingEnabled = autoClosingMode !== AutoClosingMode.DISABLED;
@@ -76,10 +78,9 @@ export function useGameSnippets() {
 
   return {
     availableLanguages,
-    isLoadingLanguages,
-    languagesError,
-    isNextButtonLocked,
-    changeSnippet,
     activateLanguage,
+    changeSnippet,
+    error,
+    isNextButtonLocked,
   };
 }

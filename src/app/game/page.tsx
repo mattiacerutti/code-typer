@@ -38,7 +38,7 @@ function Home() {
   };
 
   const {startStopwatch, stopStopwatch, resetStopwatch, getTime} = useStopwatch({onTick, onInterval: pushPositionSample});
-  const {availableLanguages, languagesError, isNextButtonLocked, activateLanguage, changeSnippet} = useGameSnippets();
+  const {availableLanguages, error, isNextButtonLocked, activateLanguage, changeSnippet} = useGameSnippets();
 
   const handleResetSnippet = () => {
     resetStopwatch();
@@ -113,8 +113,20 @@ function Home() {
     return <EndgameView handleChangeSnippet={handleSnippetChange} handleRetrySnippet={handleResetSnippet} />;
   }
 
-  if (languagesError) {
-    return <div>Failed to load languages.</div>;
+  if (error) {
+    return (
+      <div className="flex flex-col gap-5">
+        <h1 className="text-4xl">There was an error! :(</h1>
+        <p>
+          Something went wrong while getting your game ready, try again later. <br />
+          If the issue persists, please&nbsp;
+          <a className="underline" href="https://github.com/mattiacerutti/code-typer/issues">
+            open an issue
+          </a>
+          &nbsp;on Github.
+        </p>
+      </div>
+    );
   }
 
   if (status === GameStatus.LOADING) {

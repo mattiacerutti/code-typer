@@ -8,8 +8,23 @@ import type {AppRouter} from "@/server/trpc/routers";
 
 export const api = createTRPCReact<AppRouter>();
 
+export function createQueryClient() {
+  return new QueryClient({
+    defaultOptions: {
+      queries: {
+        retry: 3,
+        retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 10000),
+      },
+      mutations: {
+        retry: 3,
+        retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 10000),
+      },
+    },
+  });
+}
+
 export function TRPCReactProvider({children}: {children: ReactNode}) {
-  const [queryClient] = useState(() => new QueryClient());
+  const [queryClient] = useState(() => createQueryClient());
   const [trpcClient] = useState(() =>
     api.createClient({
       links: [
