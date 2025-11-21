@@ -1,104 +1,44 @@
 "use client";
 
-import {useEffect, useRef, useState} from "react";
-import {buildClientSnippet, getRandomCodeSnippets} from "@/features/snippets/services/get-random-snippets.client";
-import {fetchLanguages} from "@/features/snippets/infrastructure/adapters/snippet-fetch.client";
+import {useEffect, useRef, useState, useEffectEvent} from "react";
 import useStopwatch from "@/features/game/hooks/useStopwatch";
-import {GameStatus} from "@/features/game/types/game-status";
-import {REFRESH_BUTTON_MIN_DELAY} from "@/features/game/config/game";
 import {useGameStore} from "@/features/game/state/game-store";
 import useSettingsStore from "@/features/settings/stores/settings-store";
 import GameView from "@/features/game/components/game-view";
 import EndgameView from "@/features/game/components/endgame-view";
-import type {ILanguage} from "@/shared/types/language";
-import type {ISnippet} from "@/shared/types/snippet";
-import {AutoClosingMode} from "@/features/settings/types/autoclosing-mode";
 import {track} from "@/features/game/logic/track";
+import {useGameSnippets} from "@/features/game/hooks/useGameSnippets";
+import {GameStatus} from "@/features/game/types/game-status";
+import {buildClientSnippet} from "@/features/snippets/services/get-random-snippets.client";
+import type {ISnippet as IClientSnippet} from "@/features/shared/types/snippet";
+import type {ILanguage} from "@/features/shared/types/language";
+import {AutoClosingMode} from "@/features/settings/types/autoclosing-mode";
 
 function Home() {
   const status = useGameStore((state) => state.status);
-  const language = useGameStore((state) => state.language);
-  const currentSnippet = useGameStore((state) => state.currentSnippet);
   const initialize = useGameStore((state) => state.initialize);
-  const addSnippetsToQueue = useGameStore((state) => state.addSnippetsToQueue);
-  const goToNextSnippet = useGameStore((state) => state.goToNextSnippet);
   const resetCurrentSnippet = useGameStore((state) => state.resetCurrentSnippet);
   const setStatus = useGameStore((state) => state.setStatus);
   const registerPositionSample = useGameStore((state) => state.registerPositionSample);
-  const getSnippetQueue = useGameStore((state) => state.getSnippetQueue);
 
   const autoClosingMode = useSettingsStore((state) => state.autoClosingMode);
-  const setSelectedLanguage = useSettingsStore((state) => state.setSelectedLanguage);
 
   const [elapsedTime, setElapsedTime] = useState(0);
 
   const hiddenInputRef = useRef<HTMLInputElement | null>(null);
 
-  const onTick = (elapsedTime: number) => {
-    setElapsedTime(elapsedTime);
+  const onTick = (elapsed: number) => {
+    setElapsedTime(elapsed);
   };
 
-  const pushPositionSample = (elapsedTime: number) => {
+  const pushPositionSample = (elapsed: number) => {
     const userPosition = useGameStore.getState().userPosition;
     if (userPosition === null) return;
-    registerPositionSample(elapsedTime, userPosition);
+    registerPositionSample(elapsed, userPosition);
   };
 
   const {startStopwatch, stopStopwatch, resetStopwatch, getTime} = useStopwatch({onTick, onInterval: pushPositionSample});
-
-  const [isNextButtonLocked, setIsNextButtonLocked] = useState(false);
-
-  const backgroundFetchPromise = useRef<Promise<void> | null>(null);
-  const [availableLanguages, setAvailableLanguages] = useState<{[key: string]: ILanguage} | null>(null);
-
-  const setSnippets = async (selectedLanguage: ILanguage) => {
-    setSelectedLanguage(selectedLanguage);
-    resetStopwatch();
-    const autoClosingMode = useSettingsStore.getState().autoClosingMode;
-    const snippets = await getRandomCodeSnippets(selectedLanguage.id, autoClosingMode !== AutoClosingMode.DISABLED);
-    initialize(selectedLanguage, snippets);
-  };
-
-  const backgroundGetSnippets = async () => {
-    if (!language) return;
-    const autoClosingMode = useSettingsStore.getState().autoClosingMode;
-    const snippets = await getRandomCodeSnippets(language!.id, autoClosingMode !== AutoClosingMode.DISABLED);
-
-    addSnippetsToQueue(snippets);
-  };
-
-  const goToNextSnippetWithPrefetch = async () => {
-    if (status !== GameStatus.PLAYING && status !== GameStatus.READY && status !== GameStatus.FINISHED) return;
-
-    const snippetQueue = getSnippetQueue();
-
-    const startTime = Date.now();
-    setIsNextButtonLocked(true);
-
-    if (snippetQueue.length === 0) {
-      setStatus(GameStatus.LOADING);
-
-      if (backgroundFetchPromise.current) {
-        await backgroundFetchPromise.current;
-        backgroundFetchPromise.current = null;
-      } else {
-        await setSnippets(language!);
-        setIsNextButtonLocked(false);
-        return;
-      }
-    } else if (snippetQueue.length <= 3 && !backgroundFetchPromise.current) {
-      backgroundFetchPromise.current = backgroundGetSnippets();
-    }
-
-    const elapsedTime = Date.now() - startTime;
-    const remainingTime = Math.max(REFRESH_BUTTON_MIN_DELAY - elapsedTime, 0);
-
-    goToNextSnippet();
-
-    setTimeout(() => {
-      setIsNextButtonLocked(false);
-    }, remainingTime);
-  };
+  const {availableLanguages, error, isNextButtonLocked, activateLanguage, changeSnippet} = useGameSnippets();
 
   const handleResetSnippet = () => {
     resetStopwatch();
@@ -118,65 +58,78 @@ function Home() {
     track("GAME_END");
   };
 
-  const handleChangeSnippet = async () => {
+  const handleSnippetChange = async () => {
     setStatus(GameStatus.LOADING);
-    await goToNextSnippetWithPrefetch();
     resetStopwatch();
+    await changeSnippet();
     hiddenInputRef.current?.focus();
     track("SNIPPET_CHANGE");
   };
 
   const handleChangeLanguage = async (selectedLanguage: ILanguage) => {
-    await setSnippets(selectedLanguage);
+    resetStopwatch();
+    activateLanguage(selectedLanguage);
     track("LANGUAGE_CHANGE", {language: selectedLanguage.name});
   };
 
+  const activateLanguageEvent = useEffectEvent((language: ILanguage) => {
+    resetStopwatch();
+    activateLanguage(language);
+  });
+
+  // Initialize game on available languages load
   useEffect(() => {
-    const initializeGame = async () => {
-      const languages = await fetchLanguages();
-      setAvailableLanguages(languages);
+    if (!availableLanguages) return;
 
-      const selectedLanguage = useSettingsStore.getState().selectedLanguage;
+    const selectedLanguage = useSettingsStore.getState().selectedLanguage;
+    const langId = selectedLanguage?.id ?? Object.keys(availableLanguages)[0];
+    if (!langId) return;
 
-      const langId = selectedLanguage?.id ?? Object.keys(languages)[0];
+    const languageToUse = availableLanguages[langId];
+    if (!languageToUse) return;
 
-      await setSnippets(languages[langId]);
-    };
-    initializeGame();
-  }, [setSnippets]);
+    activateLanguageEvent(languageToUse);
+  }, [availableLanguages]);
 
-  const reparseExistingSnippets = async () => {
+  // Every time autoclosing mode changes, reparse all snippets
+  useEffect(() => {
     const gameState = useGameStore.getState();
     const activeLanguage = gameState.language;
     const activeSnippet = gameState.currentSnippet;
     if (!activeLanguage || !activeSnippet) return;
 
-    const snippetsToReparse = [activeSnippet, ...gameState.getSnippetQueue()];
-
     setStatus(GameStatus.LOADING);
     resetStopwatch();
 
+    const snippetsToReparse = [activeSnippet, ...gameState.getSnippetQueue()];
     const reparsedSnippets = snippetsToReparse
       .map((snippet) => buildClientSnippet(snippet.rawSnippet, autoClosingMode !== AutoClosingMode.DISABLED))
-      .filter((snippet): snippet is ISnippet => snippet !== null);
-
-    if (reparsedSnippets.length === 0) {
-      await setSnippets(activeLanguage);
-      return;
-    }
+      .filter((snippet): snippet is IClientSnippet => snippet !== null);
 
     initialize(activeLanguage, reparsedSnippets);
-  };
+  }, [autoClosingMode, initialize, resetStopwatch, setStatus]);
 
-  useEffect(() => {
-    reparseExistingSnippets();
-  }, [autoClosingMode, reparseExistingSnippets]);
-
-  if (status === GameStatus.FINISHED && currentSnippet) {
-    return <EndgameView handleChangeSnippet={handleChangeSnippet} handleRetrySnippet={handleResetSnippet} />;
+  if (status === GameStatus.FINISHED) {
+    return <EndgameView handleChangeSnippet={handleSnippetChange} handleRetrySnippet={handleResetSnippet} />;
   }
 
-  if (status === GameStatus.LOADING || !availableLanguages || !currentSnippet || !language) {
+  if (error) {
+    return (
+      <div className="flex flex-col gap-5">
+        <h1 className="text-4xl">There was an error! :(</h1>
+        <p>
+          Something went wrong while getting your game ready, try again later. <br />
+          If the issue persists, please&nbsp;
+          <a className="underline" href="https://github.com/mattiacerutti/code-typer/issues">
+            open an issue
+          </a>
+          &nbsp;on Github.
+        </p>
+      </div>
+    );
+  }
+
+  if (status === GameStatus.LOADING) {
     return <div>Loading...</div>;
   }
 
@@ -184,11 +137,11 @@ function Home() {
     <GameView
       onGameFinished={handleEndGame}
       onGameStarted={handleStartGame}
-      changeSnippet={handleChangeSnippet}
+      changeSnippet={handleSnippetChange}
       resetSnippet={handleResetSnippet}
       changeLanguage={handleChangeLanguage}
       isRefreshing={isNextButtonLocked}
-      availableLanguages={availableLanguages}
+      availableLanguages={availableLanguages!}
       elapsedTime={elapsedTime}
       hiddenInputRef={hiddenInputRef}
     />

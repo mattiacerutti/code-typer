@@ -5,7 +5,7 @@ import {addCharacter} from "@/features/game/logic/typing/add-character";
 import {deleteWord} from "@/features/game/logic/typing/delete-word";
 import {deleteLine} from "@/features/game/logic/typing/delete-line";
 import {GameStatus} from "@/features/game/types/game-status";
-import type {IParsedSnippet} from "@/shared/types/snippet";
+import type {IParsedSnippet} from "@/features/shared/types/snippet";
 import {AutoClosingMode} from "@/features/settings/types/autoclosing-mode";
 
 interface IUseTypingProps {

@@ -1,4 +1,4 @@
-import {CharacterState, WhitespaceTypes} from "@/shared/types/character";
+import {CharacterState, WhitespaceTypes} from "@/features/shared/types/character";
 import React from "react";
 
 interface ICharacterProps {

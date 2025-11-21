@@ -1,4 +1,4 @@
-import {ILanguage} from "@/shared/types/language";
+import {ILanguage} from "@/features/shared/types/language";
 import {PrismaClient} from "@prisma/client";
 import {callGitHubApi} from "@lib/github";
 import {SUPPORTED_LANGUAGES} from "./languages";

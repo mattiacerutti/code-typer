@@ -1,5 +1,5 @@
-import {CharacterState, CharacterTypes, WhitespaceTypes} from "@/shared/types/character";
-import {IParsedSnippet} from "@/shared/types/snippet";
+import {CharacterState, CharacterTypes, WhitespaceTypes} from "@/features/shared/types/character";
+import {IParsedSnippet} from "@/features/shared/types/snippet";
 import {getChar, hasOnlyWhitespacesBefore, resetCharactersInRange} from "@/features/game/logic/typing/shared";
 import {AutoClosingMode} from "@/features/settings/types/autoclosing-mode";
 

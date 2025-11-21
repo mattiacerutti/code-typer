@@ -1,4 +1,4 @@
-import {ILanguage} from "@/shared/types/language";
+import {ILanguage} from "@/features/shared/types/language";
 import {create} from "zustand";
 import {persist} from "zustand/middleware";
 import {AutoClosingMode} from "@/features/settings/types/autoclosing-mode";

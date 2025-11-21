@@ -1,5 +1,5 @@
-import {CharacterState, CharacterTypes, WhitespaceTypes} from "@/shared/types/character";
-import {IParsedSnippet, ISnippet} from "@/shared/types/snippet";
+import {CharacterState, CharacterTypes, WhitespaceTypes} from "@/features/shared/types/character";
+import {IParsedSnippet, ISnippet} from "@/features/shared/types/snippet";
 
 export function isGameFinished(parsedSnippets: IParsedSnippet) {
   const allCorrect = parsedSnippets.every(

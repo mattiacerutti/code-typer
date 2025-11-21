@@ -1,4 +1,4 @@
-import {prisma} from "@/shared/db/prisma";
+import {prisma} from "@/server/prisma";
 import {Snippet} from "@prisma/client";
 
 export async function findRandomSnippets(languageId: string, quantity: number): Promise<Pick<Snippet, "id" | "content">[]> {

@@ -1,4 +1,4 @@
-import {ISnippet} from "@/shared/types/snippet.server";
+import {ISnippet} from "@/features/shared/types/snippet.server";
 import {filterSnippets} from "@/features/snippets/logic/filter";
 import {findRandomSnippets} from "@/features/snippets/infrastructure/repositories/snippet.repository.server";
 import {extractAutoCompleteDisabledRanges} from "@/features/snippets/logic/parsing/snippet-parser.server";

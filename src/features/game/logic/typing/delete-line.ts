@@ -1,6 +1,6 @@
 import {getLineStart, getPreviousLineEnd, isFirstCharacter, resetCharactersInRange} from "@/features/game/logic/typing/shared";
 import {AutoClosingMode} from "@/features/settings/types/autoclosing-mode";
-import {IParsedSnippet} from "@/shared/types/snippet";
+import {IParsedSnippet} from "@/features/shared/types/snippet";
 
 export function deleteLine(snippet: IParsedSnippet, position: number, autoClosingMode: AutoClosingMode): [IParsedSnippet, number] {
   if (position === 0) return [snippet, 0];

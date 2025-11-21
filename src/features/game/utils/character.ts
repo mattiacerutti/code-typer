@@ -1,5 +1,5 @@
-import {CharacterState} from "@/shared/types/character";
-import {ICharacter, WhitespaceTypes} from "@/shared/types/character";
+import {CharacterState} from "@/features/shared/types/character";
+import {ICharacter, WhitespaceTypes} from "@/features/shared/types/character";
 
 export function getCharacterText(char: ICharacter): string {
   switch (char.value) {

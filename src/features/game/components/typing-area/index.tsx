@@ -1,6 +1,6 @@
 import {createRef, useEffect} from "react";
 import useCodeHighlight from "@/features/game/hooks/useCodeHighlight";
-import {CharacterTypes, ICharacter, WhitespaceTypes} from "@/shared/types/character";
+import {CharacterTypes, ICharacter, WhitespaceTypes} from "@/features/shared/types/character";
 import {isGameFinished} from "@/features/game/logic/game-logic";
 import {GameStatus} from "@/features/game/types/game-status";
 import Caret from "./caret";
