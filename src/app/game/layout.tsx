@@ -2,10 +2,22 @@ import React from "react";
 import Link from "next/link";
 import {FaGithub} from "react-icons/fa";
 import ThemeToggle from "@/components/theme-toggle";
+import {Toaster} from "sonner";
 
 function GameLayout({children}: {children: React.ReactNode}) {
   return (
     <div className="flex min-h-screen w-screen flex-col">
+      <Toaster
+        position="bottom-right"
+        richColors
+        visibleToasts={1}
+        toastOptions={{
+          classNames: {
+            toast: "!bg-(--color-surface) !text-(--color-foreground) !border-none",
+            title: "!font-bold !text-sm",
+          },
+        }}
+      />
       <main className="flex w-full flex-1 flex-col items-center justify-center">
         <div className="max-xl:hidden">{children}</div>
         <p className="px-10 text-center text-lg xl:hidden">Website doesn&apos;t yet support mobile. Please visit using a desktop device.</p>

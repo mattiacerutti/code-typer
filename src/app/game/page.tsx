@@ -80,19 +80,14 @@ function Home() {
     activateLanguage(language);
   });
 
-  const activateLanguageWithSnippetEvent = useEffectEvent((snippetId: string) => {
+  const activateLanguageWithSnippetEvent = useEffectEvent((snippetId: string, defaultLanguage: ILanguage) => {
     resetStopwatch();
-    activateLanguageWithSnippet(snippetId);
+    activateLanguageWithSnippet(snippetId, defaultLanguage);
   });
 
   // Initialize game on available languages load
   useEffect(() => {
     if (!availableLanguages) return;
-
-    if (snippetIdFromUrl) {
-      activateLanguageWithSnippetEvent(snippetIdFromUrl);
-      return;
-    }
 
     const selectedLanguage = useSettingsStore.getState().selectedLanguage;
     const langId = selectedLanguage?.id ?? Object.keys(availableLanguages)[0];
@@ -100,6 +95,11 @@ function Home() {
 
     const languageToUse = availableLanguages[langId];
     if (!languageToUse) return;
+
+    if (snippetIdFromUrl) {
+      activateLanguageWithSnippetEvent(snippetIdFromUrl, languageToUse);
+      return;
+    }
 
     activateLanguageEvent(languageToUse);
   }, [availableLanguages, snippetIdFromUrl]);

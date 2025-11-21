@@ -8,6 +8,8 @@ import {IClientSnippet} from "@/features/shared/types/snippet";
 import useSettingsStore from "@/features/settings/stores/settings-store";
 import {AutoClosingMode} from "@/features/settings/types/autoclosing-mode";
 import {buildClientSnippets} from "@/features/snippets/services/build-client-snippets.client";
+import {toast} from "sonner";
+import {tryCatch} from "@/utils";
 
 export function useGameSnippets() {
   const language = useGameStore((state) => state.language);
@@ -25,9 +27,11 @@ export function useGameSnippets() {
 
   const {data: availableLanguages, isError: languagesError} = api.snippet.languages.useQuery();
   const {error: randomError, ...fetchRandomSnippets} = api.snippet.random.useMutation();
-  const {error: byIdError, ...fetchSnippetById} = api.snippet.byId.useMutation();
+  const fetchSnippetById = api.snippet.byId.useMutation({
+    retry: false,
+  });
 
-  const error = languagesError || randomError || byIdError;
+  const error = languagesError || randomError;
 
   const fetchSnippetsForLanguage = async (language: ILanguage): Promise<IClientSnippet[]> => {
     const autoClosingEnabled = autoClosingMode !== AutoClosingMode.DISABLED;
@@ -46,8 +50,16 @@ export function useGameSnippets() {
     initialize(language, snippets);
   };
 
-  const activateLanguageWithSnippet = async (snippetId: string) => {
-    const snippet = await fetchSnippetById.mutateAsync({snippetId});
+  const activateLanguageWithSnippet = async (snippetId: string, defaultLanguage: ILanguage) => {
+    const [snippet, error] = await tryCatch(fetchSnippetById.mutateAsync({snippetId}));
+    if (error) {
+      await activateLanguage(defaultLanguage);
+      toast("Snippet not found", {
+        description: "The snippet you requested does not exist.",
+      });
+      return;
+    }
+
     const language = availableLanguages![snippet.languageId];
     const snippetsQueue = await fetchRandomSnippets.mutateAsync({languageId: language.id});
 
