@@ -7,6 +7,7 @@ import {useGameStore} from "../state/game-store";
 import {useState} from "react";
 import SettingsModal from "@/features/settings/components/modal";
 import {IoSettingsSharp} from "react-icons/io5";
+import {ImShare2} from "react-icons/im";
 import useSettingsStore from "@/features/settings/stores/settings-store";
 
 interface IGameViewProps {
@@ -53,25 +54,41 @@ function GameView(props: IGameViewProps) {
     onGameFinished();
   };
 
+  console.log({currentSnippet});
+
   return (
     <>
       <SettingsModal isOpen={isSettingsModalOpen} closeModal={() => setIsSettingsModalOpen(false)} />
       <div className="flex flex-col items-center justify-center">
         <div className={`relative bottom-8 text-(--color-danger) ${!isCapsLockOn && "opacity-0"} text-2xl font-bold`}>Caps Lock is on</div>
-        <div className="flex flex-col items-center justify-center gap-10">
-          <div className="flex w-full flex-row">
+        <div className="flex flex-col items-center justify-end gap-10">
+          <div className="grid w-full grid-cols-[1fr_auto_1fr] items-center before:content-['']">
             <div className="flex h-full flex-1 justify-center">
               <div className="h-fit w-fit min-w-20 rounded-md bg-(--color-surface) px-4 py-2 text-center align-middle font-medium text-(--color-foreground)">
                 {humanizeTime(elapsedTime)}
               </div>
             </div>
-            <button
-              className="aspect-square h-auto w-fit rounded-md bg-(--color-accent) px-4 py-2 text-center font-medium text-(--color-accent-contrast) shadow-sm enabled:hover:bg-(--color-accent-hover) disabled:cursor-not-allowed disabled:opacity-20"
-              onClick={() => setIsSettingsModalOpen(true)}
-              disabled={status !== GameStatus.READY}
-            >
-              <IoSettingsSharp />
-            </button>
+            <div className="flex gap-2 justify-self-end">
+              <button
+                className="aspect-square h-auto w-fit rounded-md bg-(--color-accent) px-4 py-2 text-center font-medium text-(--color-accent-contrast) shadow-sm enabled:hover:bg-(--color-accent-hover) disabled:cursor-not-allowed disabled:opacity-20"
+                onClick={() => {
+                  const url = new URL(window.location.href);
+                  url.searchParams.set("snippet", currentSnippet.rawSnippet.id);
+                  navigator.clipboard.writeText(url.toString());
+                  console.log("Copied to clipboard:", url.toString());
+                }}
+                disabled={status !== GameStatus.READY}
+              >
+                <ImShare2 />
+              </button>
+              <button
+                className="aspect-square h-auto w-fit rounded-md bg-(--color-accent) px-4 py-2 text-center font-medium text-(--color-accent-contrast) shadow-sm enabled:hover:bg-(--color-accent-hover) disabled:cursor-not-allowed disabled:opacity-20"
+                onClick={() => setIsSettingsModalOpen(true)}
+                disabled={status !== GameStatus.READY}
+              >
+                <IoSettingsSharp />
+              </button>
+            </div>
           </div>
           <div className="relative h-fit w-fit">
             <TypingArea onGameFinished={handleSnippetFinished} />

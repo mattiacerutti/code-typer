@@ -3,6 +3,7 @@ import {ICharacter} from "@/features/shared/types/character";
 export type IParsedSnippet = ICharacter[];
 
 export interface IRawSnippet {
+  id: string;
   content: string;
   disabledRanges: {startIndex: number; endIndex: number}[];
 }

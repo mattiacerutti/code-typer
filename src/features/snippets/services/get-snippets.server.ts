@@ -1,6 +1,6 @@
 import {IRawSnippet} from "@/features/shared/types/snippet";
 import {filterSnippets} from "@/features/snippets/logic/filter";
-import {findRandomSnippets} from "@/features/snippets/infrastructure/repositories/snippet.repository.server";
+import {findRandomSnippets, findSnippetById} from "@/features/snippets/infrastructure/repositories/snippet.repository.server";
 import {extractAutoCompleteDisabledRanges} from "@/features/snippets/logic/parsing/snippet-parser.server";
 import {MAX_GET_SNIPPETS_ATTEMPTS, MIN_SNIPPETS_NUMBER, SNIPPETS_RETRIEVED_PER_QUERY} from "@/features/snippets/config/snippets.server";
 
@@ -17,6 +17,7 @@ export async function getRandomSnippets(languageId: string): Promise<IRawSnippet
       const disabledRanges = extractAutoCompleteDisabledRanges(snippet.content, languageId);
 
       return {
+        id: snippet.id,
         content: snippet.content,
         disabledRanges,
       };
@@ -32,4 +33,19 @@ export async function getRandomSnippets(languageId: string): Promise<IRawSnippet
   }
 
   return snippets.sort(() => Math.random() - 0.5);
+}
+
+export async function getSnippetById(snippetId: string): Promise<(IRawSnippet & {languageId: string}) | null> {
+  const snippet = await findSnippetById(snippetId);
+
+  if (!snippet) return null;
+
+  const disabledRanges = extractAutoCompleteDisabledRanges(snippet.content, snippet.languageId);
+
+  return {
+    id: snippet.id,
+    content: snippet.content,
+    disabledRanges,
+    languageId: snippet.languageId,
+  };
 }

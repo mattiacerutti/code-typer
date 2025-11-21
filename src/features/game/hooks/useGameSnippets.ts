@@ -25,8 +25,9 @@ export function useGameSnippets() {
 
   const {data: availableLanguages, isError: languagesError} = api.snippet.languages.useQuery();
   const {error: randomError, ...fetchRandomSnippets} = api.snippet.random.useMutation();
+  const {error: byIdError, ...fetchSnippetById} = api.snippet.byId.useMutation();
 
-  const error = languagesError || randomError;
+  const error = languagesError || randomError || byIdError;
 
   const fetchSnippetsForLanguage = async (language: ILanguage): Promise<IClientSnippet[]> => {
     const autoClosingEnabled = autoClosingMode !== AutoClosingMode.DISABLED;
@@ -42,6 +43,17 @@ export function useGameSnippets() {
   const activateLanguage = async (language: ILanguage) => {
     setSelectedLanguage(language);
     const snippets = await fetchSnippetsForLanguage(language);
+    initialize(language, snippets);
+  };
+
+  const activateLanguageWithSnippet = async (snippetId: string) => {
+    const snippet = await fetchSnippetById.mutateAsync({snippetId});
+    const language = availableLanguages![snippet.languageId];
+    const snippetsQueue = await fetchRandomSnippets.mutateAsync({languageId: language.id});
+
+    const rawSnippets = [snippet, ...snippetsQueue.filter((s) => s.id !== snippet.id)];
+    const snippets = buildClientSnippets(rawSnippets, autoClosingMode !== AutoClosingMode.DISABLED);
+
     initialize(language, snippets);
   };
 
@@ -80,6 +92,7 @@ export function useGameSnippets() {
   return {
     availableLanguages,
     activateLanguage,
+    activateLanguageWithSnippet,
     changeSnippet,
     error,
     isNextButtonLocked,
