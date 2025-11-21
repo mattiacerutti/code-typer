@@ -56,14 +56,15 @@ export function useGameSnippets() {
 
       if (backgroundFetchPromise.current) {
         await backgroundFetchPromise.current;
-        backgroundFetchPromise.current = null;
       } else if (language) {
         await activateLanguage(language);
         setIsNextButtonLocked(false);
         return;
       }
     } else if (snippetQueue.length <= 3 && !backgroundFetchPromise.current) {
-      backgroundFetchPromise.current = refillSnippetQueue(language!);
+      backgroundFetchPromise.current = refillSnippetQueue(language!).finally(() => {
+        backgroundFetchPromise.current = null;
+      });
     }
 
     const elapsedTime = Date.now() - startTime;
