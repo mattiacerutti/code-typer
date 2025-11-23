@@ -55,14 +55,17 @@ function GameView(props: IGameViewProps) {
     onGameFinished();
   };
 
-  const handleShareSnippet = () => {
+  const handleShareSnippet = async () => {
     const url = new URL(window.location.href);
     url.searchParams.set("snippet", currentSnippet.rawSnippet.id);
-    navigator.clipboard.writeText(url.toString());
-    toast.success("Snippet link copied to clipboard!");
+    try {
+      await navigator.clipboard.writeText(url.toString());
+      toast.success("Snippet link copied to clipboard!");
+    } catch {
+      toast.error("Failed to copy snippet link to clipboard.");
+      return;
+    }
   };
-
-  console.log({currentSnippet});
 
   return (
     <>
