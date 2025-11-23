@@ -9,6 +9,7 @@ import SettingsModal from "@/features/settings/components/modal";
 import {IoSettingsSharp} from "react-icons/io5";
 import {ImShare2} from "react-icons/im";
 import useSettingsStore from "@/features/settings/stores/settings-store";
+import {toast} from "sonner";
 
 interface IGameViewProps {
   onGameFinished: () => void;
@@ -54,6 +55,13 @@ function GameView(props: IGameViewProps) {
     onGameFinished();
   };
 
+  const handleShareSnippet = () => {
+    const url = new URL(window.location.href);
+    url.searchParams.set("snippet", currentSnippet.rawSnippet.id);
+    navigator.clipboard.writeText(url.toString());
+    toast.success("Snippet link copied to clipboard!");
+  };
+
   console.log({currentSnippet});
 
   return (
@@ -71,12 +79,7 @@ function GameView(props: IGameViewProps) {
             <div className="flex gap-2 justify-self-end">
               <button
                 className="aspect-square h-auto w-fit rounded-md bg-(--color-accent) px-4 py-2 text-center font-medium text-(--color-accent-contrast) shadow-sm enabled:hover:bg-(--color-accent-hover) disabled:cursor-not-allowed disabled:opacity-20"
-                onClick={() => {
-                  const url = new URL(window.location.href);
-                  url.searchParams.set("snippet", currentSnippet.rawSnippet.id);
-                  navigator.clipboard.writeText(url.toString());
-                  console.log("Copied to clipboard:", url.toString());
-                }}
+                onClick={handleShareSnippet}
                 disabled={status !== GameStatus.READY}
               >
                 <ImShare2 />
