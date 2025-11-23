@@ -1,4 +1,4 @@
-import React from "react";
+import React, {Suspense} from "react";
 import Link from "next/link";
 import {FaGithub} from "react-icons/fa";
 import ThemeToggle from "@/components/theme-toggle";
@@ -19,7 +19,9 @@ function GameLayout({children}: {children: React.ReactNode}) {
         }}
       />
       <main className="flex w-full flex-1 flex-col items-center justify-center">
-        <div className="max-xl:hidden">{children}</div>
+        <div className="max-xl:hidden">
+          <Suspense>{children}</Suspense>
+        </div>
         <p className="px-10 text-center text-lg xl:hidden">Website doesn&apos;t yet support mobile. Please visit using a desktop device.</p>
       </main>
       <footer className="flex items-center justify-center py-4 text-sm text-(--color-muted)">
