@@ -1,7 +1,6 @@
 import {prisma} from "@/server/prisma";
-import {Snippet} from "@prisma/client";
 
-export async function findRandomSnippets(languageId: string, quantity: number): Promise<Pick<Snippet, "id" | "content">[]> {
+export async function findRandomSnippets(languageId: string, quantity: number) {
   const snippets = await prisma.snippet.findManyRandom(quantity, {
     select: {
       id: true,
@@ -17,4 +16,33 @@ export async function findRandomSnippets(languageId: string, quantity: number): 
   });
 
   return snippets;
+}
+
+export async function findSnippetById(snippetId: string) {
+  const snippet = await prisma.snippet.findUnique({
+    where: {
+      id: snippetId,
+    },
+    select: {
+      id: true,
+      content: true,
+      fileVersion: {
+        select: {
+          file: {
+            select: {
+              languageId: true,
+            },
+          },
+        },
+      },
+    },
+  });
+
+  if (!snippet) return null;
+
+  return {
+    id: snippet.id,
+    content: snippet.content,
+    languageId: snippet.fileVersion.file.languageId,
+  };
 }

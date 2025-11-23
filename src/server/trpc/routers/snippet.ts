@@ -1,7 +1,7 @@
 import {TRPCError} from "@trpc/server";
 import {z} from "zod";
 import {createTRPCRouter, publicProcedure} from "@/server/trpc/trpc";
-import {getRandomSnippets} from "@/features/snippets/services/get-random-snippets.server";
+import {getRandomSnippets, getSnippetById} from "@/features/snippets/services/get-snippets.server";
 import {doesLanguageExist, getLanguages} from "@/features/snippets/infrastructure/repositories/language.repository.server";
 
 export const snippetRouter = createTRPCRouter({
@@ -23,5 +23,21 @@ export const snippetRouter = createTRPCRouter({
       }
 
       return getRandomSnippets(languageId);
+    }),
+  byId: publicProcedure
+    .input(
+      z.object({
+        snippetId: z.uuid(),
+      })
+    )
+    .mutation(async ({input}) => {
+      const snippetId = input.snippetId;
+      const snippet = await getSnippetById(snippetId);
+
+      if (!snippet) {
+        throw new TRPCError({code: "NOT_FOUND", message: "Snippet not found"});
+      }
+
+      return snippet;
     }),
 });

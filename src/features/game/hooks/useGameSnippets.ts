@@ -8,6 +8,8 @@ import {IClientSnippet} from "@/features/shared/types/snippet";
 import useSettingsStore from "@/features/settings/stores/settings-store";
 import {AutoClosingMode} from "@/features/settings/types/autoclosing-mode";
 import {buildClientSnippets} from "@/features/snippets/services/build-client-snippets.client";
+import {toast} from "sonner";
+import {tryCatch} from "@/utils";
 
 export function useGameSnippets() {
   const language = useGameStore((state) => state.language);
@@ -25,6 +27,9 @@ export function useGameSnippets() {
 
   const {data: availableLanguages, isError: languagesError} = api.snippet.languages.useQuery();
   const {error: randomError, ...fetchRandomSnippets} = api.snippet.random.useMutation();
+  const fetchSnippetById = api.snippet.byId.useMutation({
+    retry: false,
+  });
 
   const error = languagesError || randomError;
 
@@ -42,6 +47,25 @@ export function useGameSnippets() {
   const activateLanguage = async (language: ILanguage) => {
     setSelectedLanguage(language);
     const snippets = await fetchSnippetsForLanguage(language);
+    initialize(language, snippets);
+  };
+
+  const activateLanguageWithSnippet = async (snippetId: string, defaultLanguage: ILanguage) => {
+    const [snippet, error] = await tryCatch(fetchSnippetById.mutateAsync({snippetId}));
+    if (error) {
+      await activateLanguage(defaultLanguage);
+      toast("Snippet not found", {
+        description: "The snippet you requested does not exist.",
+      });
+      return;
+    }
+
+    const language = availableLanguages![snippet.languageId];
+    const snippetsQueue = await fetchRandomSnippets.mutateAsync({languageId: language.id});
+
+    const rawSnippets = [snippet, ...snippetsQueue.filter((s) => s.id !== snippet.id)];
+    const snippets = buildClientSnippets(rawSnippets, autoClosingMode !== AutoClosingMode.DISABLED);
+
     initialize(language, snippets);
   };
 
@@ -80,6 +104,7 @@ export function useGameSnippets() {
   return {
     availableLanguages,
     activateLanguage,
+    activateLanguageWithSnippet,
     changeSnippet,
     error,
     isNextButtonLocked,

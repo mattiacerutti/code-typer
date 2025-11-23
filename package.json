@@ -40,6 +40,7 @@
     "react-icons": "^5.5.0",
     "recharts": "^3.2.1",
     "rxjs": "^7.8.2",
+    "sonner": "^2.0.7",
     "tree-sitter": "0.21.1",
     "tree-sitter-c": "0.20.0",
     "tree-sitter-c-sharp": "0.23.1",

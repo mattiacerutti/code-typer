@@ -12,6 +12,7 @@ import {GameStatus} from "@/features/game/types/game-status";
 import {buildClientSnippets} from "@/features/snippets/services/build-client-snippets.client";
 import type {ILanguage} from "@/features/shared/types/language";
 import {AutoClosingMode} from "@/features/settings/types/autoclosing-mode";
+import {useSearchParams} from "next/navigation";
 
 function Home() {
   const status = useGameStore((state) => state.status);
@@ -23,6 +24,9 @@ function Home() {
   const autoClosingMode = useSettingsStore((state) => state.autoClosingMode);
 
   const [elapsedTime, setElapsedTime] = useState(0);
+
+  const searchParams = useSearchParams();
+  const snippetIdFromUrl = searchParams.get("snippet");
 
   const hiddenInputRef = useRef<HTMLInputElement | null>(null);
 
@@ -37,7 +41,7 @@ function Home() {
   };
 
   const {startStopwatch, stopStopwatch, resetStopwatch, getTime} = useStopwatch({onTick, onInterval: pushPositionSample});
-  const {availableLanguages, error, isNextButtonLocked, activateLanguage, changeSnippet} = useGameSnippets();
+  const {availableLanguages, error, isNextButtonLocked, activateLanguage, activateLanguageWithSnippet, changeSnippet} = useGameSnippets();
 
   const handleResetSnippet = () => {
     resetStopwatch();
@@ -76,6 +80,11 @@ function Home() {
     activateLanguage(language);
   });
 
+  const activateLanguageWithSnippetEvent = useEffectEvent((snippetId: string, defaultLanguage: ILanguage) => {
+    resetStopwatch();
+    activateLanguageWithSnippet(snippetId, defaultLanguage);
+  });
+
   // Initialize game on available languages load
   useEffect(() => {
     if (!availableLanguages) return;
@@ -87,8 +96,13 @@ function Home() {
     const languageToUse = availableLanguages[langId];
     if (!languageToUse) return;
 
+    if (snippetIdFromUrl) {
+      activateLanguageWithSnippetEvent(snippetIdFromUrl, languageToUse);
+      return;
+    }
+
     activateLanguageEvent(languageToUse);
-  }, [availableLanguages]);
+  }, [availableLanguages, snippetIdFromUrl]);
 
   // Every time autoclosing mode changes, reparse all snippets
   useEffect(() => {
